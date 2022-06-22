@@ -5,30 +5,65 @@
 #include <iostream>
 #include "webserv.h"
 
-#define PORT "3490"
+#define PORT 3490
 
 int main(int argc, char **argv) {
   struct sockaddr_in sockaddress;
 
+  int connections;
   int  sockfd = socket(AF_INET, SOCK_STREAM, 0);
   fcntl(sockfd, F_SETFL, O_NONBLOCK);
+  // setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, )
   if (sockfd == -1) {
     perror("socket");
     exit(errno);
   }
   sockaddress.sin_family = AF_INET;
-  sockaddress.sin_port = htons(3490);
+  sockaddress.sin_port = htons(PORT);
   sockaddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
   std::cout << sizeof(sockaddr) << " " << sizeof(sockaddr_in) << "\n";
   if (bind(sockfd, (const sockaddr *)&sockaddress, sizeof(sockaddr_in))) {
     perror("bind");
+    close(sockfd);
     exit(errno);
   }
   if (listen(sockfd, 5)) {
     perror("listen");
     exit(errno);
   }
+  struct pollfd pollfd[200];
+  memset(pollfd, 0, sizeof(pollfd));
+  pollfd[0].fd = sockfd;
+  pollfd[0].events = POLLIN;
+  char buf[512];
+  strncpy(buf, "hello world!\n", 13);
+  int new_sd;
+
+
+  while (1) {
+    connections = poll(pollfd, 1, 60000);
+    if (!connections)
+      break;
+    new_sd = accept(sockfd, NULL, NULL);
+    pollfd[1].fd = new_sd;
+    pollfd[1].events = POLLIN;
+    std::cout << "connection received\n";
+    if (send(pollfd[1].fd, buf, 13, 0) < 0) {
+      perror("send");
+      close(pollfd[1].fd);
+      exit(errno);
+    }
+    close(pollfd[1].fd);
+  }
+
+  close(pollfd[0].fd);
+  close(pollfd[1].fd);
+  close(sockfd);
+  std::cout << "poll timed out. Connection closed\n";
+}
+
+
   // s_addrinfo *result, *rp;
   // s_addrinfo hints;
   // memset(&hints, 0, sizeof(s_addrinfo));
@@ -44,5 +79,3 @@ int main(int argc, char **argv) {
   //   std::cerr << "error: addrinfo\n";
   //   exit(EXIT_FAILURE);
   // }
-  std::cout << "Socket ready: fd = " << sockfd << '\n';
-}
