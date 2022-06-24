@@ -1,0 +1,4 @@
+1 - server class
+2 - key - value / pollfd - port
+3 - parse configuration file, initialize server instances
+4 - read / write methods

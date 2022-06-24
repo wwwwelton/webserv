@@ -4,14 +4,19 @@
 #include <netdb.h>
 #include <iostream>
 #include "webserv.h"
+#include <set>
 
 #define PORT 3490
 
 int main(int argc, char **argv) {
   struct sockaddr_in sockaddress;
 
+
   int connections;
   int  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  //server( socket(AF_INET, SOCK_STREAM, 0), port);
+  // insert(15, server);
+
   fcntl(sockfd, F_SETFL, O_NONBLOCK);
   // setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, )
   if (sockfd == -1) {
@@ -51,6 +56,9 @@ int main(int argc, char **argv) {
       break;
     new_sd = accept(sockfd, NULL, NULL);
     pollfd[1].fd = new_sd;
+    // server = setserver[new_sd];
+    // server.accept();
+
     pollfd[1].events = POLLIN;
     std::cout << "connection received\n";
     if (send(pollfd[1].fd, buf, 74, 0) < 0) {
