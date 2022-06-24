@@ -10,7 +10,8 @@ Server::Server(void) {
   _socket();
 }
 
-Server::Server(uint16_t port, int backlog) {
+Server::Server(uint16_t _port, int backlog) {
+  this->port = _port;
   _socket();
   _bind(port);
   _listen(backlog);

@@ -1,11 +1,13 @@
 //Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
 //Creation date: 21/06/2022
 
+#include <set>
+#include <map>
 #include <netdb.h>
 #include <iostream>
+#include <utility>
 #include "webserv.h"
 #include "Server.hpp"
-#include <set>
 
 #define PORT 3490
 
@@ -16,7 +18,13 @@ int main(int argc, char** argv) {
   socklen_t sockaddrlen = sizeof(sockaddress);
   int    connections;
   int    new_sd, nfds, currentsize;
+  std::map<int, Server*> serverlist;
 
+
+  serverlist.insert(std::make_pair(server1.sockfd, &server1));
+  Server *serverptr;
+  serverptr = serverlist[server1.sockfd];
+  std::cout << serverptr->port << "\n";
   memset(pollfd, 0, sizeof(pollfd));
   pollfd[0].fd = server1.sockfd;
   pollfd[0].events = POLLIN;
