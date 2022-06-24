@@ -12,8 +12,10 @@
 int main(void) {
   Server server1(PORT, 5);
   struct pollfd pollfd[200];
+  struct sockaddr_in sockaddress;
+  socklen_t sockaddrlen = sizeof(sockaddress);
   int    connections;
-  int    new_sd;
+  int    new_sd, nfds, currentsize;
 
   memset(pollfd, 0, sizeof(pollfd));
   pollfd[0].fd = server1.sockfd;
@@ -24,22 +26,49 @@ int main(void) {
           "Content-Type: text/plain\n"
           "Content-Length: 12\n\n"
           "Hello world!\n", 74);
+  nfds = 1;
   while (1) {
-    connections = poll(pollfd, 1, 60000);
-    if (!connections)
+    connections = poll(pollfd, nfds, 60000);
+    std::cout << "poll returned with " << connections << " connections\n";
+    if (connections <= 0) {
+      std::cout << "webserver timed out with no connections\n";
       break;
-    new_sd = accept(server1.sockfd, NULL, NULL);
-    pollfd[1].fd = new_sd;
-
-    pollfd[1].events = POLLIN;
-    std::cout << "connection received\n";
-    if (send(pollfd[1].fd, buf, 74, 0) < 0) {
-      perror("send");
-      close(pollfd[1].fd);
-      exit(errno);
     }
-    std::cout << "message sent\n";
-    close(pollfd[1].fd);
+    currentsize = nfds;
+    for (int i = 0; i < nfds; i++) {
+      if (pollfd[i].revents == 0) {
+        std::cout << "no events in fd " << pollfd[i].fd << "\n";
+        continue;
+      }
+      std::cout << "event found in fd " << pollfd[i].fd << "\n";
+      if (pollfd[i].fd == server1.sockfd) {
+        std::cout << "listening socket is readable\n";
+        new_sd = accept(server1.sockfd,
+                       (sockaddr *)&sockaddress,
+                       &sockaddrlen);
+        std::cout << "accepted on port: "
+                  << ntohs(sockaddress.sin_port) << "\n";
+        while (new_sd != -1) {
+          pollfd[nfds].fd = new_sd;
+          pollfd[nfds].events = POLLIN;
+          std::cout << "connection received\n";
+          nfds++;
+          new_sd = accept(server1.sockfd, NULL, NULL);
+        }
+      }
+      else {
+        if (send(pollfd[i].fd, buf, 74, 0) < 0) {
+          perror("send");
+          close(pollfd[i].fd);
+          exit(errno);
+        }
+        std::cout << "message sent\n";
+        close(pollfd[i].fd);
+        pollfd[i].fd = -1;
+      }
+    }
+    std::cout << "end of loop, poll\n";
+    std::cout << "\n========================\n\n";
   }
   close(pollfd[0].fd);
   close(pollfd[1].fd);
