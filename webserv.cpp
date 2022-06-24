@@ -37,7 +37,11 @@ int main(int argc, char **argv) {
   pollfd[0].fd = sockfd;
   pollfd[0].events = POLLIN;
   char buf[512];
-  strncpy(buf, "hello world!\n", 13);
+  strncpy(buf, \
+  "HTTP/1.1 200 OK\n" \
+  "Content-Type: text/plain\n" \
+  "Content-Length: 12\n\n" \
+  "Hello world!\n", 74);
   int new_sd;
 
 
@@ -49,7 +53,7 @@ int main(int argc, char **argv) {
     pollfd[1].fd = new_sd;
     pollfd[1].events = POLLIN;
     std::cout << "connection received\n";
-    if (send(pollfd[1].fd, buf, 13, 0) < 0) {
+    if (send(pollfd[1].fd, buf, 74, 0) < 0) {
       perror("send");
       close(pollfd[1].fd);
       exit(errno);
