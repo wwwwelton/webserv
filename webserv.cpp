@@ -12,6 +12,8 @@
 int main(int argc, char** argv) {
   Server server1(PORT, 5);
   struct pollfd pollfd[200];
+  struct sockaddr_in sockaddress;
+  socklen_t sockaddrlen = sizeof(sockaddress);
   int    connections;
   int    new_sd, nfds, currentsize;
 
@@ -41,7 +43,11 @@ int main(int argc, char** argv) {
       std::cout << "event found in fd " << pollfd[i].fd << "\n";
       if (pollfd[i].fd == server1.sockfd) {
         std::cout << "listening socket is readable\n";
-        new_sd = accept(server1.sockfd, NULL, NULL);
+        new_sd = accept(server1.sockfd,
+                       (sockaddr *)&sockaddress,
+                       &sockaddrlen);
+        std::cout << "accepted on port: "
+                  << ntohs(sockaddress.sin_port) << "\n";
         while (new_sd != -1) {
           pollfd[nfds].fd = new_sd;
           pollfd[nfds].events = POLLIN;
@@ -62,6 +68,7 @@ int main(int argc, char** argv) {
       }
     }
     std::cout << "end of loop, poll\n";
+    std::cout << "\n========================\n\n";
   }
   close(pollfd[0].fd);
   close(pollfd[1].fd);
