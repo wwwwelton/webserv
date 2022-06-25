@@ -7,7 +7,7 @@ int init(char **argv,
                  std::map<int, Server*>* map,
                  pollfd *pollfds) {
   int i = 0;
-  struct server_config* configfile = readconfig(argv);
+  struct server_config** configfile = readconfig(argv);
 
   while (i < 1) {
     (void)configfile;

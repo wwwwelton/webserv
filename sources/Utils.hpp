@@ -13,6 +13,6 @@ struct server_config {
   std::string root;
 };
 
-struct server_config* readconfig(char** argv);
+struct server_config** readconfig(char** argv);
 
 #endif  // UTILS_HPP_
