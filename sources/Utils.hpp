@@ -5,6 +5,8 @@
 #define UTILS_HPP_
 
 #include <string>
+#include <vector>
+
 #include "webserv.h"
 
 struct server_config {
@@ -13,6 +15,6 @@ struct server_config {
   std::string root;
 };
 
-struct server_config** readconfig(char** argv);
+std::vector<struct server_config> readconfig(char** argv);
 
 #endif  // UTILS_HPP_

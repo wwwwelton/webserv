@@ -18,6 +18,7 @@ int accept_connections(pollfd *pollfds, int socketfd, int nfds) {
 
 void send_messages(pollfd *pollfds, int i, char *buf, char *buf2) {
   int rc;
+  (void)rc;
   rc = recv(pollfds[i].fd, buf, sizeof(buf) - 74, 0);
   rc = send(pollfds[i].fd, buf2, 74, 0);
   close(pollfds[i].fd);
