@@ -1,6 +1,9 @@
 //Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
 //Creation date: 23/06/2022
 
+#ifndef SERVER_HPP
+# define SERVER_HPP
+
 #include <string>
 #include "webserv.h"
 
@@ -28,6 +31,8 @@ public:
   void _listen(int backlog);
   // virtual void accept_connections(pollfd* pollfd) = 0;
 };
+
+#endif  // SERVER_HPP
 
 /*
 server {

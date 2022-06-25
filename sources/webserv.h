@@ -17,7 +17,14 @@
 #include <map>
 #include "Server.hpp"
 
+#include <string>
+
+#include "Utils.hpp"
+
 typedef struct addrinfo s_addrinfo;
-int init(char **configfile, std::map<int, Server*>* map, pollfd *pollfds);
+int init(char **argv, std::map<int, Server*>* map, pollfd *pollfds);
+
+#define PORT1 3490
+#define PORT2 3491
 
 #endif  // WEBSERV_H

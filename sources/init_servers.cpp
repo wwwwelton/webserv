@@ -3,11 +3,11 @@
 
 #include "webserv.h"
 
-int init(char **configfile,
+int init(char **argv,
                  std::map<int, Server*>* map,
                  pollfd *pollfds) {
   int i = 0;
-  (void)configfile;
+  struct server_config* configfile = readconfig(argv);
 
   while (i < 1) {
     Server *tmp = new Server;

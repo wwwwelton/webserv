@@ -10,9 +10,9 @@ OBJECTS =	$(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 HEADERS =	$(addprefix $(SRC_DIR)/, $(HDR_FIL))
 
-HDR_FIL =	webserv.h Server.hpp
+HDR_FIL =	webserv.h Server.hpp Utils.hpp
 
-SRC_FIL =	webserv.cpp Server.cpp
+SRC_FIL =	webserv.cpp Server.cpp Utils.cpp init_servers.cpp
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 				$(CC) $(CFLAGS) -c $< -o $@

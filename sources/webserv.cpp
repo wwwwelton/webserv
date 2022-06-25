@@ -7,12 +7,11 @@
 #include <iostream>
 #include <utility>
 #include "webserv.h"
-#include "Server.hpp"
 
-#define PORT 3490
-
-int main(void) {
-  Server server1(PORT, 5);
+int main(int argc, char **argv) {
+  (void)argc;
+  (void)argv;
+  Server server1(PORT1, 5);
   struct pollfd pollfd[200];
   memset(pollfd, 0, sizeof(pollfd));
   std::map<int, Server*> serverlist;
@@ -37,6 +36,8 @@ int main(void) {
   int    connections;
   int    new_sd, nfds, currentsize;
   nfds = 1;
+  (void)rc;
+  (void)currentsize;
   while (1) {
     connections = poll(pollfd, nfds, 60000);
     if (connections <= 0) {
