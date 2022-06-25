@@ -7,25 +7,24 @@
 #define PORT1 3490
 #define PORT2 3491
 
-#include <errno.h>
-#include <fcntl.h>
-#include <poll.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <fcntl.h>
+#include <poll.h>
 #include <unistd.h>
+#include <netdb.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <cerrno>
 #include <map>
 #include <set>
-#include <netdb.h>
 #include <iostream>
 #include <utility>
-#include "Server.hpp"
-
 #include <string>
 
+
+#include "Server.hpp"
 #include "Utils.hpp"
 
 class Server;

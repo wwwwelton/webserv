@@ -1,25 +1,15 @@
 //Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
 //Creation date: 21/06/2022
 
-#include <set>
-#include <map>
-#include <netdb.h>
-#include <iostream>
-#include <utility>
 #include "webserv.h"
 
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
-  Server server1(PORT1, 5);
   struct pollfd pollfd[200];
   memset(pollfd, 0, sizeof(pollfd));
   std::map<int, Server*> serverlist;
-        // socketFD, server
   std::map<int, int>     clientlist;
-        // clientFD, socketFD
-  pollfd[0].fd = server1.sockfd;
-  pollfd[0].events = POLLIN;
 
 
   char buf[512000];
@@ -29,13 +19,12 @@ int main(int argc, char **argv) {
           "Content-Type: text/plain\n"
           "Content-Length: 12\n\n"
           "Hello world!\n", 74);
-  serverlist.insert(std::make_pair(server1.sockfd, &server1));
 
 
   int rc;
-  int    connections;
-  int    new_sd, nfds, currentsize;
-  nfds = 1;
+  int connections;
+  int new_sd, nfds, currentsize;
+  nfds = init(argv, &serverlist, pollfd);
   (void)rc;
   (void)currentsize;
   while (1) {
@@ -49,12 +38,12 @@ int main(int argc, char **argv) {
         continue;
       }
       if (serverlist[pollfd[i].fd]) {
-        new_sd = accept(server1.sockfd, NULL, NULL);
+        new_sd = accept(pollfd[i].fd, NULL, NULL);
         while (new_sd != -1) {
           pollfd[nfds].fd = new_sd;
           pollfd[nfds].events = POLLIN;
           nfds++;
-          new_sd = accept(server1.sockfd, NULL, NULL);
+          new_sd = accept(pollfd[i].fd, NULL, NULL);
         }
       }
       else {

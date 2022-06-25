@@ -9,11 +9,10 @@ int init(char **argv,
   int i = 0;
   struct server_config** configfile = readconfig(argv);
 
-  while (i < 1) {
-    (void)configfile;
+  while (configfile[i]) {
     Server *tmp = new Server;
     tmp->_socket();
-    tmp->_bind(3490);
+    tmp->_bind(configfile[i]->listen);
     tmp->_listen(500);
 
     map->insert(std::make_pair(tmp->sockfd, tmp));
