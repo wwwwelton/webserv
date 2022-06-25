@@ -4,17 +4,4 @@
 #ifndef UTILS_HPP_
 #define UTILS_HPP_
 
-#include <string>
-#include <vector>
-
-#include "webserv.h"
-
-struct server_config {
-  int listen;
-  std::string server_name;
-  std::string root;
-};
-
-std::vector<struct server_config> readconfig(char** argv);
-
 #endif  // UTILS_HPP_

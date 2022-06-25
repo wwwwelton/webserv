@@ -7,7 +7,7 @@ int init(char** argv,
          std::map<int, Server*>* map,
          pollfd* pollfds) {
   size_t i;
-  std::vector<struct server_config> configfile = readconfig(argv);
+  ServerConfig configfile(argv);
 
   for (i = 0; i < configfile.size(); i++) {
     Server* tmp = new Server;

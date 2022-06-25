@@ -26,6 +26,7 @@
 
 
 #include "Server.hpp"
+#include "ServerConfig.hpp"
 #include "Utils.hpp"
 
 class Server;
