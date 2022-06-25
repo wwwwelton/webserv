@@ -33,7 +33,7 @@ int main(void) {
   serverlist.insert(std::make_pair(server1.sockfd, &server1));
 
 
-  int rc, len;
+  int rc;
   int    connections;
   int    new_sd, nfds, currentsize;
   nfds = 1;

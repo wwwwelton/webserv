@@ -14,7 +14,10 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <map>
+#include "Server.hpp"
 
 typedef struct addrinfo s_addrinfo;
+int init(char **configfile, std::map<int, Server*>* map, pollfd *pollfds);
 
 #endif  // WEBSERV_H
