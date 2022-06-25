@@ -14,13 +14,15 @@
 int main(void) {
   Server server1(PORT, 5);
   struct pollfd pollfd[200];
-  // struct sockaddr_in sockaddress;
-  // socklen_t sockaddrlen = sizeof(sockaddress);
-  int    connections;
-  int    new_sd, nfds, currentsize;
   memset(pollfd, 0, sizeof(pollfd));
+  std::map<int, Server*> serverlist;
+        // socketFD, server
+  std::map<int, int>     clientlist;
+        // clientFD, socketFD
   pollfd[0].fd = server1.sockfd;
   pollfd[0].events = POLLIN;
+
+
   char buf[512000];
   char buf2[512000];
   strncpy(buf2,
@@ -28,70 +30,43 @@ int main(void) {
           "Content-Type: text/plain\n"
           "Content-Length: 12\n\n"
           "Hello world!\n", 74);
-  nfds = 1;
+  serverlist.insert(std::make_pair(server1.sockfd, &server1));
 
-
-  std::map<int, Server*> serverlist;
-        // socketFD, server
-  std::map<int, int>     clientlist;
-        // clientFD, socketFD
 
   int rc, len;
-  serverlist.insert(std::make_pair(server1.sockfd, &server1));
-  Server *serverptr;
-  serverptr = serverlist[server1.sockfd];
-  std::cout << server1.port << "\n";
-  std::cout << serverptr->port << "\n";
-
-
+  int    connections;
+  int    new_sd, nfds, currentsize;
+  nfds = 1;
   while (1) {
     connections = poll(pollfd, nfds, 60000);
-    std::cout << "poll returned with " << connections << " connections\n";
     if (connections <= 0) {
-      std::cout << "webserver timed out with no connections\n";
       break;
     }
     currentsize = nfds;
     for (int i = 0; i < nfds; i++) {
       if (pollfd[i].revents == 0) {
-        std::cout << "no events in fd " << pollfd[i].fd << "\n";
         continue;
       }
-      std::cout << "event found in fd " << pollfd[i].fd << "\n";
-      if (pollfd[i].fd == server1.sockfd) {
-        std::cout << "listening socket is readable\n";
+      if (serverlist[pollfd[i].fd]) {
         new_sd = accept(server1.sockfd, NULL, NULL);
         while (new_sd != -1) {
           pollfd[nfds].fd = new_sd;
           pollfd[nfds].events = POLLIN;
-          std::cout << "connection received\n";
           nfds++;
           new_sd = accept(server1.sockfd, NULL, NULL);
         }
       }
       else {
         rc = recv(pollfd[i].fd, buf, sizeof(buf) - 74, 0);
-        buf[rc] = '\0';
-        std::cout << buf << '\n';
-        len = rc;
-        std::cout << "bytes received: " << len << "\n";
         rc = send(pollfd[i].fd, buf2, 74, 0);
-        if (rc < 0) {
-          perror("send");
-          close(pollfd[i].fd);
-          exit(errno);
-        }
-        std::cout << "message sent with " << rc << " bytes\n";
         close(pollfd[i].fd);
         pollfd[i].fd = -1;
       }
     }
-    std::cout << "end of loop, poll\n";
-    std::cout << "\n========================\n\n";
   }
+  // mem move poll fds
   close(pollfd[0].fd);
   close(pollfd[1].fd);
-  std::cout << "poll timed out. Connection closed\n";
 }
 
 
