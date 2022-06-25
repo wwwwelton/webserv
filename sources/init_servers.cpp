@@ -7,12 +7,12 @@ int init(char** argv,
          std::map<int, Server*>* map,
          pollfd* pollfds) {
   size_t i;
-  ServerConfig configfile(argv);
+  ServerConfig configfiles(argv);
 
-  for (i = 0; i < configfile.size(); i++) {
+  for (i = 0; i < configfiles.size(); i++) {
     Server* tmp = new Server;
     tmp->_socket();
-    tmp->_bind(configfile[i].listen);
+    tmp->_bind(configfiles[i].listen);
     tmp->_listen(500);
 
     map->insert(std::make_pair(tmp->sockfd, tmp));
