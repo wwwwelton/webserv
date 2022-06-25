@@ -5,8 +5,7 @@
 #define UTILS_HPP_
 
 #include <string>
-
-
+#include "webserv.h"
 
 struct server_config {
   int listen;

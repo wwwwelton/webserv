@@ -10,6 +10,7 @@ int init(char **argv,
   struct server_config* configfile = readconfig(argv);
 
   while (i < 1) {
+    (void)configfile;
     Server *tmp = new Server;
     tmp->_socket();
     tmp->_bind(3490);
