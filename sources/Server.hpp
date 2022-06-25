@@ -20,7 +20,6 @@ public:
   int             sockfd;
   std::string     root;
   std::string     server_name;
-  struct clientfd clients[200];
 
   Server(void);
   Server(uint16_t port, int backlog);

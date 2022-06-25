@@ -3,6 +3,27 @@
 
 #include "webserv.h"
 
+int accept_connections(pollfd *pollfds, int socketfd, int nfds) {
+  int new_sd;
+
+  new_sd = accept(socketfd, NULL, NULL);
+  while (new_sd != -1) {
+    pollfds[nfds].fd = new_sd;
+    pollfds[nfds].events = POLLIN;
+    nfds++;
+    new_sd = accept(socketfd, NULL, NULL);
+  }
+  return nfds;
+}
+
+void send_messages(pollfd *pollfds, int i, char *buf, char *buf2) {
+  int rc;
+  rc = recv(pollfds[i].fd, buf, sizeof(buf) - 74, 0);
+  rc = send(pollfds[i].fd, buf2, 74, 0);
+  close(pollfds[i].fd);
+  pollfds[i].fd = -1;
+}
+
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
@@ -21,11 +42,9 @@ int main(int argc, char **argv) {
           "Hello world!\n", 74);
 
 
-  int rc;
   int connections;
-  int new_sd, nfds, currentsize;
+  int nfds, currentsize;
   nfds = init(argv, &serverlist, pollfd);
-  (void)rc;
   (void)currentsize;
   while (1) {
     connections = poll(pollfd, nfds, 60000);
@@ -34,30 +53,19 @@ int main(int argc, char **argv) {
     }
     currentsize = nfds;
     for (int i = 0; i < nfds; i++) {
-      if (pollfd[i].revents == 0) {
+      if (pollfd[i].revents == 0)
         continue;
-      }
-      if (serverlist[pollfd[i].fd]) {
-        new_sd = accept(pollfd[i].fd, NULL, NULL);
-        while (new_sd != -1) {
-          pollfd[nfds].fd = new_sd;
-          pollfd[nfds].events = POLLIN;
-          nfds++;
-          new_sd = accept(pollfd[i].fd, NULL, NULL);
-        }
-      }
-      else {
-        rc = recv(pollfd[i].fd, buf, sizeof(buf) - 74, 0);
-        rc = send(pollfd[i].fd, buf2, 74, 0);
-        close(pollfd[i].fd);
-        pollfd[i].fd = -1;
-      }
+      if (serverlist[pollfd[i].fd])
+        nfds = accept_connections(pollfd, pollfd[i].fd, nfds);
+      else
+        send_messages(pollfd, i, buf, buf2);
     }
   }
   // mem move poll fds
   close(pollfd[0].fd);
   close(pollfd[1].fd);
 }
+
 
 
 // s_addrinfo *result, *rp;
