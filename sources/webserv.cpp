@@ -25,6 +25,19 @@ void send_messages(pollfd *pollfds, int i, char *buf, char *buf2) {
   pollfds[i].fd = -1;
 }
 
+int compress_array(pollfd *pollfds, int nfds) {
+  for (int i = 0; i < nfds; i++) {
+    if (pollfds[i].fd == -1) {
+      for (int j = i; j < nfds - 1; j++)
+        pollfds[j].fd = pollfds[j + 1].fd;
+      i--;
+      nfds--;
+    }
+  }
+  return nfds;
+}
+
+
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
@@ -43,31 +56,39 @@ int main(int argc, char **argv) {
           "Hello world!\n", 74);
 
 
-  int connections;
-  int nfds, currentsize;
+  int connections, nfds, currentsize;
+  int compress = false;
   nfds = init(argv, &serverlist, pollfd);
   (void)currentsize;
   while (1) {
+    std::cout << '\n';
     connections = poll(pollfd, nfds, 60000);
-    if (connections <= 0) {
+    if (connections <= 0)
       break;
-    }
     currentsize = nfds;
-    for (int i = 0; i < nfds; i++) {
-      if (pollfd[i].revents == 0)
+    for (int i = 0; i < currentsize; i++) {
+      if (pollfd[i].revents == 0) {
         continue;
-      if (serverlist[pollfd[i].fd])
+        std::cout << pollfd[i].fd << " has no events\n";
+      }
+      if (serverlist[pollfd[i].fd]) {
+        std::cout << pollfd[i].fd << " socket has events\n";
         nfds = accept_connections(pollfd, pollfd[i].fd, nfds);
-      else
+      }
+      else {
+        std::cout << pollfd[i].fd << " client has events\n";
         send_messages(pollfd, i, buf, buf2);
+        compress = true;
+      }
+    }
+    if (compress) {
+      compress = false;
+      nfds = compress_array(pollfd, nfds);
     }
   }
-  // mem move poll fds
-  close(pollfd[0].fd);
-  close(pollfd[1].fd);
+  for (int i = 0; i < nfds; i++)
+    close(pollfd[i].fd);
 }
-
-
 
 // s_addrinfo *result, *rp;
 // s_addrinfo hints;
