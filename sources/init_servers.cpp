@@ -5,7 +5,7 @@
 
 int init(char** argv,
          std::map<int, Server*>* map,
-         pollfd* pollfds) {
+         std::vector<_pollfd>* pollfds) {
   size_t i;
   ServerConfig configfiles(argv);
 
@@ -16,8 +16,7 @@ int init(char** argv,
     tmp->_listen(500);
 
     map->insert(std::make_pair(tmp->sockfd, tmp));
-    pollfds[i].fd = tmp->sockfd;
-    pollfds[i].events = POLLIN;
+    pollfds->push_back(_pollfd(tmp->sockfd, POLLIN));
   }
 
   return i;

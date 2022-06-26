@@ -28,11 +28,13 @@
 #include "Server.hpp"
 #include "ServerConfig.hpp"
 #include "Utils.hpp"
+#include "Pollfd.hpp"
 
 class Server;
 
 typedef struct addrinfo s_addrinfo;
-int init(char **argv, std::map<int, Server*>* map, pollfd *pollfds);
+int init(char **argv, std::map<int, Server*>* map,
+         std::vector<_pollfd>* pollfds);
 
 
 #endif  // WEBSERV_H

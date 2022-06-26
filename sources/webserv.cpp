@@ -3,48 +3,41 @@
 
 #include "webserv.h"
 
-int accept_connections(pollfd *pollfds, int socketfd, int nfds) {
+void accept_connections(std::vector<_pollfd>* pollfds, int socketfd) {
   int new_sd;
 
   new_sd = accept(socketfd, NULL, NULL);
   while (new_sd != -1) {
-    pollfds[nfds].fd = new_sd;
-    pollfds[nfds].events = POLLIN;
-    nfds++;
+    pollfds->push_back(_pollfd(new_sd, POLLIN));
     new_sd = accept(socketfd, NULL, NULL);
   }
-  return nfds;
 }
 
-void send_messages(pollfd *pollfds, int i, char *buf, char *buf2) {
+void send_messages(std::vector<_pollfd>* pollfds, int i, char *buf, char *buf2){
   int rc;
   (void)rc;
-  rc = recv(pollfds[i].fd, buf, sizeof(buf) - 74, 0);
-  rc = send(pollfds[i].fd, buf2, 74, 0);
-  close(pollfds[i].fd);
-  pollfds[i].fd = -1;
+  rc = recv((*pollfds)[i].fd, buf, sizeof(buf) - 74, 0);
+  rc = send((*pollfds)[i].fd, buf2, 74, 0);
+  close((*pollfds)[i].fd);
+  (*pollfds)[i].fd = -1;
 }
 
-int compress_array(pollfd *pollfds, int nfds) {
-  for (int i = 0; i < nfds; i++) {
-    if (pollfds[i].fd == -1) {
-      for (int j = i; j < nfds - 1; j++)
-        pollfds[j].fd = pollfds[j + 1].fd;
-      i--;
-      nfds--;
-    }
+void compress_array(std::vector<_pollfd> *pollfds) {
+  std::vector<_pollfd>::iterator it = pollfds->begin();
+  std::vector<_pollfd>::iterator ite = pollfds->end();
+  for (; it != ite; it++) {
+    if (it->fd == -1)
+      pollfds->erase(it);
   }
-  return nfds;
 }
 
 
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
-  struct pollfd pollfd[200];
-  memset(pollfd, 0, sizeof(pollfd));
   std::map<int, Server*> serverlist;
   std::map<int, int>     clientlist;
+  std::vector<_pollfd>   pollfds(15);
 
 
   char buf[512000];
@@ -56,37 +49,36 @@ int main(int argc, char **argv) {
           "Hello world!\n", 74);
 
 
-  int connections, nfds;
+  int connections;
   int compress = false;
-  nfds = init(argv, &serverlist, pollfd);
+  init(argv, &serverlist, &pollfds);
   while (1) {
-    std::cout << '\n';
-    connections = poll(pollfd, nfds, 60000);
+    connections =
+      poll((struct pollfd*)&(*pollfds.begin()), pollfds.size(), 60000);
+    std::cout << "returned connections: " << connections << '\n';
     if (connections <= 0)
       break;
-    for (int i = 0, size = nfds; i < size; i++) {
-      std::cout << size << '\n';
-      if (pollfd[i].revents == 0) {
+    for (int i = 0, size = pollfds.size(); i < size; i++) {
+      if (pollfds[i].revents == 0) {
         continue;
-        std::cout << pollfd[i].fd << " has no events\n";
       }
-      if (serverlist[pollfd[i].fd]) {
-        std::cout << pollfd[i].fd << " socket has events\n";
-        nfds = accept_connections(pollfd, pollfd[i].fd, nfds);
+      if (serverlist[pollfds[i].fd]) {
+        std::cout << pollfds[i].fd << " socket has events\n";
+        accept_connections(&pollfds, pollfds[i].fd);
       }
       else {
-        std::cout << pollfd[i].fd << " client has events\n";
-        send_messages(pollfd, i, buf, buf2);
+        std::cout << pollfds[i].fd << " client has events\n";
+        send_messages(&pollfds, i, buf, buf2);
         compress = true;
       }
     }
     if (compress) {
       compress = false;
-      nfds = compress_array(pollfd, nfds);
+      compress_array(&pollfds);
     }
   }
-  for (int i = 0; i < nfds; i++)
-    close(pollfd[i].fd);
+  for (size_t i = 0; i < pollfds.size(); i++)
+    close(pollfds[i].fd);
 }
 
 // s_addrinfo *result, *rp;
