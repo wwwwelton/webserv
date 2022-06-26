@@ -13,10 +13,15 @@ void accept_connections(std::vector<_pollfd>* pollfds, int socketfd) {
   }
 }
 
-void send_messages(std::vector<_pollfd>* pollfds, int i, char *buf, char *buf2){
+void send_messages(std::vector<_pollfd>* pollfds, int i){
+  static char buf[512000];
+  static char buf2[512000] = "HTTP/1.1 200 OK\n"
+                             "Content-Type: text/plain\n"
+                             "Content-Length: 12\n\n"
+                             "Hello world!\n";
   int rc;
-  (void)rc;
-  rc = recv((*pollfds)[i].fd, buf, sizeof(buf) - 74, 0);
+
+  rc = recv((*pollfds)[i].fd, buf, sizeof(buf), 0);
   rc = send((*pollfds)[i].fd, buf2, 74, 0);
   close((*pollfds)[i].fd);
   (*pollfds)[i].fd = -1;
@@ -37,26 +42,16 @@ int main(int argc, char **argv) {
   (void)argv;
   std::map<int, Server*> serverlist;
   std::map<int, int>     clientlist;
-  std::vector<_pollfd>   pollfds(15);
+  std::vector<_pollfd>   pollfds;
+  int conn, compress = false;
 
 
-  char buf[512000];
-  char buf2[512000];
-  strncpy(buf2,
-          "HTTP/1.1 200 OK\n"
-          "Content-Type: text/plain\n"
-          "Content-Length: 12\n\n"
-          "Hello world!\n", 74);
 
-
-  int connections;
-  int compress = false;
   init(argv, &serverlist, &pollfds);
   while (1) {
-    connections =
-      poll((struct pollfd*)&(*pollfds.begin()), pollfds.size(), 60000);
-    std::cout << "returned connections: " << connections << '\n';
-    if (connections <= 0)
+    conn = poll((struct pollfd*)&(*pollfds.begin()), pollfds.size(), 60000);
+    std::cout << "returned connections: " << conn << '\n';
+    if (conn <= 0)
       break;
     for (int i = 0, size = pollfds.size(); i < size; i++) {
       if (pollfds[i].revents == 0) {
@@ -68,7 +63,7 @@ int main(int argc, char **argv) {
       }
       else {
         std::cout << pollfds[i].fd << " client has events\n";
-        send_messages(&pollfds, i, buf, buf2);
+        send_messages(&pollfds, i);
         compress = true;
       }
     }
