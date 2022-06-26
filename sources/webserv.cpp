@@ -56,17 +56,16 @@ int main(int argc, char **argv) {
           "Hello world!\n", 74);
 
 
-  int connections, nfds, currentsize;
+  int connections, nfds;
   int compress = false;
   nfds = init(argv, &serverlist, pollfd);
-  (void)currentsize;
   while (1) {
     std::cout << '\n';
     connections = poll(pollfd, nfds, 60000);
     if (connections <= 0)
       break;
-    currentsize = nfds;
-    for (int i = 0; i < currentsize; i++) {
+    for (int i = 0, size = nfds; i < size; i++) {
+      std::cout << size << '\n';
       if (pollfd[i].revents == 0) {
         continue;
         std::cout << pollfd[i].fd << " has no events\n";
