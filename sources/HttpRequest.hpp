@@ -7,9 +7,9 @@
 
 class Server;
 
-class HttpRequest: public HttpBase {
-public:
-  static httpform handler(int fd, Server *host);
-};
+// class HttpRequest: public HttpBase {
+// public:
+//   static httpform handler(int fd, Server *host);
+// };
 
 #endif //HTTPREQUEST_HPP

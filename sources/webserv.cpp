@@ -1,10 +1,10 @@
-//Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
-//Creation date: 21/06/2022
+// Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
+// Creation date: 21/06/2022
 
 #include "webserv.h"
 
-void accept_connections(std::vector<_pollfd>* pollfds,
-                        std::map<int, Server*>*clientlist,
+void accept_connections(std::vector<_pollfd> *pollfds,
+                        std::map<int, Server *> *clientlist,
                         Server *host) {
   int new_sd;
 
@@ -16,14 +16,16 @@ void accept_connections(std::vector<_pollfd>* pollfds,
   }
 }
 
-void send_messages(int fd, std::map<int, Server*>* clientlist){
-  t_httpform form;
+void send_messages(int fd, std::map<int, Server *> *clientlist) {
+  Request req;
+  RequestHandler req_handler;
+  Response res;
 
-  // rc = recv(fd, buf, sizeof(buf), 0);
-
-  form = HttpRequest::handler(fd, (*clientlist)[fd]);
-  // process
-  HttpResponse::handler(fd, form);
+  //   req = Request(fd, clientlist[fd]);
+  req = Request(fd);
+  req_handler = RequestHandler(req);
+  res = req_handler._response();
+  res._send(fd);
   clientlist->erase(fd);
 }
 
@@ -36,18 +38,17 @@ void compress_array(std::vector<_pollfd> *pollfds) {
   }
 }
 
-
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
-  std::map<int, Server*> serverlist;
-  std::map<int, Server*> clientlist;
-  std::vector<_pollfd>   pollfds;
+  std::map<int, Server *> serverlist;
+  std::map<int, Server *> clientlist;
+  std::vector<_pollfd> pollfds;
   int conn, compress = false;
 
   init(argv, &serverlist, &pollfds);
   while (1) {
-    conn = poll((struct pollfd*)&(*pollfds.begin()), pollfds.size(), 60000);
+    conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 60000);
     std::cout << "returned connections: " << conn << '\n';
     if (conn <= 0)
       break;
@@ -58,8 +59,7 @@ int main(int argc, char **argv) {
       if (serverlist[pollfds[i].fd]) {
         std::cout << pollfds[i].fd << " socket has events\n";
         accept_connections(&pollfds, &clientlist, serverlist[pollfds[i].fd]);
-      }
-      else {
+      } else {
         std::cout << pollfds[i].fd << " client has events\n";
         send_messages(pollfds[i].fd, &clientlist);
         close(pollfds[i].fd);
