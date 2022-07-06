@@ -29,6 +29,10 @@
 #include "ServerConfig.hpp"
 #include "Utils.hpp"
 #include "Pollfd.hpp"
+#include "HttpBase.hpp"
+#include "HttpRequest.hpp"
+#include "Httpform.hpp"
+#include "HttpResponse.hpp"
 
 class Server;
 

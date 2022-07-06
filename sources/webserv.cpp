@@ -3,28 +3,28 @@
 
 #include "webserv.h"
 
-void accept_connections(std::vector<_pollfd>* pollfds, int socketfd) {
+void accept_connections(std::vector<_pollfd>* pollfds,
+                        std::map<int, Server*>*clientlist,
+                        Server *host) {
   int new_sd;
 
-  new_sd = accept(socketfd, NULL, NULL);
+  new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
+    clientlist->insert(std::make_pair(new_sd, host));
     pollfds->push_back(_pollfd(new_sd, POLLIN));
-    new_sd = accept(socketfd, NULL, NULL);
+    new_sd = accept(host->sockfd, NULL, NULL);
   }
 }
 
-void send_messages(std::vector<_pollfd>* pollfds, int i){
-  static char buf[512000];
-  static char buf2[512000] = "HTTP/1.1 200 OK\n"
-                             "Content-Type: text/plain\n"
-                             "Content-Length: 12\n\n"
-                             "Hello world!\n";
-  int rc;
+void send_messages(int fd, std::map<int, Server*>* clientlist){
+  t_httpform form;
 
-  rc = recv((*pollfds)[i].fd, buf, sizeof(buf), 0);
-  rc = send((*pollfds)[i].fd, buf2, 74, 0);
-  close((*pollfds)[i].fd);
-  (*pollfds)[i].fd = -1;
+  // rc = recv(fd, buf, sizeof(buf), 0);
+
+  form = HttpRequest::handler(fd, (*clientlist)[fd]);
+  // process
+  HttpResponse::handler(fd, form);
+  clientlist->erase(fd);
 }
 
 void compress_array(std::vector<_pollfd> *pollfds) {
@@ -41,11 +41,9 @@ int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
   std::map<int, Server*> serverlist;
-  std::map<int, int>     clientlist;
+  std::map<int, Server*> clientlist;
   std::vector<_pollfd>   pollfds;
   int conn, compress = false;
-
-
 
   init(argv, &serverlist, &pollfds);
   while (1) {
@@ -59,11 +57,13 @@ int main(int argc, char **argv) {
       }
       if (serverlist[pollfds[i].fd]) {
         std::cout << pollfds[i].fd << " socket has events\n";
-        accept_connections(&pollfds, pollfds[i].fd);
+        accept_connections(&pollfds, &clientlist, serverlist[pollfds[i].fd]);
       }
       else {
         std::cout << pollfds[i].fd << " client has events\n";
-        send_messages(&pollfds, i);
+        send_messages(pollfds[i].fd, &clientlist);
+        close(pollfds[i].fd);
+        pollfds[i].fd = -1;
         compress = true;
       }
     }

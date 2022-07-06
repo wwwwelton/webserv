@@ -11,14 +11,15 @@ OBJECTS =	$(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 HEADERS =	$(addprefix $(SRC_DIR)/, $(HDR_FIL))
 
 HDR_FIL =	webserv.h Server.hpp Utils.hpp ServerConfig.hpp Pollfd.hpp
+HDR_FIL += HttpRequest.hpp HttpBase.hpp HttpResponse.hpp
 
 SRC_FIL =		webserv.cpp Server.cpp Utils.cpp init_servers.cpp ServerConfig.cpp
-SRC_FIL +=	Pollfd.cpp
+SRC_FIL +=	Pollfd.cpp HttpBase.cpp HttpRequest.cpp HttpResponse.cpp
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 				$(CC) $(CFLAGS) -c $< -o $@
 
-CC =		clang++
+CC =		c++
 CFLAGS =	-Wall -Wextra -Werror
 CFLAGS +=	-std=c++98 -pedantic-errors
 
@@ -29,7 +30,7 @@ all:		$(NAME)
 bonus:		$(NAME)
 
 $(NAME):	$(OBJ_DIR) $(OBJECTS) $(HEADERS)
-			$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME)
+			$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) -I ./sources
 
 $(OBJ_DIR):
 			mkdir -p $(OBJ_DIR)
