@@ -32,7 +32,6 @@
 #include "HttpBase.hpp"
 #include "HttpRequest.hpp"
 #include "Httpform.hpp"
-#include "HttpResponse.hpp"
 
 class Server;
 
