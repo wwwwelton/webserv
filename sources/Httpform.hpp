@@ -1,29 +1,13 @@
 #ifndef HTTPFORM_HPP
 #define HTTPFORM_HPP
 
+#include "HttpRequest.hpp"
+
 #include <sys/socket.h>
 #include <sys/types.h>
 
 #include <map>
 #include <string>
-
-struct Request {
-  std::map<std::string, std::string> headers;
-  char *method;
-  char *path;
-  char *http_version;
-  char *host;
-  char *body;
-  int bodysize;
-
-  Request(void) {
-    return;
-  }
-
-  Request(int fd) {
-    recv(fd, HttpBase::buffer_req, 512000, MSG_NOSIGNAL);
-  }
-};
 
 struct Response {
   std::map<std::string, std::string> headers;
@@ -43,7 +27,7 @@ struct RequestHandler {
     return;
   }
 
-  RequestHandler(Request req) {
+  RequestHandler(Request& req) {
     (void)req;
     return;
   }

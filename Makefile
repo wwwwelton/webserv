@@ -20,7 +20,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 				$(CC) $(CFLAGS) -c $< -o $@
 
 CC =		c++
-CFLAGS =	-Wall -Wextra -Werror
+CFLAGS =	-Wall -Wextra -Werror -g
 CFLAGS +=	-std=c++98 -pedantic-errors
 
 RM =		rm -rf
