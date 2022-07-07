@@ -11,10 +11,10 @@ OBJECTS =	$(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 HEADERS =	$(addprefix $(SRC_DIR)/, $(HDR_FIL))
 
 HDR_FIL =	webserv.h Server.hpp Utils.hpp ServerConfig.hpp Pollfd.hpp
-HDR_FIL += HttpRequest.hpp HttpBase.hpp
+HDR_FIL += HttpRequest.hpp HttpBase.hpp HttpHandler.hpp
 
 SRC_FIL =		webserv.cpp Server.cpp Utils.cpp init_servers.cpp ServerConfig.cpp
-SRC_FIL +=	Pollfd.cpp HttpBase.cpp HttpRequest.cpp
+SRC_FIL +=	Pollfd.cpp HttpBase.cpp HttpRequest.cpp HttpHandler.cpp
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
 				$(CC) $(CFLAGS) -c $< -o $@

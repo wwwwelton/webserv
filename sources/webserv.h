@@ -4,8 +4,8 @@
 #ifndef WEBSERV_H
 #define WEBSERV_H
 
-#define PORT1 3490
-#define PORT2 3491
+#define PORT1 3492
+#define PORT2 3493
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -32,6 +32,7 @@
 #include "HttpBase.hpp"
 #include "HttpRequest.hpp"
 #include "Httpform.hpp"
+#include "HttpHandler.hpp"
 
 class Server;
 

@@ -9,32 +9,14 @@
 #include <map>
 #include <string>
 
-struct Response {
-  std::map<std::string, std::string> headers;
-  char *path;
-  char *http_version;
-  int status_code;
-  char *status_code_description;
-  char *host;
+// struct RequestHandler {
+//   RequestHandler(void) {
+//     return;
+//   }
 
-  void _send(int fd) {
-    send(fd, HttpBase::buffer_resp, 74, 0);
-  }
-};
-
-struct RequestHandler {
-  RequestHandler(void) {
-    return;
-  }
-
-  RequestHandler(Request& req) {
-    (void)req;
-    return;
-  }
-
-  Response _response(void) {
-    return (Response());
-  }
-};
+//   RequestHandler(Request& req) {
+//     (void)req;
+//     return;
+//   }
 
 #endif  // HTTPFORM_HPP
