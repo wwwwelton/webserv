@@ -1,15 +1,32 @@
-#ifndef HTTPREQUEST_HPP
-# define HTTPREQUEST_HPP
+#pragma once
+#ifndef HTTP_REQUEST_HPP
+# define HTTP_REQUEST_HPP
 
+#include "HttpRequest.hpp"
 #include "HttpBase.hpp"
-#include "Httpform.hpp"
-#include "Server.hpp"
 
-class Server;
+#include <sys/socket.h>
+#include <exception>
+#include <map>
+#include <string>
+#include <cstring>
 
-// class HttpRequest: public HttpBase {
-// public:
-//   static httpform handler(int fd, Server *host);
-// };
+struct Request {
+  std::map<std::string, std::string> headers;
+  std::string method;
+  std::string path;
+  std::string http_version;
+  std::string host;
+  std::string body;
+  int body_size;
 
-#endif //HTTPREQUEST_HPP
+  Request(int fd);
+
+  ~Request();
+
+private:
+  char *raw;
+
+};
+
+#endif // !HTTP_REQUEST_HPP

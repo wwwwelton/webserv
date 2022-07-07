@@ -17,12 +17,11 @@ void accept_connections(std::vector<_pollfd> *pollfds,
 }
 
 void send_messages(int fd, std::map<int, Server *> *clientlist) {
-  Request req;
   RequestHandler req_handler;
   Response res;
 
   //   req = Request(fd, clientlist[fd]);
-  req = Request(fd);
+  Request req = Request(fd);
   req_handler = RequestHandler(req);
   res = req_handler._response();
   res._send(fd);
