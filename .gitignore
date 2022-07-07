@@ -3,3 +3,5 @@ ibmserver.cpp
 a.out
 webserv
 objects
+.cache
+compile_commands.json
