@@ -36,6 +36,12 @@ void Server::_bind(uint16_t port) {
   sockaddress.sin_family = AF_INET;
   sockaddress.sin_port = htons(port);
   sockaddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+  int yes = 1;
+  if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes)) {
+    perror("setsockopt");
+    exit(42);
+  }
   if (bind(sockfd, (const sockaddr*)&sockaddress, sizeof(sockaddr_in))) {
     perror("bind");
     close(sockfd);
