@@ -18,6 +18,7 @@ struct server_config {
 
 class ServerConfig {
  public:
+  ServerConfig(void);
   explicit ServerConfig(char** file);
   ServerConfig(const ServerConfig& src);
   ~ServerConfig(void);
@@ -28,7 +29,6 @@ class ServerConfig {
   size_t size(void);
 
  private:
-  ServerConfig(void);
   std::vector<struct server_config> _servers;
 };
 

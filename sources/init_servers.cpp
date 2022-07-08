@@ -3,11 +3,19 @@
 
 #include "webserv.h"
 
-int init(char** argv,
+int init(int argc,
+         char** argv,
          std::map<int, Server*>* map,
          std::vector<_pollfd>* pollfds) {
   size_t i;
-  ServerConfig configfiles(argv);
+  ServerConfig configfiles;
+
+  if (argc != 1) {
+    std::cerr << "Error: Too many arguments!\n";
+    return (-1);
+  }
+
+  configfiles = ServerConfig(argv);
 
   for (i = 0; i < configfiles.size(); i++) {
     Server* tmp = new Server;

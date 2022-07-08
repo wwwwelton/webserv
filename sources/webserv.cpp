@@ -38,14 +38,14 @@ void compress_array(std::vector<_pollfd> *pollfds) {
 }
 
 int main(int argc, char **argv) {
-  (void)argc;
-  (void)argv;
   std::map<int, Server *> serverlist;
   std::map<int, Server *> clientlist;
   std::vector<_pollfd> pollfds;
   int conn, compress = false;
 
-  init(argv, &serverlist, &pollfds);
+  if (init(argc, argv, &serverlist, &pollfds) <= 0)
+    exit(1);
+
   while (1) {
     conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 60000);
     std::cout << "returned connections: " << conn << '\n';

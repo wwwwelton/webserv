@@ -7,36 +7,35 @@
 #define PORT1 3492
 #define PORT2 3493
 
+#include <fcntl.h>
+#include <netdb.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <fcntl.h>
-#include <poll.h>
 #include <unistd.h>
-#include <netdb.h>
-#include <cstring>
-#include <cstdlib>
-#include <cstdio>
+
 #include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
 #include <map>
 #include <set>
-#include <vector>
-#include <iostream>
-#include <utility>
 #include <string>
+#include <utility>
+#include <vector>
 
-
+#include "HttpBase.hpp"
+#include "HttpHandler.hpp"
+#include "HttpRequest.hpp"
+#include "Pollfd.hpp"
 #include "Server.hpp"
 #include "ServerConfig.hpp"
-#include "Pollfd.hpp"
-#include "HttpBase.hpp"
-#include "HttpRequest.hpp"
-#include "HttpHandler.hpp"
 
 class Server;
 
 typedef struct addrinfo s_addrinfo;
-int init(char **argv, std::map<int, Server*>* map,
+int init(int argc, char** argv, std::map<int, Server*>* map,
          std::vector<_pollfd>* pollfds);
-
 
 #endif  // WEBSERV_H
