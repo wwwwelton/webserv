@@ -1,11 +1,11 @@
-CC			= c++
-CFLAGS	= -g3 -Wall -Wextra -Werror -Wno-long-long -std=c++98 -pedantic
-CFLAGS	+= -MMD -MP
+CC      = c++
+CFLAGS  = -g3 -Wall -Wextra -Werror -Wno-long-long -std=c++98 -pedantic
+CFLAGS  += -MMD -MP
 
-INCPATH	= -I./sources
-NAME 		= webserv
+INCPATH = -I./sources
+NAME    = webserv
 
-SRC			= HttpBase.cpp \
+SRC     = HttpBase.cpp \
           HttpHandler.cpp \
           HttpRequest.cpp \
           Pollfd.cpp \
@@ -14,7 +14,7 @@ SRC			= HttpBase.cpp \
           init_servers.cpp \
           webserv.cpp
 
-INC			= HttpBase.hpp \
+INC     = HttpBase.hpp \
           HttpHandler.hpp \
           HttpRequest.hpp \
           Pollfd.hpp \
@@ -22,22 +22,22 @@ INC			= HttpBase.hpp \
           ServerConfig.hpp \
           defines.hpp
 
-OBJDIR	= objects
-OBJ			= $(SRC:%.cpp=$(OBJDIR)/%.o)
-DEPS		= $(SRC:%.cpp=$(OBJDIR)/%.d)
+OBJDIR  = objects
+SRC_DIR =	sources
+OBJ     = $(SRC:%.cpp=$(OBJDIR)/%.o)
+DEPS    = $(SRC:%.cpp=$(OBJDIR)/%.d)
 
 vpath %.cpp sources
 vpath %.hpp sources
 vpath %.h   sources
-SRC_DIR =	sources
+
+all: $(NAME)
 
 $(NAME): $(OBJDIR) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 $(OBJDIR)/%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ $(INCPATH)
-
-OBJ_DIR =	objects
 
 clean:
 	rm -rf $(OBJDIR)
@@ -48,9 +48,11 @@ fclean: clean
 $(OBJDIR):
 	mkdir -p objects
 
-re:			clean all
+re: clean all
 
-run:		$(NAME)
-			./$(NAME)
+run: $(NAME)
+	./$(NAME)
 
-.PHONY:		all clean fclean re
+.PHONY: all clean fclean re
+
+-include $(DEPS)
