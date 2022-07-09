@@ -4,12 +4,6 @@
 
 RequestHandler::meth_map RequestHandler::methodptr = RequestHandler::init_map();
 
-std::string RequestHandler::methods[3] = {
-  "GET",
-  "POST",
-  "DELETE",
-};
-
 RequestHandler::meth_map RequestHandler::init_map(void) {
   meth_map _map;
   _map["GET"] = &RequestHandler::_get;
@@ -18,40 +12,35 @@ RequestHandler::meth_map RequestHandler::init_map(void) {
   return _map;
 }
 
-RequestHandler::funcptr RequestHandler::fptr[3] = {
-  &RequestHandler::_get,
-  &RequestHandler::_post,
-  &RequestHandler::_delete,
-};
-
 void Response::_send(int fd) {
   send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
 }
 
 void RequestHandler::_get(void) {
-  std::cout << "get function\n";
-  return;
+  if (path == root)
+    _get_body("./server_root/wink");
+  else if (access(path.c_str(), F_OK)) {
+    statuscode = "404 ";
+    statusmsg = "FAIL\n";
+    _get_body(root + server->error_page[404]);
+  }
+  else
+    _get_body(path);
 }
 
-void RequestHandler::_post(void) {
-  return;
-}
-
-void RequestHandler::_delete(void) {
-  return;
-}
-
-void RequestHandler::process(void) {
+void RequestHandler::_get_body(std::string body_path) {
   std::ifstream in;
-  std::string str = "HTTP/1.1 200 OK\n"
-                    "Content-Type: text/html\n"
-                    "Content-Length: LENGTH\n\n";
+  std::string str = httpversion +
+                    statuscode +
+                    statusmsg +
+                    DFL_CONTENTTYPE +
+                    DFL_CONTENTLEN;
   std::string body;
   std::string size;
   std::stringstream ss;
 
   char buf[BUFFER_SIZE + 1];
-  in.open("./server_root/wink");
+  in.open(body_path.c_str());
   while (in.good()) {
     in.get(buf, BUFFER_SIZE, 0);
     body += buf;
@@ -67,14 +56,27 @@ void RequestHandler::process(void) {
   in.close();
 }
 
+void RequestHandler::_post(void) {
+  return;
+}
+
+void RequestHandler::_delete(void) {
+  return;
+}
+
+void RequestHandler::process(void) {
+  (this->*methodptr[method])();
+}
+
 RequestHandler::RequestHandler(void) { }
 RequestHandler::RequestHandler(Request const& req, Server *_server)
-: failresponse("FAIL\n"), okresponse("OK\n"), httpversion("HTTP/1.1 "),
-  statuscode("200 ")
+: httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
 {
-  std::cout << req;
-  (void)req;
+  std::cout << req << "\n";
   server = _server;
+  path = "./" + server->root + req.path;
+  root = "./" + server->root + "/";
+  std::cout << root << "\n";
+  std::cout << path << "\n";
   method = req.method;
-  (this->*RequestHandler::methodptr["GET"])();
 }
