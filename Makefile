@@ -50,4 +50,7 @@ $(OBJDIR):
 
 re:			clean all
 
+run:		$(NAME)
+			./$(NAME)
+
 .PHONY:		all clean fclean re
