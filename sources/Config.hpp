@@ -5,6 +5,8 @@
 #ifndef SERVER_CONFIG_HPP_
 #define SERVER_CONFIG_HPP_
 
+#include <arpa/inet.h>
+
 #include <string>
 #include <vector>
 
