@@ -16,7 +16,7 @@ Config::Config(char** file) {
   _servers.push_back(new Server());
 
   _servers[0]->ip = htonl(INADDR_LOOPBACK);
-  _servers[0]->port = PORT1;
+  _servers[0]->port = htons(PORT1);
   _servers[0]->server_name.push_back(std::string("www.localhost"));
   _servers[0]->server_name.push_back(std::string("localhost"));
   _servers[0]->root = std::string(DEFAULT_SERVER_ROOT);
@@ -35,7 +35,7 @@ Config::Config(char** file) {
   _servers.push_back(new Server());
 
   _servers[1]->ip = htonl(INADDR_LOOPBACK);
-  _servers[1]->port = PORT2;
+  _servers[1]->port = htons(PORT2);
   _servers[1]->server_name.push_back(std::string("www.localhost2"));
   _servers[1]->server_name.push_back(std::string("localhost2"));
   _servers[1]->root = std::string(DEFAULT_SERVER_ROOT);
