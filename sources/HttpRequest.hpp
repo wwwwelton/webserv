@@ -5,11 +5,9 @@
 #include "HttpRequest.hpp"
 #include "HttpBase.hpp"
 
-#include <sys/socket.h>
-#include <exception>
 #include <map>
 #include <string>
-#include <cstring>
+#include <vector>
 
 struct Request {
   std::map<std::string, std::string> headers;
@@ -24,8 +22,15 @@ struct Request {
 
   ~Request();
 
+  bool is_valid() const ;
+
 private:
+  bool valid;
   char *raw;
+  size_t nbytes;
+
+  std::vector<std::string>* tokenize_request(char *payload);
+  void parse_request(std::vector<std::string>* tokens);
 
 };
 
