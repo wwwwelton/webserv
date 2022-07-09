@@ -8,6 +8,8 @@
 #define DEFAULT_TIMEOUT 300
 #define DEFAULT_ROUTE_METHOD "ALL"
 #define DEFAULT_ROOT "root"
-#define DEFAULT_CLIENT_MAX_BODY_SIZE 1
+#define DEFAULT_CLI_MAX_BODY_SIZE 1
+#define DEFAULT_SERVER_ROOT "server_root"
+#define DEFAULT_BACKLOG 500;
 
 #endif  // DEFINES_H

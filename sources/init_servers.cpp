@@ -10,17 +10,15 @@ int init(int argc,
   (void)argc;
 
   size_t i;
-  ServerConfig configfiles;
+  Config configs;
 
-  configfiles = ServerConfig(argv);
+  configs = Config(argv);
 
-  for (i = 0; i < configfiles.size(); i++) {
-    Server* tmp = new Server;
-    tmp->port = htons(PORT1 + i);
-    tmp->_connect(500);
+  for (i = 0; i < configs.size(); i++) {
+    configs[i]->_connect(configs.backlog);
 
-    map->insert(std::make_pair(tmp->sockfd, tmp));
-    pollfds->push_back(_pollfd(tmp->sockfd, POLLIN));
+    map->insert(std::make_pair(configs[i]->sockfd, configs[i]));
+    pollfds->push_back(_pollfd(configs[i]->sockfd, POLLIN));
   }
 
   return i;
