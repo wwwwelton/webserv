@@ -22,7 +22,8 @@ void send_messages(int fd, std::map<int, Server *> *clientlist) {
 
   //   req = Request(fd, clientlist[fd]);
   Request req = Request(fd);
-  req_handler = RequestHandler(req);
+  req_handler = RequestHandler(req, (*clientlist)[fd]);
+  req_handler.process();
   res = req_handler._response();
   res._send(fd);
   clientlist->erase(fd);

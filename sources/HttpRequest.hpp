@@ -33,5 +33,5 @@ private:
   void parse_request(std::vector<std::string>* tokens);
 
 };
-
+std::ostream& operator<<(std::ostream& out, const Request& request);
 #endif // !HTTP_REQUEST_HPP
