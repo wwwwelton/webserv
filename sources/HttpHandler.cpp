@@ -72,11 +72,8 @@ RequestHandler::RequestHandler(void) { }
 RequestHandler::RequestHandler(Request const& req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
 {
-  std::cout << req << "\n";
   server = _server;
   path = "./" + server->root + req.path;
   root = "./" + server->root + "/";
-  std::cout << root << "\n";
-  std::cout << path << "\n";
   method = req.method;
 }
