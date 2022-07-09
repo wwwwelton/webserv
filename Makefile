@@ -48,7 +48,7 @@ fclean: clean
 $(OBJDIR):
 	mkdir -p objects
 
-re: clean all
+re: fclean all
 
 run: $(NAME)
 	./$(NAME)
