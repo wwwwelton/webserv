@@ -30,12 +30,13 @@
 #include "HttpRequest.hpp"
 #include "Pollfd.hpp"
 #include "Server.hpp"
-#include "ServerConfig.hpp"
+#include "Config.hpp"
 #include "defines.hpp"
 
 class Server;
 
 typedef struct addrinfo s_addrinfo;
+
 int init(int argc, char** argv, std::map<int, Server*>* map,
          std::vector<_pollfd>* pollfds);
 

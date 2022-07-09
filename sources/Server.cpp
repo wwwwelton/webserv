@@ -4,15 +4,7 @@
 #include "Server.hpp"
 
 Server::Server(void) {
-  ip = htonl(INADDR_LOOPBACK);
-  port = 0;
-  server_name = std::vector<std::string>();
-  root = std::string("");
-  index = std::vector<std::string>();
-  error_page = std::map<int, std::string>();
-  timeout = DEFAULT_TIMEOUT;
-  location = std::map<std::string, server_location>();
-  sockfd = -1;
+  return;
 }
 
 Server::~Server(void) {
@@ -48,7 +40,8 @@ void Server::_bind(void) {
 }
 
 void Server::_listen(int backlog) {
-  if (listen(sockfd, backlog)) {
+  (void)backlog;
+  if (listen(sockfd, 500)) {
     perror("listen");
     exit(errno);
   }

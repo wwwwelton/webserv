@@ -10,7 +10,7 @@ SRC			= HttpBase.cpp \
           HttpRequest.cpp \
           Pollfd.cpp \
           Server.cpp \
-          ServerConfig.cpp \
+          Config.cpp \
           init_servers.cpp \
           webserv.cpp
 
@@ -19,7 +19,7 @@ INC			= HttpBase.hpp \
           HttpRequest.hpp \
           Pollfd.hpp \
           Server.hpp \
-          ServerConfig.hpp \
+          Config.hpp \
           defines.hpp
 
 OBJDIR	= objects
