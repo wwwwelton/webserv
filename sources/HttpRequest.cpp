@@ -107,7 +107,6 @@ std::vector<std::string>* Request::tokenize_request(char *payload) {
     this->body.append(line);
   }
 
-  std::cout << "request: " << *this << std::endl;
   return 0;
 }
 
