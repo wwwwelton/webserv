@@ -10,7 +10,7 @@ RequestHandler::RequestHandler(void) { }
 RequestHandler::RequestHandler(Request const& req) {
   std::ifstream in;
   std::string str = "HTTP/1.1 200 OK\n"
-                    "Content-Type: text/plain\n"
+                    "Content-Type: text/html\n"
                     "Content-Length: LENGTH\n\n";
   std::string body;
   std::string size;
