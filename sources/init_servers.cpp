@@ -7,21 +7,17 @@ int init(int argc,
          char** argv,
          std::map<int, Server*>* map,
          std::vector<_pollfd>* pollfds) {
+  (void)argc;
+
   size_t i;
   ServerConfig configfiles;
-
-  if (argc != 1) {
-    std::cerr << "Error: Too many arguments!\n";
-    return (-1);
-  }
 
   configfiles = ServerConfig(argv);
 
   for (i = 0; i < configfiles.size(); i++) {
     Server* tmp = new Server;
-    tmp->_socket();
-    tmp->_bind(configfiles[i].listen);
-    tmp->_listen(500);
+    tmp->port = htons(PORT1 + i);
+    tmp->_connect(500);
 
     map->insert(std::make_pair(tmp->sockfd, tmp));
     pollfds->push_back(_pollfd(tmp->sockfd, POLLIN));

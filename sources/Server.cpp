@@ -1,20 +1,18 @@
-//Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
-//Creation date: 24/06/2022
+// Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
+// Creation date: 24/06/2022
 
 #include "Server.hpp"
-#include <netdb.h>
-
-#define PORT 3490
 
 Server::Server(void) {
-  _socket();
-}
-
-Server::Server(uint16_t _port, int backlog) {
-  this->port = _port;
-  _socket();
-  _bind(port);
-  _listen(backlog);
+  ip = htonl(INADDR_LOOPBACK);
+  port = 0;
+  server_name = std::vector<std::string>();
+  root = std::string("");
+  index = std::vector<std::string>();
+  error_page = std::map<int, std::string>();
+  timeout = DEFAULT_TIMEOUT;
+  location = std::map<std::string, server_location>();
+  sockfd = -1;
 }
 
 Server::~Server(void) {
@@ -30,12 +28,12 @@ void Server::_socket(void) {
   fcntl(sockfd, F_SETFL, O_NONBLOCK);
 }
 
-void Server::_bind(uint16_t port) {
+void Server::_bind(void) {
   struct sockaddr_in sockaddress;
 
   sockaddress.sin_family = AF_INET;
-  sockaddress.sin_port = htons(port);
-  sockaddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+  sockaddress.sin_port = port;
+  sockaddress.sin_addr.s_addr = ip;
 
   int yes = 1;
   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes)) {
@@ -54,4 +52,11 @@ void Server::_listen(int backlog) {
     perror("listen");
     exit(errno);
   }
+}
+
+int Server::_connect(int backlog) {
+  _socket();
+  _bind();
+  _listen(backlog);
+  return 0;
 }

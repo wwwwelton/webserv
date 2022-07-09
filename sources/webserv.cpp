@@ -43,8 +43,7 @@ int main(int argc, char **argv) {
   std::vector<_pollfd> pollfds;
   int conn, compress = false;
 
-  if (init(argc, argv, &serverlist, &pollfds) <= 0)
-    exit(1);
+  init(argc, argv, &serverlist, &pollfds);
 
   while (1) {
     conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 60000);

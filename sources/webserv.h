@@ -31,6 +31,7 @@
 #include "Pollfd.hpp"
 #include "Server.hpp"
 #include "ServerConfig.hpp"
+#include "defines.hpp"
 
 class Server;
 
