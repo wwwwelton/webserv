@@ -44,10 +44,10 @@ int main(int argc, char **argv) {
   std::map<int, Server *> clientlist;
   std::vector<_pollfd> pollfds;
   int conn, compress = false;
-  Logger logger;
+  Logger logger(LVL_DEBUG);
 
   init(argc, argv, &serverlist, &pollfds);
-  logger.info() << "initializing webserv" << std::endl;
+  logger.debug() << "initializing webserv" << std::endl;
 
   while (1) {
     conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 60000);

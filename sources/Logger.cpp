@@ -9,6 +9,8 @@
 #define WARNING "WARNING"
 #define ERROR   "ERROR"
 
+Logger::NullStream Logger::_null_stream;
+
 void Logger::_init_colors() {
   this->_level_colors[DEBUG]    = "\x1b[0m";
   this->_level_colors[NORMAL]   = "\x1b[0m";
@@ -18,21 +20,24 @@ void Logger::_init_colors() {
   this->_level_colors["reset"]  = "\x1b[0m";
 }
 
-Logger::Logger(const char *filename, bool colored_output)
+Logger::Logger(const char *filename, log_levels level, bool colored_output)
 : _out(file_stream) {
   file_stream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+  _log_level = level;
   file_stream.open(filename);
   _colored_output = colored_output;
 }
 
-Logger::Logger(bool colored_output) : _out(std::cout) {
+Logger::Logger(log_levels level, bool colored_output) : _out(std::cout) {
   this->_colored_output = colored_output;
+  _log_level = level;
   if (colored_output)
     _init_colors();
 }
 
-Logger::Logger(std::ostream& out, bool colored_output) : _out(out) {
+Logger::Logger(std::ostream& out, log_levels level, bool colored_output) : _out(out) {
   _colored_output = colored_output;
+  _log_level = level;
   if (colored_output)
     _init_colors();
 }
@@ -78,17 +83,25 @@ void Logger::_print_timestamp() const {
 }
 
 std::ostream &Logger::debug() const {
-  return _print_log(DEBUG);
+  if (_log_level >= LVL_DEBUG)
+    return _print_log(DEBUG);
+  return _null_stream;
 }
 
 std::ostream &Logger::info() const {
-  return _print_log(INFO);
+  if (_log_level >= LVL_INFO)
+    return _print_log(INFO);
+  return _null_stream;
 }
 
 std::ostream &Logger::warning() const { 
-  return _print_log(WARNING);
+  if (_log_level >= LVL_WARNING)
+    return _print_log(WARNING);
+  return _null_stream;
 }
 
 std::ostream &Logger::error() const { 
-  return _print_log(ERROR);
+  if (_log_level >= LVL_ERROR)
+    return _print_log(ERROR);
+  return _null_stream;
 }
