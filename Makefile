@@ -11,6 +11,7 @@ SRC     = HttpBase.cpp \
           Pollfd.cpp \
           Server.cpp \
           Config.cpp \
+          Logger.cpp \
           init_servers.cpp \
           webserv.cpp
 
@@ -20,6 +21,7 @@ INC     = HttpBase.hpp \
           Pollfd.hpp \
           Server.hpp \
           Config.hpp \
+          Logger.hpp \
           defines.hpp
 
 OBJDIR  = objects
