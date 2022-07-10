@@ -49,7 +49,8 @@ public:
   RequestHandler(Request const& req, Server *_server);
 
   void _get(void);
-  void _get_body(std::string body_path);
+  void _get_body(std::string const& body_path);
+  void extension_dispatcher(std::string const& body_path);
   void _post(void);
   void _delete(void);
   void process(void);

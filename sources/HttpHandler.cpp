@@ -21,23 +21,29 @@ void RequestHandler::_get(void) {
     for (size_t i = 0; i < server->index.size(); i++) {
       std::string indexpath = root + server->index[i];
       if (!access(indexpath.c_str(), R_OK)) {
-        _get_body(indexpath);
-        return;
+        return extension_dispatcher(indexpath);
       }
     }
-    _get_body(root + server->error_page[404]);
+    extension_dispatcher(root + server->error_page[404]);
   }
   else if (!access(path.c_str(), R_OK)) {
-    _get_body(path);
+    extension_dispatcher(path);
   }
   else {
       statuscode = "404 ";
       statusmsg = "FAIL\n";
-      _get_body(root + server->error_page[404]);
+      extension_dispatcher(root + server->error_page[404]);
   }
 }
 
-void RequestHandler::_get_body(std::string body_path) {
+void RequestHandler::extension_dispatcher(std::string const& body_path) {
+  std::string extension(body_path.substr(body_path.find_last_of('.')));
+  if (extension == ".html")
+    return _get_body(body_path);
+  std::cout << extension << " support not yet implemented\n";
+}
+
+void RequestHandler::_get_body(std::string const& body_path) {
   std::ifstream in;
   std::string str = httpversion +
                     statuscode +
