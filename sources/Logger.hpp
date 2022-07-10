@@ -5,12 +5,14 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 class Logger
 {
 public:
-  Logger(bool colored_output = true);
-  Logger(std::ostream& out, bool colored_output = false);
+  explicit Logger(bool colored_output = true);
+  Logger(const char *filename, bool colored_output = false);
+  Logger(std::ostream &out, bool colored_output = false);
   Logger(const Logger &);
   Logger &operator=(const Logger &);
   ~Logger();
@@ -21,6 +23,7 @@ public:
   std::ostream &error() const ;
 
 private:
+  std::ofstream file_stream;
   std::ostream& _out;
   bool _colored_output;
 

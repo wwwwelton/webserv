@@ -10,12 +10,19 @@
 #define ERROR   "ERROR"
 
 void Logger::_init_colors() {
-  this->_level_colors[DEBUG]    = "";
-  this->_level_colors[NORMAL]   = "";
+  this->_level_colors[DEBUG]    = "\x1b[0m";
+  this->_level_colors[NORMAL]   = "\x1b[0m";
   this->_level_colors[INFO]     = "\x1b[34m";
   this->_level_colors[WARNING]  = "\x1b[33m";
   this->_level_colors[ERROR]    = "\x1b[31m";
   this->_level_colors["reset"]  = "\x1b[0m";
+}
+
+Logger::Logger(const char *filename, bool colored_output)
+: _out(file_stream) {
+  file_stream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+  file_stream.open(filename);
+  _colored_output = colored_output;
 }
 
 Logger::Logger(bool colored_output) : _out(std::cout) {
@@ -41,18 +48,21 @@ Logger& Logger::operator=(const Logger &other) {
   return *this;
 }
 
-Logger::~Logger() { }
+Logger::~Logger() {
+  if (file_stream.is_open())
+    file_stream.close();
+}
 
 std::ostream &Logger::_print_log(const std::string &level) const {
   if (_colored_output) {
-    this->_out << _level_colors.at(level);
+    _out << _level_colors.at(level);
   }
 
-  this->_out << "[" << level << " - ";
+  _out << "[" << std::setfill(' ') <<  std::setw(7) << level << " - ";
   _print_timestamp();
-  this->_out << "] ";
+  _out << "] ";
 
-  return this->_out;
+  return _out;
 }
 
 void Logger::_print_timestamp() const {
@@ -62,7 +72,7 @@ void Logger::_print_timestamp() const {
   std::tm* now = std::localtime(&t);
   char buf[100];
   std::strftime(buf, 100, "%Y-%m-%d %X", now);
-  this->_out
+  _out
     << buf << '.'
     << std::setfill('0') << std::setw(3) << time.tv_usec / 1000;
 }
