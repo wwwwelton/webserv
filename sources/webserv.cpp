@@ -2,6 +2,7 @@
 // Creation date: 21/06/2022
 
 #include "webserv.h"
+#include "Logger.hpp"
 
 void accept_connections(std::vector<_pollfd> *pollfds,
                         std::map<int, Server *> *clientlist,
@@ -43,23 +44,24 @@ int main(int argc, char **argv) {
   std::map<int, Server *> clientlist;
   std::vector<_pollfd> pollfds;
   int conn, compress = false;
+  Logger logger;
 
   init(argc, argv, &serverlist, &pollfds);
+  logger.info() << "initializing webserv" << std::endl;
 
   while (1) {
     conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 60000);
-    std::cout << "returned connections: " << conn << '\n';
+    logger.debug() << "returned connections: " << conn << '\n';
     if (conn <= 0)
       break;
     for (int i = 0, size = pollfds.size(); i < size; i++) {
       if (pollfds[i].revents == 0) {
         continue;
       }
+      logger.info() << "events detected on socket " << pollfds[i].fd << std::endl;
       if (serverlist[pollfds[i].fd]) {
-        std::cout << pollfds[i].fd << " socket has events\n";
         accept_connections(&pollfds, &clientlist, serverlist[pollfds[i].fd]);
       } else {
-        std::cout << pollfds[i].fd << " client has events\n";
         send_messages(pollfds[i].fd, &clientlist);
         close(pollfds[i].fd);
         pollfds[i].fd = -1;

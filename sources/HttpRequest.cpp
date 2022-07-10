@@ -1,4 +1,5 @@
 #include "HttpRequest.hpp"
+#include "Logger.hpp"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <iostream>
@@ -7,18 +8,6 @@
 #include <string>
 #include <sstream>
 #include <cstring>
-
-// t_httpform HttpRequest::handler(int fd, Server *host) {
-//   t_httpform form;
-//   int rc;
-
-//   (void)host;
-//   rc = recv(fd, buffer_req, sizeof(buffer_req), 0);
-//   buffer_req[rc] = '\0';
-//   form.body = buffer_resp;
-//   form.bodysize = 74;
-//   return form;
-// }
 
 // TODO: remove this
 std::ostream& operator<<(std::ostream& out, const Request& request) {
@@ -59,6 +48,10 @@ Request::Request(int fd) {
   this->nbytes = bytes;
   std::vector<std::string>* tokens = tokenize_request(this->raw);
   parse_request(tokens);
+  Logger().debug() << "new " << this->method
+    << " request for path " << this->path
+    << " on host " << this->headers["Host"]
+    << std::endl;
 }
 
 Request::~Request() {
@@ -82,7 +75,6 @@ std::vector<std::string>* Request::tokenize_request(char *payload) {
   std::stringstream stream(payload);
   std::string line;
   std::getline(stream, line);
-  std::cout << "line read: " << line << std::endl;
 
   int method_end = line.find(' ');
   this->method = line.substr(0, method_end);
@@ -106,7 +98,7 @@ std::vector<std::string>* Request::tokenize_request(char *payload) {
     std::getline(stream, line);
     this->body.append(line);
   }
-
+  this->valid = true;
   return 0;
 }
 
