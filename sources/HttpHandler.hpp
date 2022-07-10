@@ -28,12 +28,14 @@ struct Response {
 class RequestHandler {
 typedef void (RequestHandler::*funcptr)(void);
 typedef std::map<std::string, void (RequestHandler::*)(void)> meth_map;
+
 private:
   static meth_map methodptr;
 
   std::string httpversion;
   std::string statuscode;
   std::string statusmsg;
+  std::string location;
   std::string method;
   std::string path;
   std::string root;
@@ -51,6 +53,7 @@ public:
   void _post(void);
   void _delete(void);
   void process(void);
+  std::string find_location(std::string path, Server *_server);
   Response _response(void) {
     return (Response());
   }

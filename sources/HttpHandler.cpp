@@ -17,15 +17,24 @@ void Response::_send(int fd) {
 }
 
 void RequestHandler::_get(void) {
-  if (path == root)
-    _get_body("./server_root/wink");
-  else if (access(path.c_str(), F_OK)) {
-    statuscode = "404 ";
-    statusmsg = "FAIL\n";
+  if (path == root) {
+    for (size_t i = 0; i < server->index.size(); i++) {
+      std::string indexpath = root + server->index[i];
+      if (!access(indexpath.c_str(), R_OK)) {
+        _get_body(indexpath);
+        return;
+      }
+    }
     _get_body(root + server->error_page[404]);
   }
-  else
+  else if (!access(path.c_str(), R_OK)) {
     _get_body(path);
+  }
+  else {
+      statuscode = "404 ";
+      statusmsg = "FAIL\n";
+      _get_body(root + server->error_page[404]);
+  }
 }
 
 void RequestHandler::_get_body(std::string body_path) {
@@ -68,12 +77,26 @@ void RequestHandler::process(void) {
   (this->*methodptr[method])();
 }
 
+std::string RequestHandler::find_location(std::string path, Server *server) {
+  while (path.size()) {
+    if (server->location.count(path))
+      return server->location[path].root;
+    path = path.erase(path.find_last_of('/'));
+  }
+  return server->location["/"].root;
+}
+
 RequestHandler::RequestHandler(void) { }
 RequestHandler::RequestHandler(Request const& req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
 {
+  location = find_location(req.path, _server);
   server = _server;
-  path = "./" + server->root + req.path;
-  root = "./" + server->root + "/";
+  path = "./" + location + req.path;
+  root = "./" + location + "/";
+  // std::cout << "reqpath      -> " << req.path << "\n";
+  // std::cout << "path         -> " << path << "\n";
+  // std::cout << "server root  -> " << server->root << "\n";
+  // std::cout << "server       -> " << root << "\n";
   method = req.method;
 }
