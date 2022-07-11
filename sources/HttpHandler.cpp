@@ -33,14 +33,14 @@ void RequestHandler::_get(void) {
   code = errno;
   statuscode = "404 ";
   statusmsg = "FAIL\n";
-  Logger().debug() << "access failed with " << strerror(code);
   if (code == ENOENT)
     extension_dispatcher(root + server->error_page[404]);
-  if (code == EACCES) {
+  else if (code == EACCES) {
     statuscode = "405 ";
     extension_dispatcher(root + server->error_page[405]);
   }
-  Logger().error() << "Failed request on RequestHandler::_get\n";
+  else
+    Logger().error() << "Failed request on RequestHandler::_get\n";
 }
 
 void RequestHandler::_get_php_cgi(std::string const& body_path) {
