@@ -1,14 +1,21 @@
 #ifndef HTTPHANDLER_HPP
 # define HTTPHANDLER_HPP
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdio.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <map>
+
 #include "Server.hpp"
 #include "HttpRequest.hpp"
 #include "HttpBase.hpp"
+
 
 class Server;
 
@@ -50,6 +57,7 @@ public:
 
   void _get(void);
   void _get_body(std::string const& body_path);
+  void _get_php_cgi(std::string const& body_path);
   void extension_dispatcher(std::string const& body_path);
   void _post(void);
   void _delete(void);

@@ -12,6 +12,6 @@
 #define DEFAULT_SERVER_ROOT "server_root"
 #define DEFAULT_BACKLOG 500;
 
-#define DFL_CONTENTTYPE "Content-Type: text/html\n"
+#define DFL_CONTENTTYPE "Content-Type: text/html; charset=utf-8\n"
 #define DFL_CONTENTLEN  "Content-Length: LENGTH\n\n"
 #endif  // DEFINES_H

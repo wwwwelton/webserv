@@ -17,30 +17,59 @@ void Response::_send(int fd) {
 }
 
 void RequestHandler::_get(void) {
+  int code;
   if (path == root) {
     for (size_t i = 0; i < server->index.size(); i++) {
       std::string indexpath = root + server->index[i];
-      if (!access(indexpath.c_str(), R_OK)) {
+      if (!access(indexpath.c_str(), R_OK))
         return extension_dispatcher(indexpath);
-      }
     }
-    extension_dispatcher(root + server->error_page[404]);
+    code = errno;
   }
   else if (!access(path.c_str(), R_OK)) {
-    extension_dispatcher(path);
+    return extension_dispatcher(path);
   }
-  else {
-      statuscode = "404 ";
-      statusmsg = "FAIL\n";
-      extension_dispatcher(root + server->error_page[404]);
+  code = errno;
+  statuscode = "404 ";
+  statusmsg = "FAIL\n";
+  std::cout << strerror(code);
+  if (code == ENOENT)
+    extension_dispatcher(root + server->error_page[404]);
+  if (code == EACCES) {
+    statuscode = "405 ";
+    extension_dispatcher(root + server->error_page[405]);
   }
+  // extension_dispatcher(root + server->error_page[404]);
+}
+
+void RequestHandler::_get_php_cgi(std::string const& body_path) {
+  int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC);
+  if (fd == -1)
+    throw(std::exception());
+  int status;
+  int pid = fork();
+  if (pid == 0) {
+    if (dup2(fd, STDOUT_FILENO) == -1) {
+      perror("dup2");
+      exit(1);
+    }
+    std::cout << body_path.c_str();
+    execlp("php-cgi", "-f", body_path.substr(2).c_str(), NULL);
+  }
+  waitpid(pid, &status, 0);
+  std::cout << WEXITSTATUS(status) << "\n";
+  close(fd);
+  _get_body("./tmp");
 }
 
 void RequestHandler::extension_dispatcher(std::string const& body_path) {
   std::string extension(body_path.substr(body_path.find_last_of('.')));
   if (extension == ".html")
     return _get_body(body_path);
-  std::cout << extension << " support not yet implemented\n";
+  else if (extension == ".php")
+    return _get_php_cgi(body_path);
+  else
+    std::cout << extension << " support not yet implemented\n";
 }
 
 void RequestHandler::_get_body(std::string const& body_path) {
@@ -59,6 +88,7 @@ void RequestHandler::_get_body(std::string const& body_path) {
   while (in.good()) {
     in.get(buf, BUFFER_SIZE, 0);
     body += buf;
+    std::cout << buf;
   }
   std::cout << body << "\n";
   str += body;
