@@ -14,6 +14,7 @@ RequestHandler::meth_map RequestHandler::init_map(void) {
 
 void Response::_send(int fd) {
   send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
+  Logger().info() << "Response sent to client " << fd << "\n";
 }
 
 void RequestHandler::_get(void) {
@@ -32,14 +33,14 @@ void RequestHandler::_get(void) {
   code = errno;
   statuscode = "404 ";
   statusmsg = "FAIL\n";
-  std::cout << strerror(code);
+  Logger().debug() << "access failed with " << strerror(code);
   if (code == ENOENT)
     extension_dispatcher(root + server->error_page[404]);
   if (code == EACCES) {
     statuscode = "405 ";
     extension_dispatcher(root + server->error_page[405]);
   }
-  // extension_dispatcher(root + server->error_page[404]);
+  Logger().error() << "Failed request on RequestHandler::_get\n";
 }
 
 void RequestHandler::_get_php_cgi(std::string const& body_path) {
@@ -53,11 +54,10 @@ void RequestHandler::_get_php_cgi(std::string const& body_path) {
       perror("dup2");
       exit(1);
     }
-    std::cout << body_path.c_str();
+    // std::cout << body_path.c_str();
     execlp("php-cgi", "-f", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
-  std::cout << WEXITSTATUS(status) << "\n";
   close(fd);
   _get_body("./tmp");
 }
@@ -69,7 +69,7 @@ void RequestHandler::extension_dispatcher(std::string const& body_path) {
   else if (extension == ".php")
     return _get_php_cgi(body_path);
   else
-    std::cout << extension << " support not yet implemented\n";
+    Logger().warning() << extension << " support not yet implemented\n";
 }
 
 void RequestHandler::_get_body(std::string const& body_path) {
@@ -88,16 +88,15 @@ void RequestHandler::_get_body(std::string const& body_path) {
   while (in.good()) {
     in.get(buf, BUFFER_SIZE, 0);
     body += buf;
-    std::cout << buf;
   }
-  std::cout << body << "\n";
+  // std::cout << body << "\n";
   str += body;
   ss << body.size();
   ss >> size;
   str.replace(str.find("LENGTH"), 6, size);
   std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
   HttpBase::size = str.size();
-  std::cout << str.size() << "\n";
+  // std::cout << str.size() << "\n";
   in.close();
 }
 
@@ -130,9 +129,5 @@ RequestHandler::RequestHandler(Request const& req, Server *_server)
   server = _server;
   path = "./" + location + req.path;
   root = "./" + location + "/";
-  // std::cout << "reqpath      -> " << req.path << "\n";
-  // std::cout << "path         -> " << path << "\n";
-  // std::cout << "server root  -> " << server->root << "\n";
-  // std::cout << "server       -> " << root << "\n";
   method = req.method;
 }

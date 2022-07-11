@@ -15,7 +15,7 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
 #include "HttpBase.hpp"
-
+#include "Logger.hpp"
 
 class Server;
 
@@ -46,23 +46,22 @@ private:
   std::string method;
   std::string path;
   std::string root;
-  Server* server;
-  bool    valid;
+  Server*     server;
+  bool        valid;
 
   static meth_map init_map();
-
-public:
-  RequestHandler(void);
-  RequestHandler(Request const& req, Server *_server);
-
   void _get(void);
   void _get_body(std::string const& body_path);
   void _get_php_cgi(std::string const& body_path);
   void extension_dispatcher(std::string const& body_path);
   void _post(void);
   void _delete(void);
-  void process(void);
   std::string find_location(std::string path, Server *_server);
+
+public:
+  RequestHandler(void);
+  RequestHandler(Request const& req, Server *_server);
+  void process(void);
   Response _response(void) {
     return (Response());
   }
