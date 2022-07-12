@@ -1,9 +1,0 @@
-Content-type: text/html; charset=UTF-8
-
-<html>
- <head>
-  <title>Teste PHP</title>
- </head>
- <body>
- <p>Olá Mundo</p> </body>
-</html>

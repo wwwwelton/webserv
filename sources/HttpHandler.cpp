@@ -60,11 +60,12 @@ void RequestHandler::_get_php_cgi(std::string const& body_path) {
   waitpid(pid, &status, 0);
   close(fd);
   _get_body("./tmp");
+  unlink("./tmp");
 }
 
 void RequestHandler::extension_dispatcher(std::string const& body_path) {
   std::string extension(body_path.substr(body_path.find_last_of('.')));
-  if (extension == ".html")
+  if (extension == ".html" || extension == ".css")
     return _get_body(body_path);
   else if (extension == ".php")
     return _get_php_cgi(body_path);
@@ -98,6 +99,7 @@ void RequestHandler::_get_body(std::string const& body_path) {
   HttpBase::size = str.size();
   // std::cout << str.size() << "\n";
   in.close();
+  Logger().info() << "File requested: " << path << "\n";
 }
 
 void RequestHandler::_post(void) {
