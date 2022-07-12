@@ -3,6 +3,12 @@
 #include "HttpBase.hpp"
 
 RequestHandler::meth_map RequestHandler::methodptr = RequestHandler::init_map();
+Logger RequestHandler::logger = RequestHandler::init_logger();
+
+Logger RequestHandler::init_logger(void) {
+  Logger logger(LVL_DEBUG);
+  return logger;
+}
 
 RequestHandler::meth_map RequestHandler::init_map(void) {
   meth_map _map;
@@ -40,7 +46,7 @@ void RequestHandler::_get(void) {
     extension_dispatcher(root + server->error_page[405]);
   }
   else
-    Logger().error() << "Failed request on RequestHandler::_get\n";
+    logger.error() << "Failed request on RequestHandler::_get\n";
 }
 
 void RequestHandler::_get_php_cgi(std::string const& body_path) {
@@ -70,7 +76,7 @@ void RequestHandler::extension_dispatcher(std::string const& body_path) {
   else if (extension == ".php")
     return _get_php_cgi(body_path);
   else
-    Logger().warning() << extension << " support not yet implemented\n";
+    logger.warning() << extension << " support not yet implemented\n";
 }
 
 void RequestHandler::_get_body(std::string const& body_path) {
@@ -99,7 +105,7 @@ void RequestHandler::_get_body(std::string const& body_path) {
   HttpBase::size = str.size();
   // std::cout << str.size() << "\n";
   in.close();
-  Logger().info() << "File requested: " << path << "\n";
+  logger.info() << "File requested: " << path << "\n";
 }
 
 void RequestHandler::_post(void) {
@@ -127,6 +133,8 @@ RequestHandler::RequestHandler(void) { }
 RequestHandler::RequestHandler(Request const& req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
 {
+  if (req.body.size())
+    logger.debug() << "Request body:\n" << req.body << "\n";
   location = find_location(req.path, _server);
   server = _server;
   path = "./" + location + req.path;

@@ -18,6 +18,7 @@
 #include "Logger.hpp"
 
 class Server;
+class Logger;
 
 struct Response {
   std::map<std::string, std::string> headers;
@@ -38,6 +39,7 @@ typedef std::map<std::string, void (RequestHandler::*)(void)> meth_map;
 
 private:
   static meth_map methodptr;
+  static Logger logger;
 
   std::string httpversion;
   std::string statuscode;
@@ -50,6 +52,7 @@ private:
   bool        valid;
 
   static meth_map init_map();
+  static Logger init_logger();
   void _get(void);
   void _get_body(std::string const& body_path);
   void _get_php_cgi(std::string const& body_path);
