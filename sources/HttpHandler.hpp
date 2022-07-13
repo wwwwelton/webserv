@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
 #ifndef HTTPHANDLER_HPP
 # define HTTPHANDLER_HPP
 
@@ -39,7 +46,6 @@ typedef std::map<std::string, void (RequestHandler::*)(void)> meth_map;
 
 private:
   static meth_map methodptr;
-  static Logger logger;
 
   std::string httpversion;
   std::string statuscode;

@@ -1,5 +1,13 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
 #include "HttpRequest.hpp"
 #include "Logger.hpp"
+#include "webserv.hpp"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <iostream>
@@ -35,9 +43,13 @@ std::ostream& operator<<(std::ostream& out, const Request& request) {
   return out;
 }
 
-Request::Request(int fd) {
+Request::Request(int _fd) {
   this->valid = false;
-  ssize_t bytes = recv(fd, HttpBase::buffer_req, 512000, MSG_NOSIGNAL);
+  fd = _fd;
+}
+
+Request* Request::receive(int _fd) {
+  ssize_t bytes = recv(_fd, HttpBase::buffer_req, 512000, MSG_NOSIGNAL);
 
   if (bytes == -1)
     throw std::exception();
@@ -48,10 +60,11 @@ Request::Request(int fd) {
   this->nbytes = bytes;
   std::vector<std::string>* tokens = tokenize_request(this->raw);
   parse_request(tokens);
-  Logger().debug() << "new " << this->method
+  WebServ::log.debug() << "new " << this->method
     << " request for path " << this->path
     << " on host " << this->headers["Host"]
     << std::endl;
+  return this;
 }
 
 Request::~Request() {

@@ -5,35 +5,25 @@
 //#                            Welton Leite                                    #
 //##############################################################################
 
-#ifndef SERVER_CONFIG_HPP_
-#define SERVER_CONFIG_HPP_
-
-#include <arpa/inet.h>
-
-#include <string>
-#include <vector>
-
 #include "webserv.hpp"
 
-class Server;
+int main(int argc, char **argv) {
+  WebServ webserv(argc, argv);
 
-class Config {
- public:
-  Config(void);
-  explicit Config(char** file);
-  Config(const Config& src);
-  ~Config(void);
-
-  Config& operator=(const Config& rhs);
-  Server* operator[](size_t n);
-
-  size_t size(void);
-
- private:
-  std::vector<Server*> _servers;
-
- public:
-  int backlog;
-};
-
-#endif  // SERVER_CONFIG_HPP_
+  while (true) {
+    webserv._poll();
+    if (webserv.conn <= 0)
+      break;
+    for (int i = 0, size = webserv.pollfds.size(); i < size; i++) {
+      if (webserv.pollfds[i].revents == 0)
+        continue;
+      if (webserv.serverlist.count(webserv.pollfds[i].fd)) {
+        webserv._accept(i);
+      } else {
+        webserv._respond(i);
+      }
+    }
+    if (webserv.compress)
+      webserv.purge_conns();
+  }
+}

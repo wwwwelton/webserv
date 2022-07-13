@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
 #include "Logger.hpp"
 #include <ctime>
 #include <iomanip>
@@ -94,13 +101,13 @@ std::ostream &Logger::info() const {
   return _null_stream;
 }
 
-std::ostream &Logger::warning() const { 
+std::ostream &Logger::warning() const {
   if (_log_level >= LVL_WARNING)
     return _print_log(WARNING);
   return _null_stream;
 }
 
-std::ostream &Logger::error() const { 
+std::ostream &Logger::error() const {
   if (_log_level >= LVL_ERROR)
     return _print_log(ERROR);
   return _null_stream;

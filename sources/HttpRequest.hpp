@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
 #pragma once
 #ifndef HTTP_REQUEST_HPP
 # define HTTP_REQUEST_HPP
@@ -24,7 +31,9 @@ struct Request {
 
   bool is_valid() const ;
 
+  Request* receive(int fd);
 private:
+  int fd;
   bool valid;
   char *raw;
   size_t nbytes;

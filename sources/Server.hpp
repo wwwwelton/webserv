@@ -1,5 +1,9 @@
-// Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
-// Creation date: 23/06/2022
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
@@ -10,7 +14,7 @@
 #include <string>
 #include <vector>
 
-#include "webserv.h"
+#include "webserv.hpp"
 
 struct server_location {
   std::string root;

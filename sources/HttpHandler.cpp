@@ -1,15 +1,15 @@
-#include "webserv.h"
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
+#include "webserv.hpp"
 #include "HttpHandler.hpp"
 #include "HttpBase.hpp"
 
 RequestHandler::meth_map RequestHandler::methodptr = RequestHandler::init_map();
-Logger RequestHandler::logger = RequestHandler::init_logger();
-
-Logger RequestHandler::init_logger(void) {
-  Logger logger(LVL_DEBUG);
-  return logger;
-}
-
 RequestHandler::meth_map RequestHandler::init_map(void) {
   meth_map _map;
   _map["GET"] = &RequestHandler::_get;
@@ -20,7 +20,7 @@ RequestHandler::meth_map RequestHandler::init_map(void) {
 
 void Response::_send(int fd) {
   send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
-  Logger().info() << "Response sent to client " << fd << "\n";
+  WebServ::log.info() << "Response sent to client " << fd << "\n";
 }
 
 void RequestHandler::_get(void) {
@@ -46,7 +46,7 @@ void RequestHandler::_get(void) {
     extension_dispatcher(root + server->error_page[405]);
   }
   else
-    logger.error() << "Failed request on RequestHandler::_get\n";
+    WebServ::log.error() << "Failed request on RequestHandler::_get\n";
 }
 
 void RequestHandler::_get_php_cgi(std::string const& body_path) {
@@ -76,7 +76,7 @@ void RequestHandler::extension_dispatcher(std::string const& body_path) {
   else if (extension == ".php")
     return _get_php_cgi(body_path);
   else
-    logger.warning() << extension << " support not yet implemented\n";
+    WebServ::log.warning() << extension << " support not yet implemented\n";
 }
 
 void RequestHandler::_get_body(std::string const& body_path) {
@@ -105,7 +105,7 @@ void RequestHandler::_get_body(std::string const& body_path) {
   HttpBase::size = str.size();
   // std::cout << str.size() << "\n";
   in.close();
-  logger.info() << "File requested: " << path << "\n";
+  WebServ::log.info() << "File requested: " << path << "\n";
 }
 
 void RequestHandler::_post(void) {
@@ -134,7 +134,7 @@ RequestHandler::RequestHandler(Request const& req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
 {
   if (req.body.size())
-    logger.debug() << "Request body:\n" << req.body << "\n";
+    WebServ::log.debug() << "Request body:\n" << req.body << "\n";
   location = find_location(req.path, _server);
   server = _server;
   path = "./" + location + req.path;

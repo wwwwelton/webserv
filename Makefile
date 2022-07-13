@@ -5,24 +5,27 @@ CFLAGS  += -MMD -MP
 INCPATH = -I./sources
 NAME    = webserv
 
-SRC     = HttpBase.cpp \
+SRC     = main.cpp \
+          webserv.cpp \
+          HttpBase.cpp \
           HttpHandler.cpp \
           HttpRequest.cpp \
           Pollfd.cpp \
           Server.cpp \
           Config.cpp \
           Logger.cpp \
-          init_servers.cpp \
-          webserv.cpp
+          # init_servers.cpp \
 
-INC     = HttpBase.hpp \
+INC     = defines.hpp \
+          webserv.hpp \
+          HttpBase.hpp \
           HttpHandler.hpp \
           HttpRequest.hpp \
           Pollfd.hpp \
           Server.hpp \
           Config.hpp \
           Logger.hpp \
-          defines.hpp
+
 
 OBJDIR  = objects
 SRC_DIR =	sources
