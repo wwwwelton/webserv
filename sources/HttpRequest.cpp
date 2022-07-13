@@ -35,8 +35,12 @@ std::ostream& operator<<(std::ostream& out, const Request& request) {
   return out;
 }
 
-Request::Request(int fd) {
+Request::Request(int _fd) {
   this->valid = false;
+  fd = _fd;
+}
+
+Request* Request::receive(void) {
   ssize_t bytes = recv(fd, HttpBase::buffer_req, 512000, MSG_NOSIGNAL);
 
   if (bytes == -1)
@@ -52,6 +56,7 @@ Request::Request(int fd) {
     << " request for path " << this->path
     << " on host " << this->headers["Host"]
     << std::endl;
+  return this;
 }
 
 Request::~Request() {

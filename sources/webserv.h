@@ -37,6 +37,13 @@ class Server;
 
 typedef struct addrinfo s_addrinfo;
 
+typedef struct s_request {
+  s_request(Server *_server, int fd)
+  : server(_server), request(new Request(fd)) { }
+  Server  *server;
+  Request *request;
+} req;
+
 int init(int argc, char** argv, std::map<int, Server*>* map,
          std::vector<_pollfd>* pollfds);
 

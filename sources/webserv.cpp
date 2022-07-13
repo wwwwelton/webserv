@@ -5,29 +5,33 @@
 #include "Logger.hpp"
 
 void accept_connections(std::vector<_pollfd> *pollfds,
-                        std::map<int, Server *> *clientlist,
+                        std::vector<req> *clientlist,
                         Server *host) {
   int new_sd;
 
   new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
-    clientlist->insert(std::make_pair(new_sd, host));
+    (*clientlist)[new_sd].request = new Request(new_sd);
+    (*clientlist)[new_sd].server = host;
     pollfds->push_back(_pollfd(new_sd, POLLIN));
     new_sd = accept(host->sockfd, NULL, NULL);
   }
 }
 
-void send_messages(int fd, std::map<int, Server *> *clientlist) {
+void send_messages(int fd, std::vector<req> *clientlist) {
   RequestHandler req_handler;
+  Request *ptr;
   Response res;
 
   //   req = Request(fd, clientlist[fd]);
-  Request req = Request(fd);
-  req_handler = RequestHandler(req, (*clientlist)[fd]);
+  ptr = (*clientlist)[fd].request->receive();
+  req_handler = RequestHandler(*ptr, (*clientlist)[fd].server);
   req_handler.process();
   res = req_handler._response();
   res._send(fd);
-  clientlist->erase(fd);
+  delete (*clientlist)[fd].request;
+  (*clientlist)[fd].request = NULL;
+  (*clientlist)[fd].server = NULL;
 }
 
 void compress_array(std::vector<_pollfd> *pollfds) {
@@ -41,11 +45,12 @@ void compress_array(std::vector<_pollfd> *pollfds) {
 
 int main(int argc, char **argv) {
   std::map<int, Server *> serverlist;
-  std::map<int, Server *> clientlist;
-  std::vector<_pollfd> pollfds;
+  std::vector<req>        clientlist;
+  std::vector<_pollfd>    pollfds;
   int conn, compress = false;
   Logger logger(LVL_DEBUG);
 
+  clientlist.reserve(1024);
   init(argc, argv, &serverlist, &pollfds);
   logger.debug() << "initializing webserv" << std::endl;
 
