@@ -7,6 +7,7 @@
 
 #include <arpa/inet.h>
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -32,8 +33,7 @@ class Config {
   std::vector<Server*> _servers;
 
  private:
-  std::string _serialize(const std::string& file_content);
-  std::string _prepare(const std::string& file_content);
+  std::string _sanitize(const std::string& file_content);
   std::vector<std::string> _split(const std::string& file_content);
   Server* _parse(const std::string& config);
 

@@ -19,15 +19,11 @@ Config::Config(char* file) {
   ifs.open("default.conf");
   ss << ifs.rdbuf();
 
-  str = _serialize(ss.str());
-  str = _prepare(str);
+  str = _sanitize(ss.str());
   configs = _split(str);
 
   for (size_t i = 0; i < configs.size(); i++) {
     _servers.push_back(_parse(configs[i]));
-  }
-
-  for (size_t i = 0; i < configs.size(); i++) {
     std::cout << configs[i] << "\n";
   }
 
@@ -57,42 +53,84 @@ size_t Config::size(void) {
   return (_servers.size());
 }
 
-std::string Config::_serialize(const std::string& file_content) {
+std::string Config::_sanitize(const std::string& file_content) {
   std::string tmp(file_content);
+  size_t pos;
 
-  for (std::string::size_type i = 0; i < tmp.length(); i++) {
-    if (tmp[i] == '\n') {
-      tmp.erase(tmp.begin() + i);
-    }
-    if (tmp[i] == '\t') {
-      tmp.erase(tmp.begin() + i);
-    }
-  }
-  return (tmp);
-}
+  tmp.erase(std::remove(tmp.begin(), tmp.end(), '\n'), tmp.end());
+  tmp.erase(std::remove(tmp.begin(), tmp.end(), '\t'), tmp.end());
 
-std::string Config::_prepare(const std::string& file_content) {
-  std::string tmp(file_content);
-
-  size_t pos = tmp.find("server{");
+  pos = tmp.find("server{");
   while (pos != std::string::npos) {
     tmp.replace(pos, 7, "server {");
     pos += 8;
     pos = tmp.find("server{");
   }
 
+  pos = tmp.find("; ");
+  while (pos != std::string::npos) {
+    tmp.replace(pos, 1, ";");
+    pos += 1;
+    pos = tmp.find("; ", pos);
+  }
+
+  pos = tmp.find("{ ");
+  while (pos != std::string::npos) {
+    tmp.replace(pos, 1, "{");
+    pos += 1;
+    pos = tmp.find("{ ", pos);
+  }
+
+  pos = tmp.find("} ");
+  while (pos != std::string::npos) {
+    tmp.replace(pos, 1, "}");
+    pos += 1;
+    pos = tmp.find("} ", pos);
+  }
+
+  pos = tmp.find(";");
+  while (pos != std::string::npos) {
+    tmp.replace(pos, 1, ";\n");
+    pos += 2;
+    pos = tmp.find(";", pos);
+  }
+
+  pos = tmp.find("{");
+  while (pos != std::string::npos) {
+    tmp.replace(pos, 1, "{\n");
+    pos += 2;
+    pos = tmp.find("{", pos);
+  }
+
+  pos = tmp.find("}");
+  while (pos != std::string::npos) {
+    tmp.replace(pos, 1, "}\n");
+    pos += 2;
+    pos = tmp.find("}", pos);
+  }
+
   return (tmp);
 }
 
 std::vector<std::string> Config::_split(const std::string& file_content) {
-  size_t pos, pos2;
+  size_t start, end;
   std::vector<std::string> configs;
 
-  pos = file_content.find("server {");
-  pos2 = file_content.find("server {", pos + 7);
+  start = file_content.find("server {");
+  end = file_content.find("server {", start + 8);
+  if (end == std::string::npos) {
+    end = file_content.length();
+  }
 
-  configs.push_back(file_content.substr(pos, pos2 - pos));
-  configs.push_back(file_content.substr(pos2));
+  while (start != std::string::npos) {
+    configs.push_back(file_content.substr(start, end - start));
+    start += 8;
+    start = file_content.find("server {", start);
+    end = file_content.find("server {", start + 8);
+    if (end == std::string::npos) {
+      end = file_content.length();
+    }
+  }
 
   return (configs);
 }
