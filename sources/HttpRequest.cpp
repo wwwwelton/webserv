@@ -40,8 +40,8 @@ Request::Request(int _fd) {
   fd = _fd;
 }
 
-Request* Request::receive(void) {
-  ssize_t bytes = recv(fd, HttpBase::buffer_req, 512000, MSG_NOSIGNAL);
+Request* Request::receive(int _fd) {
+  ssize_t bytes = recv(_fd, HttpBase::buffer_req, 512000, MSG_NOSIGNAL);
 
   if (bytes == -1)
     throw std::exception();
