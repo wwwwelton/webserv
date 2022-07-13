@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
   logger.debug() << "initializing webserv" << std::endl;
 
   while (1) {
-    conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 60000);
+    conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), -1);
     logger.debug() << "returned connections: " << conn << '\n';
     if (conn <= 0)
       break;
