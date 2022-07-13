@@ -1,6 +1,9 @@
-// Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
-// Copyright (c) 2022 Welton Leite, wleite. All rights reserved.
-// Creation date: 25/06/2022
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
 
 #include "Config.hpp"
 
@@ -53,61 +56,33 @@ size_t Config::size(void) {
   return (_servers.size());
 }
 
+void Config::_replace_all(std::string* str,
+                          const std::string& old_word,
+                          const std::string& new_word) {
+  size_t pos;
+
+  pos = str->find(old_word);
+  while (pos != std::string::npos) {
+    str->replace(pos, old_word.length(), new_word);
+    pos = str->find(old_word, pos + new_word.length());
+  }
+}
+
 std::string Config::_sanitize(const std::string& file_content) {
   std::string tmp(file_content);
-  size_t pos;
 
   tmp.erase(std::remove(tmp.begin(), tmp.end(), '\n'), tmp.end());
   tmp.erase(std::remove(tmp.begin(), tmp.end(), '\t'), tmp.end());
 
-  pos = tmp.find("server{");
-  while (pos != std::string::npos) {
-    tmp.replace(pos, 7, "server {");
-    pos += 8;
-    pos = tmp.find("server{");
-  }
+  _replace_all(&tmp, "server{", "server {");
 
-  pos = tmp.find("; ");
-  while (pos != std::string::npos) {
-    tmp.replace(pos, 1, ";");
-    pos += 1;
-    pos = tmp.find("; ", pos);
-  }
+  _replace_all(&tmp, "; ", ";");
+  _replace_all(&tmp, "{ ", "{");
+  _replace_all(&tmp, "} ", "}");
 
-  pos = tmp.find("{ ");
-  while (pos != std::string::npos) {
-    tmp.replace(pos, 1, "{");
-    pos += 1;
-    pos = tmp.find("{ ", pos);
-  }
-
-  pos = tmp.find("} ");
-  while (pos != std::string::npos) {
-    tmp.replace(pos, 1, "}");
-    pos += 1;
-    pos = tmp.find("} ", pos);
-  }
-
-  pos = tmp.find(";");
-  while (pos != std::string::npos) {
-    tmp.replace(pos, 1, ";\n");
-    pos += 2;
-    pos = tmp.find(";", pos);
-  }
-
-  pos = tmp.find("{");
-  while (pos != std::string::npos) {
-    tmp.replace(pos, 1, "{\n");
-    pos += 2;
-    pos = tmp.find("{", pos);
-  }
-
-  pos = tmp.find("}");
-  while (pos != std::string::npos) {
-    tmp.replace(pos, 1, "}\n");
-    pos += 2;
-    pos = tmp.find("}", pos);
-  }
+  _replace_all(&tmp, ";", ";\n");
+  _replace_all(&tmp, "{", "{\n");
+  _replace_all(&tmp, "}", "}\n");
 
   return (tmp);
 }

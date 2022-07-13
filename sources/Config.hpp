@@ -1,6 +1,9 @@
-// Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
-// Copyright (c) 2022 Welton Leite, wleite. All rights reserved.
-// Creation date: 25/06/2022
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
 
 #ifndef SERVER_CONFIG_HPP_
 #define SERVER_CONFIG_HPP_
@@ -33,6 +36,10 @@ class Config {
   std::vector<Server*> _servers;
 
  private:
+  void _replace_all(std::string* str,
+                    const std::string& old_word,
+                    const std::string& new_word);
+
   std::string _sanitize(const std::string& file_content);
   std::vector<std::string> _split(const std::string& file_content);
   Server* _parse(const std::string& config);
