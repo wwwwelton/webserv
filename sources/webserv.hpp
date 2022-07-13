@@ -36,6 +36,7 @@
 #include "Server.hpp"
 #include "Config.hpp"
 #include "defines.hpp"
+#include "Logger.hpp"
 
 class Server;
 typedef struct addrinfo s_addrinfo;

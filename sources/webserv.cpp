@@ -36,7 +36,7 @@ WebServ::WebServ(int argc, char **argv) {
 
 int WebServ::_poll(void) {
   conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), -1);
-  // logger.debug() << "returned connections: " << conn << '\n';
+  log.debug() << "returned connections: " << conn << '\n';
   return conn;
 }
 

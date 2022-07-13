@@ -7,6 +7,7 @@
 
 #include "HttpRequest.hpp"
 #include "Logger.hpp"
+#include "webserv.hpp"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <iostream>
@@ -59,7 +60,7 @@ Request* Request::receive(int _fd) {
   this->nbytes = bytes;
   std::vector<std::string>* tokens = tokenize_request(this->raw);
   parse_request(tokens);
-  Logger().debug() << "new " << this->method
+  WebServ::log.debug() << "new " << this->method
     << " request for path " << this->path
     << " on host " << this->headers["Host"]
     << std::endl;
