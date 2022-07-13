@@ -8,48 +8,30 @@ Config::Config(void) {
   return;
 }
 
-Config::Config(char** file) {
+Config::Config(char* file) {
   (void)file;
 
+  std::ifstream ifs;
+  std::stringstream ss;
+  std::string str;
+  std::vector<std::string> configs;
+
+  ifs.open("default.conf");
+  ss << ifs.rdbuf();
+
+  str = _serialize(ss.str());
+  str = _prepare(str);
+  configs = _split(str);
+
+  for (size_t i = 0; i < configs.size(); i++) {
+    _servers.push_back(_parse(configs[i]));
+  }
+
+  for (size_t i = 0; i < configs.size(); i++) {
+    std::cout << configs[i] << "\n";
+  }
+
   backlog = DEFAULT_BACKLOG;
-
-  _servers.push_back(new Server());
-
-  _servers[0]->ip = inet_addr(DEFAULT_ADDRESS);
-  _servers[0]->port = htons(PORT1);
-  _servers[0]->server_name.push_back(std::string("www.localhost"));
-  _servers[0]->server_name.push_back(std::string("localhost"));
-  _servers[0]->root = std::string(DEFAULT_SERVER_ROOT);
-  _servers[0]->index.push_back(std::string("index.html"));
-  _servers[0]->index.push_back(std::string("index2.html"));
-  _servers[0]->error_page[404] = std::string("custom_404.html");
-  _servers[0]->error_page[405] = std::string("custom_405.html");
-  _servers[0]->timeout = DEFAULT_TIMEOUT;
-  _servers[0]->location["/"].root = std::string(DEFAULT_SERVER_ROOT);
-  _servers[0]->location["/"].limit_except = std::string(DEFAULT_ROUTE_METHOD);
-  _servers[0]->location["/"].client_max_body_size = DEFAULT_CLI_MAX_BODY_SIZE;
-  _servers[0]->location["/"].upload = true;
-  _servers[0]->location["/"].upload_store = DEFAULT_SERVER_ROOT;
-  _servers[0]->sockfd = -1;
-
-  _servers.push_back(new Server());
-
-  _servers[1]->ip = inet_addr(DEFAULT_ADDRESS);
-  _servers[1]->port = htons(PORT2);
-  _servers[1]->server_name.push_back(std::string("www.localhost2"));
-  _servers[1]->server_name.push_back(std::string("localhost2"));
-  _servers[1]->root = std::string(DEFAULT_SERVER_ROOT);
-  _servers[1]->index.push_back(std::string("index.html"));
-  _servers[1]->index.push_back(std::string("index2.html"));
-  _servers[1]->error_page[404] = std::string("custom_404.html");
-  _servers[1]->error_page[405] = std::string("custom_405.html");
-  _servers[1]->timeout = DEFAULT_TIMEOUT;
-  _servers[1]->location["/"].root = std::string(DEFAULT_SERVER_ROOT);
-  _servers[1]->location["/"].limit_except = std::string(DEFAULT_ROUTE_METHOD);
-  _servers[1]->location["/"].client_max_body_size = DEFAULT_CLI_MAX_BODY_SIZE;
-  _servers[1]->location["/"].upload = true;
-  _servers[1]->location["/"].upload_store = DEFAULT_SERVER_ROOT;
-  _servers[1]->sockfd = -1;
 
   return;
 }
@@ -73,4 +55,68 @@ Server* Config::operator[](size_t n) {
 
 size_t Config::size(void) {
   return (_servers.size());
+}
+
+std::string Config::_serialize(const std::string& file_content) {
+  std::string tmp(file_content);
+
+  for (std::string::size_type i = 0; i < tmp.length(); i++) {
+    if (tmp[i] == '\n') {
+      tmp.erase(tmp.begin() + i);
+    }
+    if (tmp[i] == '\t') {
+      tmp.erase(tmp.begin() + i);
+    }
+  }
+  return (tmp);
+}
+
+std::string Config::_prepare(const std::string& file_content) {
+  std::string tmp(file_content);
+
+  size_t pos = tmp.find("server{");
+  while (pos != std::string::npos) {
+    tmp.replace(pos, 7, "server {");
+    pos += 8;
+    pos = tmp.find("server{");
+  }
+
+  return (tmp);
+}
+
+std::vector<std::string> Config::_split(const std::string& file_content) {
+  size_t pos, pos2;
+  std::vector<std::string> configs;
+
+  pos = file_content.find("server {");
+  pos2 = file_content.find("server {", pos + 7);
+
+  configs.push_back(file_content.substr(pos, pos2 - pos));
+  configs.push_back(file_content.substr(pos2));
+
+  return (configs);
+}
+
+Server* Config::_parse(const std::string& config) {
+  (void)config;
+  Server* srv = new Server();
+
+  srv->ip = inet_addr(DEFAULT_ADDRESS);
+  srv->port = htons(PORT1);
+  srv->server_name.push_back(std::string("www.localhost"));
+  srv->server_name.push_back(std::string("localhost"));
+  srv->root = std::string(DEFAULT_SERVER_ROOT);
+  srv->index.push_back(std::string("index.html"));
+  srv->index.push_back(std::string("index2.html"));
+  srv->error_page[404] = std::string("custom_404.html");
+  srv->error_page[405] = std::string("custom_405.html");
+  srv->timeout = DEFAULT_TIMEOUT;
+  srv->location["/"].root = std::string(DEFAULT_SERVER_ROOT);
+  srv->location["/"].limit_except = std::string(DEFAULT_ROUTE_METHOD);
+  srv->location["/"].client_max_body_size = DEFAULT_CLI_MAX_BODY_SIZE;
+  srv->location["/"].upload = true;
+  srv->location["/"].upload_store = DEFAULT_SERVER_ROOT;
+  srv->sockfd = -1;
+
+  return (srv);
 }

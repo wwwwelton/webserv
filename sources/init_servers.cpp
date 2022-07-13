@@ -12,7 +12,7 @@ int init(int argc,
   size_t i;
   Config configs;
 
-  configs = Config(argv);
+  configs = Config(argv[1]);
 
   for (i = 0; i < configs.size(); i++) {
     configs[i]->_connect(configs.backlog);

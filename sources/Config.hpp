@@ -7,6 +7,8 @@
 
 #include <arpa/inet.h>
 
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -17,7 +19,7 @@ class Server;
 class Config {
  public:
   Config(void);
-  explicit Config(char** file);
+  explicit Config(char* file);
   Config(const Config& src);
   ~Config(void);
 
@@ -28,6 +30,12 @@ class Config {
 
  private:
   std::vector<Server*> _servers;
+
+ private:
+  std::string _serialize(const std::string& file_content);
+  std::string _prepare(const std::string& file_content);
+  std::vector<std::string> _split(const std::string& file_content);
+  Server* _parse(const std::string& config);
 
  public:
   int backlog;
