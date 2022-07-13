@@ -1,5 +1,9 @@
-//Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
-//Creation date: 26/06/2022
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
 
 #ifndef _POLLFD_HPP
 # define _POLLFD_HPP

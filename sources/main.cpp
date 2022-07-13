@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
 #include "webserv.hpp"
 
 int main(int argc, char **argv) {

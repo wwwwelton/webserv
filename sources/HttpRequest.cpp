@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
 #include "HttpRequest.hpp"
 #include "Logger.hpp"
 #include <sys/socket.h>

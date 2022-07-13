@@ -1,6 +1,9 @@
-// Copyright (c) 2022 João Rodriguez A.K.A. VLN37. All rights reserved.
-// Copyright (c) 2022 Welton Leite, wleite. All rights reserved.
-// Creation date: 25/06/2022
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
 
 #include "Config.hpp"
 

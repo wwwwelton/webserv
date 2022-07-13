@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                           João Rodriguez                                   #
+//#                            Paulo Sergio                                    #
+//#                            Welton Leite                                    #
+//##############################################################################
+
 #ifndef HTTPBASE_HPP
 #define HTTPBASE_HPP
 
