@@ -56,11 +56,13 @@ public:
   void _accept(int fd);
   void _respond(int fd);
   void purge_conns(void);
+  static Logger init_log();
 
 public:
   std::map<int, Server *> serverlist;
   std::vector<req>        clientlist;
   std::vector<_pollfd>    pollfds;
+  static Logger           log;
   int                     conn;
   int                     compress;
 };

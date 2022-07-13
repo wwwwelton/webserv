@@ -8,6 +8,12 @@
 #include "webserv.hpp"
 #include "Logger.hpp"
 
+Logger WebServ::log = WebServ::init_log();
+Logger WebServ::init_log(void) {
+  Logger logger(LVL_DEBUG);
+  return logger;
+}
+
 WebServ::WebServ(int argc, char **argv) {
   size_t i;
   Config configs;
