@@ -24,7 +24,7 @@ struct Request {
 
   bool is_valid() const ;
 
-  Request* receive(void);
+  Request* receive(int fd);
 private:
   int fd;
   bool valid;
