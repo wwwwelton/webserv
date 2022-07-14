@@ -6,15 +6,15 @@
 //##############################################################################
 
 #include "webserv.hpp"
-#include "HttpHandler.hpp"
+#include "HttpResponse.hpp"
 #include "HttpBase.hpp"
 
-RequestHandler::meth_map RequestHandler::methodptr = RequestHandler::init_map();
-RequestHandler::meth_map RequestHandler::init_map(void) {
+Response::meth_map Response::methodptr = Response::init_map();
+Response::meth_map Response::init_map(void) {
   meth_map _map;
-  _map["GET"] = &RequestHandler::_get;
-  _map["POST"] = &RequestHandler::_post;
-  _map["DELETE"] = &RequestHandler::_delete;
+  _map["GET"] = &Response::_get;
+  _map["POST"] = &Response::_post;
+  _map["DELETE"] = &Response::_delete;
   return _map;
 }
 
@@ -23,7 +23,7 @@ void Response::_send(int fd) {
   WebServ::log.info() << "Response sent to client " << fd << "\n";
 }
 
-void RequestHandler::_get(void) {
+void Response::_get(void) {
   int code;
   if (path == root) {
     for (size_t i = 0; i < server->index.size(); i++) {
@@ -46,10 +46,10 @@ void RequestHandler::_get(void) {
     extension_dispatcher(root + server->error_page[405]);
   }
   else
-    WebServ::log.error() << "Failed request on RequestHandler::_get\n";
+    WebServ::log.error() << "Failed request on Response::_get\n";
 }
 
-void RequestHandler::_get_php_cgi(std::string const& body_path) {
+void Response::_get_php_cgi(std::string const& body_path) {
   int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC);
   if (fd == -1)
     throw(std::exception());
@@ -69,7 +69,7 @@ void RequestHandler::_get_php_cgi(std::string const& body_path) {
   unlink("./tmp");
 }
 
-void RequestHandler::extension_dispatcher(std::string const& body_path) {
+void Response::extension_dispatcher(std::string const& body_path) {
   std::string extension(body_path.substr(body_path.find_last_of('.')));
   if (extension == ".html" || extension == ".css")
     return _get_body(body_path);
@@ -79,7 +79,7 @@ void RequestHandler::extension_dispatcher(std::string const& body_path) {
     WebServ::log.warning() << extension << " support not yet implemented\n";
 }
 
-void RequestHandler::_get_body(std::string const& body_path) {
+void Response::_get_body(std::string const& body_path) {
   std::ifstream in;
   std::string str = httpversion +
                     statuscode +
@@ -108,19 +108,19 @@ void RequestHandler::_get_body(std::string const& body_path) {
   WebServ::log.info() << "File requested: " << path << "\n";
 }
 
-void RequestHandler::_post(void) {
+void Response::_post(void) {
   return;
 }
 
-void RequestHandler::_delete(void) {
+void Response::_delete(void) {
   return;
 }
 
-void RequestHandler::process(void) {
+void Response::process(void) {
   (this->*methodptr[method])();
 }
 
-std::string RequestHandler::find_location(std::string path, Server *server) {
+std::string Response::find_location(std::string path, Server *server) {
   while (path.size()) {
     if (server->location.count(path))
       return server->location[path].root;
@@ -129,8 +129,8 @@ std::string RequestHandler::find_location(std::string path, Server *server) {
   return server->location["/"].root;
 }
 
-RequestHandler::RequestHandler(void) { }
-RequestHandler::RequestHandler(Request const& req, Server *_server)
+Response::Response(void) { }
+Response::Response(Request const& req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
 {
   if (req.body.size())

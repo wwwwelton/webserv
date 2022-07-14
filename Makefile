@@ -8,7 +8,7 @@ NAME    = webserv
 SRC     = main.cpp \
           webserv.cpp \
           HttpBase.cpp \
-          HttpHandler.cpp \
+          HttpResponse.cpp \
           HttpRequest.cpp \
           Pollfd.cpp \
           Server.cpp \
@@ -19,7 +19,7 @@ SRC     = main.cpp \
 INC     = defines.hpp \
           webserv.hpp \
           HttpBase.hpp \
-          HttpHandler.hpp \
+          HttpResponse.hpp \
           HttpRequest.hpp \
           Pollfd.hpp \
           Server.hpp \

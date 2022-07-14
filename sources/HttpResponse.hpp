@@ -5,8 +5,8 @@
 //#                            Welton Leite                                    #
 //##############################################################################
 
-#ifndef HTTPHANDLER_HPP
-# define HTTPHANDLER_HPP
+#ifndef HTTPRESPONSE_HPP
+# define HTTPRESPONSE_HPP
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -27,22 +27,22 @@
 class Server;
 class Logger;
 
-struct Response {
-  std::map<std::string, std::string> headers;
-  char *path;
-  char *http_version;
-  int status_code;
-  char *status_code_description;
-  char *host;
+// struct Response {
+//   std::map<std::string, std::string> headers;
+//   char *path;
+//   char *http_version;
+//   int status_code;
+//   char *status_code_description;
+//   char *host;
 
-  void _send(int fd);
-};
+//   void _send(int fd);
+// };
 
 #define BUFFER_SIZE 100
 
-class RequestHandler {
-typedef void (RequestHandler::*funcptr)(void);
-typedef std::map<std::string, void (RequestHandler::*)(void)> meth_map;
+class Response {
+typedef void (Response::*funcptr)(void);
+typedef std::map<std::string, void (Response::*)(void)> meth_map;
 
 private:
   static meth_map methodptr;
@@ -68,12 +68,13 @@ private:
   std::string find_location(std::string path, Server *_server);
 
 public:
-  RequestHandler(void);
-  RequestHandler(Request const& req, Server *_server);
+  Response(void);
+  Response(Request const& req, Server *_server);
   void process(void);
-  Response _response(void) {
-    return (Response());
-  }
+  void _send(int fd);
+  // Response _response(void) {
+  //   return (Response());
+  // }
 };
 
-#endif // HTTPHANDLER_HPP
+#endif // HTTPRESPONSE_HPP

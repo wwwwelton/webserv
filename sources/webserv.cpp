@@ -55,16 +55,14 @@ void WebServ::_accept(int i) {
 
 void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
-  RequestHandler req_handler;
+  Response req_handler;
   Request *ptr;
-  Response res;
 
   //   req = Request(fd, clientlist[fd]);
   ptr = clientlist[fd].request->receive(fd);
-  req_handler = RequestHandler(*ptr, clientlist[fd].server);
+  req_handler = Response(*ptr, clientlist[fd].server);
   req_handler.process();
-  res = req_handler._response();
-  res._send(fd);
+  req_handler._send(fd);
   delete clientlist[fd].request;
   clientlist[fd].request = NULL;
   clientlist[fd].server = NULL;

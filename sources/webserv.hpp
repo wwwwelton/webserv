@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "HttpBase.hpp"
-#include "HttpHandler.hpp"
+#include "HttpResponse.hpp"
 #include "HttpRequest.hpp"
 #include "Pollfd.hpp"
 #include "Server.hpp"
