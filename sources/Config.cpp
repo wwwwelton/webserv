@@ -24,8 +24,9 @@ Config::Config(char* file) {
   ss << ifs.rdbuf();
 
   str = _sanitize(ss.str());
+
   host = _sub_host(str);
-  vhost = _split(str);
+  vhost = _sub_vhost(str);
 
   std::cout << host << "\n";
   for (size_t i = 0; i < vhost.size(); i++) {
@@ -100,7 +101,7 @@ std::string Config::_sub_host(const std::string& file_content) {
   return (host);
 }
 
-std::vector<std::string> Config::_split(const std::string& file_content) {
+std::vector<std::string> Config::_sub_vhost(const std::string& file_content) {
   size_t start, end;
   std::vector<std::string> vhost;
 
