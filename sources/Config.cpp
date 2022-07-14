@@ -17,17 +17,20 @@ Config::Config(char* file) {
   std::ifstream ifs;
   std::stringstream ss;
   std::string str;
-  std::vector<std::string> configs;
+  std::string host;
+  std::vector<std::string> vhost;
 
   ifs.open("default.conf");
   ss << ifs.rdbuf();
 
   str = _sanitize(ss.str());
-  configs = _split(str);
+  host = _sub_host(str);
+  vhost = _split(str);
 
-  for (size_t i = 0; i < configs.size(); i++) {
-    _servers.push_back(_parse(configs[i]));
-    std::cout << configs[i] << "\n";
+  std::cout << host << "\n";
+  for (size_t i = 0; i < vhost.size(); i++) {
+    _servers.push_back(_parse(vhost[i]));
+    std::cout << vhost[i] << "\n";
   }
 
   backlog = DEFAULT_BACKLOG;
@@ -87,9 +90,19 @@ std::string Config::_sanitize(const std::string& file_content) {
   return (tmp);
 }
 
+std::string Config::_sub_host(const std::string& file_content) {
+  size_t pos;
+  std::string host;
+
+  pos = file_content.find("server {");
+  host = file_content.substr(0, pos);
+
+  return (host);
+}
+
 std::vector<std::string> Config::_split(const std::string& file_content) {
   size_t start, end;
-  std::vector<std::string> configs;
+  std::vector<std::string> vhost;
 
   start = file_content.find("server {");
   end = file_content.find("server {", start + 8);
@@ -98,7 +111,7 @@ std::vector<std::string> Config::_split(const std::string& file_content) {
   }
 
   while (start != std::string::npos) {
-    configs.push_back(file_content.substr(start, end - start));
+    vhost.push_back(file_content.substr(start, end - start));
     start += 8;
     start = file_content.find("server {", start);
     end = file_content.find("server {", start + 8);
@@ -107,7 +120,7 @@ std::vector<std::string> Config::_split(const std::string& file_content) {
     }
   }
 
-  return (configs);
+  return (vhost);
 }
 
 Server* Config::_parse(const std::string& config) {

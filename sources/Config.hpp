@@ -41,6 +41,7 @@ class Config {
                     const std::string& new_word);
 
   std::string _sanitize(const std::string& file_content);
+  std::string _sub_host(const std::string& file_content);
   std::vector<std::string> _split(const std::string& file_content);
   Server* _parse(const std::string& config);
 
