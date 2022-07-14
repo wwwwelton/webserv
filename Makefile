@@ -10,7 +10,6 @@ SRC     = main.cpp \
           HttpBase.cpp \
           HttpResponse.cpp \
           HttpRequest.cpp \
-          HttpRequestParser.cpp \
           Pollfd.cpp \
           Server.cpp \
           Config.cpp \
@@ -22,7 +21,6 @@ INC     = defines.hpp \
           HttpBase.hpp \
           HttpResponse.hpp \
           HttpRequest.hpp \
-          HttpRequestParser.hpp \
           Pollfd.hpp \
           Server.hpp \
           Config.hpp \
