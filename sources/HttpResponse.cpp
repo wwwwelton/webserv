@@ -105,7 +105,7 @@ void Response::_get_body(std::string const& body_path) {
   HttpBase::size = str.size();
   // std::cout << str.size() << "\n";
   in.close();
-  WebServ::log.info() << "File requested: " << path << "\n";
+  WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
 void Response::_post(void) {

@@ -10,11 +10,12 @@
 
 Logger WebServ::log = WebServ::init_log();
 Logger WebServ::init_log(void) {
-  Logger logger(LVL_DEBUG);
+  Logger logger(LOG_LEVEL);
   return logger;
 }
 
 WebServ::WebServ(int argc, char **argv) {
+  log.info() << "Initializing WebServ\n";
   size_t i;
   Config configs;
   (void)argc;
@@ -36,7 +37,7 @@ WebServ::WebServ(int argc, char **argv) {
 
 int WebServ::_poll(void) {
   conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), -1);
-  log.debug() << "returned connections: " << conn << '\n';
+  log.info() << "returned connections: " << conn << '\n';
   return conn;
 }
 
@@ -44,12 +45,16 @@ void WebServ::_accept(int i) {
   Server *host = serverlist[pollfds[i].fd];
   int new_sd;
 
+  log.info() << "Events detected in socket " << pollfds[i].fd << "\n";
   new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
     clientlist[new_sd].request = new Request(new_sd);
     clientlist[new_sd].server = host;
     pollfds.push_back(_pollfd(new_sd, POLLIN));
     new_sd = accept(host->sockfd, NULL, NULL);
+    log.info() << host->server_name[0]
+               << " accepted connection of client "
+               << new_sd << "\n";
   }
 }
 

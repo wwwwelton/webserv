@@ -8,6 +8,8 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#define LOG_LEVEL LVL_DEBUG
+
 #define DEFAULT_ADDRESS "127.0.0.1"
 #define DEFAULT_TIMEOUT 300
 #define DEFAULT_ROUTE_METHOD "ALL"
