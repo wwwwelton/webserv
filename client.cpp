@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-int main (int argc, char *argv[])
+int main (void)
 {
   struct sockaddr_in server;
   int sock_fd;
@@ -35,14 +35,16 @@ int main (int argc, char *argv[])
 
   perror("connected");
 
-  const char *data = "Hello, world!\n\n";
+  const char *data = "GET /index.html HTTP/1.1\r\n"
+                     "Host: 127.0.0.1:3492\r\n\r\n";
   int len = strlen(data);
 
-  for (int i = 0; i < len; i++) {
-    send(sock_fd, data + i, 1, 0);
-    std::cout << "Sending a byte to the server" << std::endl;
-    sleep(1);
-  }
+  send(sock_fd, data, len, 0);
+  // for (int i = 0; i < len; i++) {
+  //   send(sock_fd, data + i, 1, 0);
+  //   std::cout << "Sending a byte to the server" << std::endl;
+  //   sleep(1);
+  // }
   close(conn_fd);
   close(sock_fd);
   return 0;
