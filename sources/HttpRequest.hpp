@@ -24,6 +24,7 @@ struct Request {
   std::string host;
   std::string body;
   int body_size;
+  int finished;
 
   Request(int fd);
 

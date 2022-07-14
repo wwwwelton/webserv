@@ -65,15 +65,18 @@ void WebServ::_respond(int i) {
 
   //   req = Request(fd, clientlist[fd]);
   ptr = clientlist[fd].request->receive(fd);
-  req_handler = Response(*ptr, clientlist[fd].server);
-  req_handler.process();
-  req_handler._send(fd);
-  delete clientlist[fd].request;
-  clientlist[fd].request = NULL;
-  clientlist[fd].server = NULL;
-  close(pollfds[i].fd);
-  pollfds[i].fd = -1;
-  compress = true;
+  if (ptr->finished) {
+    req_handler = Response(*ptr, clientlist[fd].server);
+    req_handler.process();
+    req_handler._send(fd);
+    delete clientlist[fd].request;
+    clientlist[fd].request = NULL;
+    clientlist[fd].server = NULL;
+    close(pollfds[i].fd);
+    pollfds[i].fd = -1;
+    compress = true;
+  }
+
 }
 
 void WebServ::purge_conns(void) {

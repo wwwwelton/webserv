@@ -45,6 +45,7 @@ std::ostream& operator<<(std::ostream& out, const Request& request) {
 
 Request::Request(int _fd) {
   this->valid = false;
+  this->finished = true;
   fd = _fd;
 }
 
