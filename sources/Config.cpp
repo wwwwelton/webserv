@@ -28,13 +28,13 @@ Config::Config(char* file) {
   host = _sub_host(str);
   vhost = _sub_vhost(str);
 
-  std::cout << host << "\n";
+  _parse_host(host);
+
+  //   std::cout << host << "\n";
   for (size_t i = 0; i < vhost.size(); i++) {
     _servers.push_back(_parse(vhost[i]));
-    std::cout << vhost[i] << "\n";
+    // std::cout << vhost[i] << "\n";
   }
-
-  backlog = DEFAULT_BACKLOG;
 
   return;
 }
@@ -60,23 +60,14 @@ size_t Config::size(void) {
   return (_servers.size());
 }
 
-void Config::_replace_all(std::string* str,
-                          const std::string& old_word,
-                          const std::string& new_word) {
-  size_t pos;
-
-  pos = str->find(old_word);
-  while (pos != std::string::npos) {
-    str->replace(pos, old_word.length(), new_word);
-    pos = str->find(old_word, pos + new_word.length());
-  }
-}
-
 std::string Config::_sanitize(const std::string& file_content) {
   std::string tmp(file_content);
 
-  tmp.erase(std::remove(tmp.begin(), tmp.end(), '\n'), tmp.end());
-  tmp.erase(std::remove(tmp.begin(), tmp.end(), '\t'), tmp.end());
+  //   tmp.erase(std::remove(tmp.begin(), tmp.end(), '\n'), tmp.end());
+  //   tmp.erase(std::remove(tmp.begin(), tmp.end(), '\t'), tmp.end());
+
+  _replace_all(&tmp, "\n", " ");
+  _replace_all(&tmp, "\t", " ");
 
   _replace_all(&tmp, "server{", "server {");
 
@@ -124,6 +115,21 @@ std::vector<std::string> Config::_sub_vhost(const std::string& file_content) {
   return (vhost);
 }
 
+void Config::_parse_host(const std::string& host) {
+  std::istringstream is(host);
+  std::string line;
+  std::vector<std::string> tokens;
+
+  while (std::getline(is, line)) {
+    line = _trim(line, "; ");
+    tokens = _split(line, " ");
+
+    if (tokens[0] == "workers") {
+      backlog = _stoi(tokens[1]);
+    }
+  }
+}
+
 Server* Config::_parse(const std::string& config) {
   (void)config;
   Server* srv = new Server();
@@ -146,4 +152,47 @@ Server* Config::_parse(const std::string& config) {
   srv->sockfd = -1;
 
   return (srv);
+}
+
+void Config::_replace_all(std::string* str,
+                          const std::string& old_word,
+                          const std::string& new_word) {
+  size_t pos;
+
+  pos = str->find(old_word);
+  while (pos != std::string::npos) {
+    str->replace(pos, old_word.length(), new_word);
+    pos = str->find(old_word, pos + new_word.length());
+  }
+}
+
+std::string Config::_trim(const std::string& str, const std::string& set) {
+  std::string tmp(str);
+
+  tmp.erase(tmp.find_last_not_of(set) + 1);
+  tmp.erase(0, tmp.find_first_not_of(set));
+
+  return (tmp);
+}
+
+std::vector<std::string> Config::_split(const std::string& str,
+                                        const std::string& del) {
+  std::vector<std::string> list;
+  std::string s(str);
+  size_t pos = 0;
+
+  std::string token;
+  while ((pos = s.find(del)) != std::string::npos) {
+    token = s.substr(0, pos);
+    list.push_back(token);
+    s.erase(0, pos + del.length());
+  }
+  list.push_back(s);
+  return (list);
+}
+
+size_t Config::_stoi(const std::string& str) {
+  size_t n;
+  std::istringstream(str) >> n;
+  return (n);
 }
