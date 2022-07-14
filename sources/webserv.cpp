@@ -51,10 +51,10 @@ void WebServ::_accept(int i) {
     clientlist[new_sd].request = new Request(new_sd);
     clientlist[new_sd].server = host;
     pollfds.push_back(_pollfd(new_sd, POLLIN));
-    new_sd = accept(host->sockfd, NULL, NULL);
     log.info() << host->server_name[0]
                << " accepted connection of client "
                << new_sd << "\n";
+    new_sd = accept(host->sockfd, NULL, NULL);
   }
 }
 
@@ -76,7 +76,6 @@ void WebServ::_respond(int i) {
     pollfds[i].fd = -1;
     compress = true;
   }
-
 }
 
 void WebServ::purge_conns(void) {
