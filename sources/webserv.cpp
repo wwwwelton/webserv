@@ -63,7 +63,6 @@ void WebServ::_respond(int i) {
   Response req_handler;
   Request *ptr;
 
-  //   req = Request(fd, clientlist[fd]);
   ptr = clientlist[fd].request->receive(fd);
   if (ptr->finished) {
     req_handler = Response(*ptr, clientlist[fd].server);
