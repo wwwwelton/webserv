@@ -12,6 +12,7 @@
 Response::meth_map Response::methodptr = Response::init_map();
 Response::meth_map Response::init_map(void) {
   meth_map _map;
+
   _map["GET"] = &Response::_get;
   _map["POST"] = &Response::_post;
   _map["DELETE"] = &Response::_delete;
@@ -26,13 +27,20 @@ Response::function_vector Response::init_pre(void) {
   return vec;
 }
 
+Response::function_vector Response::get_method = Response::init_get();
+Response::function_vector Response::init_get(void) {
+  function_vector vec;
+
+  vec.push_back(&Response::_get);
+  return vec;
+}
+
 void Response::_send(int fd) {
   send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
   WebServ::log.info() << "Response sent to client " << fd << "\n";
 }
 
-int Response::_get(void) {
-  int code;
+int Response::validate_index(void) {
   if (path == root) {
     for (size_t i = 0; i < server->index.size(); i++) {
       std::string indexpath = root + server->index[i];
@@ -41,27 +49,40 @@ int Response::_get(void) {
         return 200;
       }
     }
-    code = errno;
+    if (errno == ENOENT)
+      return NOT_FOUND;
+    if (errno == EACCES)
+      return FORBIDDEN;
   }
-  else if (!access(path.c_str(), R_OK)) {
+  return 0;
+}
+
+int Response::validate_path(void) {
+  if (!access(path.c_str(), R_OK)) {
     response_path = path;
-    return 200;
+    return OK;
   }
-  code = errno;
-  statuscode = "404 ";
-  statusmsg = "FAIL\n";
-  if (code == ENOENT)
-    return 404;
-    // extension_dispatcher(root + server->error_page[404]);
-  else if (code == EACCES) {
-    statuscode = "405 ";
-    return 405;
-    // extension_dispatcher(root + server->error_page[405]);
-  }
+  if (errno == ENOENT)
+    return NOT_FOUND;
+  else if (errno == EACCES)
+    return FORBIDDEN;
   else {
-    WebServ::log.error() << "Failed request on Response::_get\n";
-    return 404;
+    WebServ::log.warning() << "unexpected outcome in Response::validate_path\n";
+    return NOT_FOUND;
   }
+}
+
+int Response::_get(void) {
+  int code;
+
+  code = validate_index();
+  if (code)
+    return code;
+  code = validate_path();
+  if (code)
+    return code;
+  WebServ::log.error() << "Failed request on Response::_get\n";
+  return NOT_FOUND;
 }
 
 void Response::_get_php_cgi(std::string const& body_path) {
@@ -85,7 +106,12 @@ void Response::_get_php_cgi(std::string const& body_path) {
 }
 
 void Response::extension_dispatcher(std::string const& body_path) {
-  std::string extension(body_path.substr(body_path.find_last_of('.')));
+  std::string extension;
+
+  if (body_path.find_last_of('.') == std::string::npos)
+    extension = ".html";
+  else
+    extension = body_path.substr(body_path.find_last_of('.'));
   if (extension == ".html" || extension == ".css")
     return _get_body(body_path);
   else if (extension == ".php")
@@ -141,17 +167,29 @@ int Response::validate_limit_except(void) {
   return METHOD_NOT_ALLOWED;
 }
 
+void Response::set_statuscode(int code) {
+  std::stringstream ss;
+
+  statuscode.clear();
+  ss << code;
+  ss >> statuscode;
+  statuscode.push_back(32);
+}
+
 void Response::process(void) {
   response_code = validate_limit_except();
-  if (response_code == 0)
+  if (response_code == 0) {
     response_code = (this->*methodptr[method])();
-  if (response_code != 0) {
-    if (server->error_page.count(response_code))
-      _get_body(root + server->error_page[response_code]);
-    else
-      _get_body(root + server->error_page[404]);
+    std::cout << "here\n";
   }
-  _get_body(response_path);
+  if (response_code > 399) {
+    if (server->error_page.count(response_code))
+      response_path = root + server->error_page[response_code];
+    else // TODO(welton) default error pages
+      response_path = root + server->error_page[NOT_FOUND];
+  }
+  set_statuscode(response_code);
+  extension_dispatcher(response_path);
 }
 
 void Response::find_location(std::string path, Server *server) {

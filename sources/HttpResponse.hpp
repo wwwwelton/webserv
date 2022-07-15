@@ -51,6 +51,7 @@ typedef std::vector<int (Response::*)(void)> function_vector;
 private:
   static meth_map methodptr;
   static function_vector pre_method;
+  static function_vector get_method;
 
   std::string response_path;
   int         response_code;
@@ -67,11 +68,15 @@ private:
 
   static meth_map init_map();
   static function_vector init_pre();
+  static function_vector init_get();
   static Logger init_logger();
 
 
-  int _get(void);
   int validate_limit_except(void);
+  int _get(void);
+  int validate_index(void);
+  int validate_path(void);
+  void set_statuscode(int code);
   void _get_body(std::string const& body_path);
   void _get_php_cgi(std::string const& body_path);
   void extension_dispatcher(std::string const& body_path);
