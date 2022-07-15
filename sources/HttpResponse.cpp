@@ -216,8 +216,9 @@ int Response::validate_limit_except(void) {
       return 0;
     if (location->limit_except.find(method) != std::string::npos)
       return 0;
+    return METHOD_NOT_ALLOWED;
   }
-  return METHOD_NOT_ALLOWED;
+  return 0;
 }
 
 void Response::set_statuscode(int code) {
