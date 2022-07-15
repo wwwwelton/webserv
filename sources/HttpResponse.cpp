@@ -18,35 +18,50 @@ Response::meth_map Response::init_map(void) {
   return _map;
 }
 
+Response::function_vector Response::pre_method = Response::init_pre();
+Response::function_vector Response::init_pre(void) {
+  function_vector vec;
+
+  vec.push_back(&Response::validate_limit_except);
+  return vec;
+}
+
 void Response::_send(int fd) {
   send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
   WebServ::log.info() << "Response sent to client " << fd << "\n";
 }
 
-void Response::_get(void) {
+int Response::_get(void) {
   int code;
   if (path == root) {
     for (size_t i = 0; i < server->index.size(); i++) {
       std::string indexpath = root + server->index[i];
-      if (!access(indexpath.c_str(), R_OK))
-        return extension_dispatcher(indexpath);
+      if (!access(indexpath.c_str(), R_OK)) {
+        response_path = indexpath;
+        return 200;
+      }
     }
     code = errno;
   }
   else if (!access(path.c_str(), R_OK)) {
-    return extension_dispatcher(path);
+    response_path = path;
+    return 200;
   }
   code = errno;
   statuscode = "404 ";
   statusmsg = "FAIL\n";
   if (code == ENOENT)
-    extension_dispatcher(root + server->error_page[404]);
+    return 404;
+    // extension_dispatcher(root + server->error_page[404]);
   else if (code == EACCES) {
     statuscode = "405 ";
-    extension_dispatcher(root + server->error_page[405]);
+    return 405;
+    // extension_dispatcher(root + server->error_page[405]);
   }
-  else
+  else {
     WebServ::log.error() << "Failed request on Response::_get\n";
+    return 404;
+  }
 }
 
 void Response::_get_php_cgi(std::string const& body_path) {
@@ -108,25 +123,48 @@ void Response::_get_body(std::string const& body_path) {
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
-void Response::_post(void) {
-  return;
+int Response::_post(void) {
+  return 0;
 }
 
-void Response::_delete(void) {
-  return;
+int Response::_delete(void) {
+  return 0;
+}
+
+int Response::validate_limit_except(void) {
+  if (location->limit_except.size()) {
+    if (location->limit_except == "ALL")
+      return 0;
+    if (location->limit_except.find(method) != std::string::npos)
+      return 0;
+  }
+  return METHOD_NOT_ALLOWED;
 }
 
 void Response::process(void) {
-  (this->*methodptr[method])();
+  response_code = validate_limit_except();
+  if (response_code == 0)
+    response_code = (this->*methodptr[method])();
+  if (response_code != 0) {
+    std::cout << "here\n";
+    if (server->error_page.count(response_code))
+      _get_body(root + server->error_page[response_code]);
+    else
+      _get_body(root + server->error_page[404]);
+  }
+  std::cout << "here2\n";
+  std::cout << response_path << "\n";
+  _get_body(response_path);
 }
 
-std::string Response::find_location(std::string path, Server *server) {
+void Response::find_location(std::string path, Server *server) {
   while (path.size()) {
-    if (server->location.count(path))
-      return server->location[path].root;
+    if (server->location.count(path)) {
+      location = &server->location[path];
+    }
     path = path.erase(path.find_last_of('/'));
   }
-  return server->location["/"].root;
+  location = &server->location["/"];
 }
 
 Response::Response(void) { }
@@ -135,9 +173,10 @@ Response::Response(Request const& req, Server *_server)
 {
   if (req.body.size())
     WebServ::log.debug() << "Request body:\n" << req.body << "\n";
-  location = find_location(req.path, _server);
+  find_location(req.path, _server);
   server = _server;
-  path = "./" + location + req.path;
-  root = "./" + location + "/";
+  path = "./" + location->root + req.path;
+  root = "./" + location->root + "/";
   method = req.method;
+  response_code = 0;
 }
