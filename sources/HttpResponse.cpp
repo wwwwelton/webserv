@@ -149,7 +149,24 @@ void Response::assemble(std::string const& body_path) {
 }
 
 int Response::_post(void) {
-  return 0;
+  std::string   file;
+  std::ofstream ofile;
+  int           code;
+  size_t        index;
+  size_t        end;
+
+  index = req_body.find('=');
+  end = req_body.find('&');
+  file = req_body.substr(index + 1, end - index - 1);
+  std::cout << file << "\n";
+  file = location->upload_store + "/" + file;
+  std::cout << file << "\n";
+  code = access(file.c_str(), W_OK);
+  if (code == EACCES)
+    return FORBIDDEN;
+  ofile.open(file.c_str(), ofile.out | ofile.trunc);
+  ofile << req_body;
+  return CREATED;
 }
 
 int Response::_delete(void) {
@@ -203,8 +220,10 @@ Response::Response(void) { }
 Response::Response(Request const& req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
 {
-  if (req.body.size())
+  if (req.body.size()) {
     WebServ::log.debug() << "Request body:\n" << req.body << "\n";
+    req_body = req.body;
+  }
   find_location(req.path, _server);
   server = _server;
   path = "./" + location->root + req.path;

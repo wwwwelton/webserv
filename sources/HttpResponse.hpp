@@ -52,6 +52,7 @@ private:
   std::string statuscode;
   std::string statusmsg;
   std::string method;
+  std::string req_body;
   std::string path;
   std::string root;
   Server*     server;

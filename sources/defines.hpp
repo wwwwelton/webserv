@@ -19,6 +19,7 @@
 #define DEFAULT_BACKLOG 500;
 
 #define OK 200
+#define CREATED 201
 #define ACCEPTED 202
 #define BAD_REQUEST 400
 #define UNAUTHORIZED 401
