@@ -240,7 +240,7 @@ void Response::set_statuscode(int code) {
 }
 
 void Response::process(void) {
-  for (int i = 0; i < pre_method.size() && response_code == 0; i++)
+  for (size_t i = 0; i < pre_method.size() && response_code == 0; i++)
   response_code = (this->*pre_method[i])();
   if (response_code == 0)
     response_code = (this->*methodptr[method])();
