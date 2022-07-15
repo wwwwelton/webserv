@@ -44,6 +44,7 @@ std::ostream& operator<<(std::ostream& out, const Request& request) {
 }
 
 Request::Request(int _fd) {
+  raw = NULL;
   this->valid = false;
   this->finished = true;
   fd = _fd;
@@ -69,7 +70,8 @@ Request* Request::receive(int _fd) {
 }
 
 Request::~Request() {
-  delete [] raw;
+  if (raw)
+    delete [] raw;
 }
 
 bool Request::is_valid() const {

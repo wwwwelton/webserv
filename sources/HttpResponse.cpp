@@ -24,6 +24,7 @@ Response::function_vector Response::init_pre(void) {
   function_vector vec;
 
   vec.push_back(&Response::validate_limit_except);
+  vec.push_back(&Response::validate_http_version);
   return vec;
 }
 
@@ -55,6 +56,12 @@ int Response::validate_index(void) {
     if (errno == EACCES)
       return FORBIDDEN;
   }
+  return 0;
+}
+
+int Response::validate_http_version(void) {
+  if (req->http_version != "HTTP/1.1")
+    return HTTP_VERSION_UNSUPPORTED;
   return 0;
 }
 
@@ -107,10 +114,14 @@ void Response::php_cgi(std::string const& body_path) {
 void Response::dispatch(std::string const& body_path) {
   std::string extension;
 
-  if (body_path.find_last_of('.') == std::string::npos)
+  if (body_path.find_last_of('.') == std::string::npos) {
+    contenttype = "Content-Type: text/plain\n";
     extension = ".html";
-  else
+  }
+  else {
+    contenttype = "Content-Type: text/html; charset=utf-8\n";
     extension = body_path.substr(body_path.find_last_of('.'));
+  }
   if (extension == ".html" || extension == ".css")
     assemble(body_path);
   else if (extension == ".php")
@@ -124,7 +135,7 @@ void Response::assemble(std::string const& body_path) {
   std::string str = httpversion +
                     statuscode +
                     statusmsg +
-                    DFL_CONTENTTYPE +
+                    contenttype +
                     DFL_CONTENTLEN;
   std::string body;
   std::string size;
@@ -196,7 +207,7 @@ void Response::process(void) {
   response_code = validate_limit_except();
   if (response_code == 0)
     response_code = (this->*methodptr[method])();
-  if (response_code > 399) {
+  if (response_code >= BAD_REQUEST) {
     if (server->error_page.count(response_code))
       response_path = root + server->error_page[response_code];
     else // TODO(welton) default error pages
@@ -216,18 +227,18 @@ void Response::find_location(std::string path, Server *server) {
   location = &server->location["/"];
 }
 
-Response::Response(void) { }
-Response::Response(Request const& req, Server *_server)
-: httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n")
+Response::Response(void): req(NULL) { }
+Response::Response(Request const& _req, Server *_server)
+: httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n"), req(&_req)
 {
-  if (req.body.size()) {
-    WebServ::log.debug() << "Request body:\n" << req.body << "\n";
-    req_body = req.body;
+  if (_req.body.size()) {
+    WebServ::log.debug() << "Request body:\n" << _req.body << "\n";
+    req_body = req->body;
   }
-  find_location(req.path, _server);
+  find_location(_req.path, _server);
   server = _server;
-  path = "./" + location->root + req.path;
+  path = "./" + location->root + _req.path;
   root = "./" + location->root + "/";
-  method = req.method;
+  method = req->method;
   response_code = 0;
 }

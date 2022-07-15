@@ -51,15 +51,18 @@ private:
   std::string httpversion;
   std::string statuscode;
   std::string statusmsg;
+  std::string contenttype;
   std::string method;
   std::string req_body;
   std::string path;
   std::string root;
   Server*     server;
+  Request const* req;
   bool        valid;
   server_location* location;
 
   int validate_limit_except(void);
+  int validate_http_version(void);
   int _get(void);
   int validate_index(void);
   int validate_path(void);
