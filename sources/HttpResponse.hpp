@@ -35,15 +35,18 @@ class Response {
 typedef void(Response::*funcptr)(void);
 typedef std::map<std::string, int (Response::*)(void)> meth_map;
 typedef std::vector<int (Response::*)(void)> function_vector;
+typedef std::map<int, std::string> status_map;
 
 private:
+  static std::map<int, std::string> statuslist;
   static meth_map methodptr;
   static function_vector pre_method;
   static function_vector get_method;
 
-  static meth_map init_map();
+  static meth_map        init_map();
   static function_vector init_pre();
   static function_vector init_get();
+  static status_map      init_status_map();
 
   std::string response_path;
   int         response_code;
