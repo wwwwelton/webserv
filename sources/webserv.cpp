@@ -48,7 +48,7 @@ void WebServ::_accept(int i) {
   log.info() << "Events detected in socket " << pollfds[i].fd << "\n";
   new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
-    clientlist[new_sd].request = new Request(new_sd);
+    clientlist[new_sd].request_parser = new HttpRequestParser(new_sd);
     clientlist[new_sd].server = host;
     pollfds.push_back(_pollfd(new_sd, POLLIN));
     log.info() << host->server_name[0]
@@ -62,14 +62,25 @@ void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
   Response req_handler;
   Request *ptr;
+  HttpRequestParser& parser = *clientlist[fd].request_parser;
 
-  ptr = clientlist[fd].request->receive(fd);
-  if (ptr->finished) {
+  try {
+    parser.tokenize_partial_request();
+
+  } catch (std::exception& e) {
+    WebServ::log.error()
+      << "exception caught while tokenizing request: "
+      << e.what() << std::endl;
+    return ;
+  }
+
+  if (parser.finished) {
+    ptr = parser.get_request();
     req_handler = Response(*ptr, clientlist[fd].server);
     req_handler.process();
     req_handler._send(fd);
-    delete clientlist[fd].request;
-    clientlist[fd].request = NULL;
+    delete clientlist[fd].request_parser;
+    clientlist[fd].request_parser = NULL;
     clientlist[fd].server = NULL;
     close(pollfds[i].fd);
     pollfds[i].fd = -1;

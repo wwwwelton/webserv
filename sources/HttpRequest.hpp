@@ -23,25 +23,17 @@ struct Request {
   std::string http_version;
   std::string host;
   std::string body;
+  bool valid;
   int body_size;
   int finished;
 
-  Request(int fd);
+  Request();
 
   ~Request();
 
   bool is_valid() const ;
 
-  Request* receive(int fd);
-private:
-  int fd;
-  bool valid;
-  char *raw;
-  size_t nbytes;
-
-  std::vector<std::string>* tokenize_request(char *payload);
-  void parse_request(std::vector<std::string>* tokens);
-
 };
+
 std::ostream& operator<<(std::ostream& out, const Request& request);
 #endif // !HTTP_REQUEST_HPP
