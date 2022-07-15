@@ -146,14 +146,11 @@ void Response::process(void) {
   if (response_code == 0)
     response_code = (this->*methodptr[method])();
   if (response_code != 0) {
-    std::cout << "here\n";
     if (server->error_page.count(response_code))
       _get_body(root + server->error_page[response_code]);
     else
       _get_body(root + server->error_page[404]);
   }
-  std::cout << "here2\n";
-  std::cout << response_path << "\n";
   _get_body(response_path);
 }
 
