@@ -31,18 +31,6 @@ class Server;
 class Logger;
 class server_location;
 
-// struct Response {
-//   std::map<std::string, std::string> headers;
-//   char *path;
-//   char *http_version;
-//   int status_code;
-//   char *status_code_description;
-//   char *host;
-
-//   void _send(int fd);
-// };
-
-
 class Response {
 typedef void(Response::*funcptr)(void);
 typedef std::map<std::string, int (Response::*)(void)> meth_map;
@@ -52,6 +40,10 @@ private:
   static meth_map methodptr;
   static function_vector pre_method;
   static function_vector get_method;
+
+  static meth_map init_map();
+  static function_vector init_pre();
+  static function_vector init_get();
 
   std::string response_path;
   int         response_code;
@@ -66,20 +58,14 @@ private:
   bool        valid;
   server_location* location;
 
-  static meth_map init_map();
-  static function_vector init_pre();
-  static function_vector init_get();
-  static Logger init_logger();
-
-
   int validate_limit_except(void);
   int _get(void);
   int validate_index(void);
   int validate_path(void);
   void set_statuscode(int code);
-  void _get_body(std::string const& body_path);
-  void _get_php_cgi(std::string const& body_path);
-  void extension_dispatcher(std::string const& body_path);
+  void assemble(std::string const& body_path);
+  void php_cgi(std::string const& body_path);
+  void dispatch(std::string const& body_path);
   int _post(void);
   int _delete(void);
   void find_location(std::string path, Server *_server);
@@ -89,9 +75,6 @@ public:
   Response(void);
   void process(void);
   void _send(int fd);
-  // Response _response(void) {
-  //   return (Response());
-  // }
 };
 
 #endif // HTTPRESPONSE_HPP

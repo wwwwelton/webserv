@@ -31,7 +31,8 @@ Response::function_vector Response::get_method = Response::init_get();
 Response::function_vector Response::init_get(void) {
   function_vector vec;
 
-  vec.push_back(&Response::_get);
+  vec.push_back(&Response::validate_index);
+  vec.push_back(&Response::validate_path);
   return vec;
 }
 
@@ -46,7 +47,7 @@ int Response::validate_index(void) {
       std::string indexpath = root + server->index[i];
       if (!access(indexpath.c_str(), R_OK)) {
         response_path = indexpath;
-        return 200;
+        return OK;
       }
     }
     if (errno == ENOENT)
@@ -67,25 +68,23 @@ int Response::validate_path(void) {
   else if (errno == EACCES)
     return FORBIDDEN;
   else {
-    WebServ::log.warning() << "unexpected outcome in Response::validate_path\n";
+    WebServ::log.warning() << "Unexpected outcome in Response::validate_path\n";
     return NOT_FOUND;
   }
 }
 
 int Response::_get(void) {
-  int code;
+  int code = 0;
 
-  code = validate_index();
+  for (size_t i = 0; i < get_method.size() && code == 0; i++)
+    code = (this->*get_method[i])();
   if (code)
     return code;
-  code = validate_path();
-  if (code)
-    return code;
-  WebServ::log.error() << "Failed request on Response::_get\n";
+  WebServ::log.warning() << "Unexpected outcome in Response::_get\n";
   return NOT_FOUND;
 }
 
-void Response::_get_php_cgi(std::string const& body_path) {
+void Response::php_cgi(std::string const& body_path) {
   int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC);
   if (fd == -1)
     throw(std::exception());
@@ -101,11 +100,11 @@ void Response::_get_php_cgi(std::string const& body_path) {
   }
   waitpid(pid, &status, 0);
   close(fd);
-  _get_body("./tmp");
+  assemble("./tmp");
   unlink("./tmp");
 }
 
-void Response::extension_dispatcher(std::string const& body_path) {
+void Response::dispatch(std::string const& body_path) {
   std::string extension;
 
   if (body_path.find_last_of('.') == std::string::npos)
@@ -113,14 +112,14 @@ void Response::extension_dispatcher(std::string const& body_path) {
   else
     extension = body_path.substr(body_path.find_last_of('.'));
   if (extension == ".html" || extension == ".css")
-    return _get_body(body_path);
+    assemble(body_path);
   else if (extension == ".php")
-    return _get_php_cgi(body_path);
+    php_cgi(body_path);
   else
     WebServ::log.warning() << extension << " support not yet implemented\n";
 }
 
-void Response::_get_body(std::string const& body_path) {
+void Response::assemble(std::string const& body_path) {
   std::ifstream in;
   std::string str = httpversion +
                     statuscode +
@@ -173,15 +172,13 @@ void Response::set_statuscode(int code) {
   statuscode.clear();
   ss << code;
   ss >> statuscode;
-  statuscode.push_back(32);
+  statuscode.push_back(' ');
 }
 
 void Response::process(void) {
   response_code = validate_limit_except();
-  if (response_code == 0) {
+  if (response_code == 0)
     response_code = (this->*methodptr[method])();
-    std::cout << "here\n";
-  }
   if (response_code > 399) {
     if (server->error_page.count(response_code))
       response_path = root + server->error_page[response_code];
@@ -189,7 +186,7 @@ void Response::process(void) {
       response_path = root + server->error_page[NOT_FOUND];
   }
   set_statuscode(response_code);
-  extension_dispatcher(response_path);
+  dispatch(response_path);
 }
 
 void Response::find_location(std::string path, Server *server) {
