@@ -12,6 +12,7 @@
 Response::status_map Response::statuslist = Response::init_status_map();
 Response::status_map Response::init_status_map(void) {
   status_map _map;
+
   _map[200] = "OK\n";
   _map[201] = "CREATED\n";
   _map[202] = "ACCEPTED\n";
@@ -133,19 +134,27 @@ void Response::php_cgi(std::string const& body_path) {
 void Response::dispatch(std::string const& body_path) {
   std::string extension;
 
-  if (body_path.find_last_of('.') == std::string::npos) {
-    contenttype = "Content-Type: text/plain\n";
-    extension = ".html";
-  }
-  else {
-    contenttype = "Content-Type: text/html; charset=utf-8\n";
-    extension = body_path.substr(body_path.find_last_of('.'));
-  }
-  if (extension == ".html" || extension == ".css")
-    assemble(body_path);
-  else if (extension == ".php")
-    php_cgi(body_path);
+  if (body_path.find_last_of('.') == std::string::npos)
+    extension = "text";
   else
+    extension = body_path.substr(body_path.find_last_of('.'));
+  if (extension == "text") {
+    contenttype = "Content-Type: text/plain\n";
+    assemble(body_path);
+  }
+  else if (extension == ".html") {
+    contenttype = "Content-Type: text/html; charset=utf-8\n";
+    assemble(body_path);
+  }
+  else if (extension == ".css") {
+    contenttype = "Content-Type: text/css; charset=utf-8\n";
+    assemble(body_path);
+  }
+  else if (extension == ".php") {
+    contenttype = "Content-Type: text/html; charset=utf-8\n";
+    php_cgi(body_path);
+  }
+  else // TODO(VLN37) return 500 default page
     WebServ::log.warning() << extension << " support not yet implemented\n";
 }
 
@@ -188,9 +197,7 @@ int Response::_post(void) {
   index = req_body.find('=');
   end = req_body.find('&');
   file = req_body.substr(index + 1, end - index - 1);
-  std::cout << file << "\n";
   file = location->upload_store + "/" + file;
-  std::cout << file << "\n";
   code = access(file.c_str(), W_OK);
   if (code == EACCES)
     return FORBIDDEN;
@@ -216,6 +223,12 @@ int Response::validate_limit_except(void) {
 void Response::set_statuscode(int code) {
   std::stringstream ss;
 
+  if (response_code >= BAD_REQUEST) {
+    if (server->error_page.count(response_code))
+      response_path = root + server->error_page[response_code];
+    else // TODO(welton) default error pages
+      response_path = root + server->error_page[NOT_FOUND];
+  }
   statuscode.clear();
   ss << code;
   ss >> statuscode;
@@ -227,15 +240,10 @@ void Response::set_statuscode(int code) {
 }
 
 void Response::process(void) {
-  response_code = validate_limit_except();
+  for (int i = 0; i < pre_method.size() && response_code == 0; i++)
+  response_code = (this->*pre_method[i])();
   if (response_code == 0)
     response_code = (this->*methodptr[method])();
-  if (response_code >= BAD_REQUEST) {
-    if (server->error_page.count(response_code))
-      response_path = root + server->error_page[response_code];
-    else // TODO(welton) default error pages
-      response_path = root + server->error_page[NOT_FOUND];
-  }
   set_statuscode(response_code);
   dispatch(response_path);
 }

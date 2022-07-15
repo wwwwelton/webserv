@@ -71,6 +71,7 @@ void WebServ::_respond(int i) {
     clientlist[fd].request = NULL;
     clientlist[fd].server = NULL;
     close(pollfds[i].fd);
+    log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
     pollfds[i].fd = -1;
     compress = true;
   }
