@@ -1,5 +1,5 @@
 CC      = c++
-CFLAGS  = -g3 -Wall -Wextra -Werror -Wno-long-long -std=c++98 -pedantic
+CFLAGS  = -g3 -Wall -Wextra -Werror -std=c++98 -pedantic
 CFLAGS  += -MMD -MP
 
 INCPATH = -I./sources
@@ -10,6 +10,7 @@ SRC     = main.cpp \
           HttpBase.cpp \
           HttpResponse.cpp \
           HttpRequest.cpp \
+          HttpRequestParser.cpp \
           Pollfd.cpp \
           Server.cpp \
           Config.cpp \
@@ -21,11 +22,11 @@ INC     = defines.hpp \
           HttpBase.hpp \
           HttpResponse.hpp \
           HttpRequest.hpp \
+          HttpRequestParser.hpp \
           Pollfd.hpp \
           Server.hpp \
           Config.hpp \
           Logger.hpp \
-
 
 OBJDIR  = objects
 SRC_DIR =	sources
@@ -56,7 +57,7 @@ $(OBJDIR):
 re: fclean all
 
 run: $(NAME)
-	./$(NAME)
+	./$(NAME) ./default.conf
 
 .PHONY: all clean fclean re
 

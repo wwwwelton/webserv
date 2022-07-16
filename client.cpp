@@ -35,16 +35,30 @@ int main (void)
 
   perror("connected");
 
-  const char *data = "GET /index.html HTTP/1.1\r\n"
-                     "Host: 127.0.0.1:3492\r\n\r\n";
+  // const char *data = "GET /index.html HTTP/1.1\r\n"
+  //                    "Host: 127.0.0.1:3492\r\n\r\n";
+
+  const char *data = "POST /index.php HTTP/1.1\r\n"
+                     "Host: 127.0.0.1:3492\r\n"
+                     "Content-Type: text/plain\r\n"
+                     "Content-Length: 15\r\n"
+                     "\r\n"
+                     "Hello, world!\r\n"
+                     "\r\n"
+                     ;
+
   int len = strlen(data);
 
-  send(sock_fd, data, len, 0);
-  // for (int i = 0; i < len; i++) {
-  //   send(sock_fd, data + i, 1, 0);
-  //   std::cout << "Sending a byte to the server" << std::endl;
-  //   sleep(1);
-  // }
+  // send(sock_fd, data, len, 0);
+  for (int i = 0; i < len; i++) {
+    int result = send(sock_fd, data + i, 1, 0);
+    if (result == -1) {
+      std::cout << "failed to send byte: " << data[i] << std::endl;
+      break;
+    }
+    std::cout << "Sending byte: " << data[i] << std::endl;
+    usleep(1000 * 1000 * 0.1);
+  }
   close(conn_fd);
   close(sock_fd);
   return 0;
