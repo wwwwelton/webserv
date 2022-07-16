@@ -182,6 +182,7 @@ void Response::assemble(std::string const& body_path) {
   HttpBase::size = str.size();
   // std::cout << str.size() << "\n";
   in.close();
+  WebServ::log.debug() << "Host: " << req->host << "\n";
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
@@ -209,6 +210,9 @@ int Response::_delete(void) {
 }
 
 int Response::validate_limit_except(void) {
+  // std::cout << location->limit_except << "\n";
+  // std::cout << method << "\n";
+  // server->print();
   if (location->limit_except.size()) {
     if (location->limit_except == "ALL")
       return 0;

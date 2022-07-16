@@ -7,7 +7,7 @@
 
 #include "WebServ.hpp"
 
-int main(int argc, char **argv) {
+void loop(int argc, char **argv) {
   WebServ webserv(argc, argv);
 
   while (true) {
@@ -25,5 +25,15 @@ int main(int argc, char **argv) {
     }
     if (webserv.compress)
       webserv.purge_conns();
+  }
+}
+
+int main(int argc, char **argv) {
+  while (true) {
+    try {
+      loop(argc, argv);
+    } catch (std::exception& e) {
+      WebServ::log.error() << "EXCEPTION HANDLED REINITIALIZING...\n";
+    }
   }
 }
