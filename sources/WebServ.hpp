@@ -5,9 +5,11 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
+#pragma once
 #ifndef WEBSERV_HPP
 #define WEBSERV_HPP
 
+#include "HttpRequestParser.hpp"
 #define PORT1 3492
 #define PORT2 3493
 
@@ -45,7 +47,7 @@ typedef struct s_request {
   s_request();
   s_request(Server *_server, int fd);
   Server  *server;
-  Request *request;
+  HttpRequestParser *request_parser;
 } req;
 
 class WebServ {

@@ -8,9 +8,9 @@
 #include "WebServ.hpp"
 
 s_request::s_request(void)
-: server(NULL), request(NULL) { }
+  : server(NULL), request_parser(NULL) { }
 s_request::s_request(Server *_server, int fd)
-: server(_server), request(new Request(fd)) { }
+  : server(_server), request_parser(new HttpRequestParser(fd)) { }
 
 Logger WebServ::log = WebServ::init_log();
 Logger WebServ::init_log(void) {
@@ -65,7 +65,7 @@ void WebServ::_accept(int i) {
   log.info() << "Events detected in socket " << pollfds[i].fd << "\n";
   new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
-    clientlist[new_sd].request = new Request(new_sd);
+    clientlist[new_sd].request_parser = new HttpRequestParser(new_sd);
     clientlist[new_sd].server = host;
     pollfds.push_back(_pollfd(new_sd, POLLIN));
     log.info() << host->server_name[0]
@@ -77,15 +77,26 @@ void WebServ::_accept(int i) {
 
 void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
-  Request *ptr;
+  Response req_handler;
+  
+  HttpRequestParser& parser = *clientlist[fd].request_parser;
+  try {
+    parser.parse();
 
-  ptr = clientlist[fd].request->receive(fd);
-  if (ptr->finished) {
-    Response req_handler(*ptr, clientlist[fd].server);
+  } catch (std::exception& e) {
+    WebServ::log.error()
+      << "exception caught while tokenizing request: "
+      << e.what() << std::endl;
+    return ;
+  }
+
+  if (parser.finished) {
+    Request &ptr = parser.get_request();
+    req_handler = Response(ptr, clientlist[fd].server);
     req_handler.process();
     req_handler._send(fd);
-    delete clientlist[fd].request;
-    clientlist[fd].request = NULL;
+    delete clientlist[fd].request_parser;
+    clientlist[fd].request_parser = NULL;
     clientlist[fd].server = NULL;
     close(pollfds[i].fd);
     log.info() << "Connection closed with client " << pollfds[i].fd << "\n";

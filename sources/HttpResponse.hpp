@@ -25,6 +25,7 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
 #include "HttpBase.hpp"
+#include "WebServ.hpp"
 #include "Logger.hpp"
 
 class Server;
