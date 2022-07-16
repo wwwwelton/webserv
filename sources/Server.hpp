@@ -9,12 +9,16 @@
 #define SERVER_HPP
 
 #include <netdb.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
 
-#include "webserv.hpp"
+#include "Config.hpp"
+#include "defines.hpp"
 
 struct server_location {
   std::string root;

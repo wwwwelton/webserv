@@ -5,9 +5,12 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "webserv.hpp"
+#include "WebServ.hpp"
 
-#include "Logger.hpp"
+s_request::s_request(void)
+: server(NULL), request(NULL) { }
+s_request::s_request(Server *_server, int fd)
+: server(_server), request(new Request(fd)) { }
 
 Logger WebServ::log = WebServ::init_log();
 Logger WebServ::init_log(void) {
@@ -18,7 +21,6 @@ Logger WebServ::init_log(void) {
 WebServ::WebServ(int argc, char **argv) {
   log.info() << "Initializing WebServ\n";
   size_t i;
-  Config configs;
 
   conn = 0;
   compress = false;

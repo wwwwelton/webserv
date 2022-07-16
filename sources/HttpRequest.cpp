@@ -5,17 +5,8 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "HttpRequest.hpp"
-#include "Logger.hpp"
-#include "webserv.hpp"
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <iostream>
 
-#include <map>
-#include <string>
-#include <sstream>
-#include <cstring>
+#include "HttpRequest.hpp"
 
 // TODO: remove this
 std::ostream& operator<<(std::ostream& out, const Request& request) {

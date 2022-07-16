@@ -6,7 +6,7 @@ INCPATH = -I./sources
 NAME    = webserv
 
 SRC     = main.cpp \
-          webserv.cpp \
+          WebServ.cpp \
           HttpBase.cpp \
           HttpResponse.cpp \
           HttpRequest.cpp \
@@ -17,7 +17,7 @@ SRC     = main.cpp \
           # init_servers.cpp \
 
 INC     = defines.hpp \
-          webserv.hpp \
+          WebServ.hpp \
           HttpBase.hpp \
           HttpResponse.hpp \
           HttpRequest.hpp \

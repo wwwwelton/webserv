@@ -5,9 +5,7 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "webserv.hpp"
 #include "HttpResponse.hpp"
-#include "HttpBase.hpp"
 
 Response::status_map Response::statuslist = Response::init_status_map();
 Response::status_map Response::init_status_map(void) {

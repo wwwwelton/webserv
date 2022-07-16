@@ -38,14 +38,12 @@
 #include "defines.hpp"
 #include "Logger.hpp"
 
-class Server;
+class Request;
 typedef struct addrinfo s_addrinfo;
 
 typedef struct s_request {
-  s_request()
-    : server(NULL), request(NULL) { }
-  s_request(Server *_server, int fd)
-    : server(_server), request(new Request(fd)) { }
+  s_request();
+  s_request(Server *_server, int fd);
   Server  *server;
   Request *request;
 } req;
@@ -60,6 +58,7 @@ public:
   static Logger init_log();
 
 public:
+  Config                  configs;
   std::map<int, Server *> serverlist;
   std::vector<req>        clientlist;
   std::vector<_pollfd>    pollfds;

@@ -5,7 +5,7 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "webserv.hpp"
+#include "WebServ.hpp"
 
 int main(int argc, char **argv) {
   WebServ webserv(argc, argv);

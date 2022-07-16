@@ -9,12 +9,20 @@
 #ifndef HTTP_REQUEST_HPP
 # define HTTP_REQUEST_HPP
 
+#include <sys/socket.h>
+#include <sys/types.h>
+
+#include <sstream>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+
 #include "HttpRequest.hpp"
 #include "HttpBase.hpp"
-
-#include <map>
-#include <string>
-#include <vector>
+#include "WebServ.hpp"
+#include "Logger.hpp"
 
 struct Request {
   std::map<std::string, std::string> headers;

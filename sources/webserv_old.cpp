@@ -5,7 +5,6 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "webserv.hpp"
 #include "Logger.hpp"
 
 int init(int argc,

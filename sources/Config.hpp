@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "webserv.hpp"
+#include "Server.hpp"
 
 class Server;
 

@@ -30,6 +30,7 @@
 class Server;
 class Logger;
 class server_location;
+class Request;
 
 class Response {
 typedef void(Response::*funcptr)(void);
