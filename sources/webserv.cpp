@@ -61,11 +61,11 @@ void WebServ::_accept(int i) {
 void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
   Response req_handler;
-  Request *ptr;
+  
   HttpRequestParser& parser = *clientlist[fd].request_parser;
 
   try {
-    parser.tokenize_partial_request();
+    parser.parse();
 
   } catch (std::exception& e) {
     WebServ::log.error()
@@ -75,8 +75,8 @@ void WebServ::_respond(int i) {
   }
 
   if (parser.finished) {
-    ptr = parser.get_request();
-    req_handler = Response(*ptr, clientlist[fd].server);
+    Request &ptr = parser.get_request();
+    req_handler = Response(ptr, clientlist[fd].server);
     req_handler.process();
     req_handler._send(fd);
     delete clientlist[fd].request_parser;
