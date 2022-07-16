@@ -51,6 +51,7 @@ class Config {
   void _replace_unique(std::string* str, char pattern);
 
   std::string _trim(const std::string& str, const std::string& set);
+  void _trim_line(std::string* str,  const std::string& set);
 
   std::vector<std::string> _split(const std::string& str,
                                   const std::string& del);

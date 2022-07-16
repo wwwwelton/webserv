@@ -23,7 +23,7 @@ Config::Config(char* file) {
 
   str = _sanitize(ss.str());
 
-  //   std::cout << str << "\n";
+  // std::cout << str << "\n";
 
   host = _sub_host(str);
   vhost = _sub_vhost(str);
@@ -68,15 +68,13 @@ std::string Config::_sanitize(const std::string& file_content) {
 
   _replace_all(&tmp, "server{", "server {");
 
-  _replace_all(&tmp, "; ", ";");
-  _replace_all(&tmp, "{ ", "{");
-  _replace_all(&tmp, "} ", "}");
-
   _replace_all(&tmp, ";", ";\n");
   _replace_all(&tmp, "{", "{\n");
   _replace_all(&tmp, "}", "}\n");
 
   _replace_unique(&tmp, ' ');
+
+  _trim_line(&tmp, " ");
 
   return (tmp);
 }
@@ -215,7 +213,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   }
   srv->sockfd = -1;
 
-  //   srv->print();
+  // srv->print();
 
   return (srv);
 }
@@ -251,6 +249,17 @@ std::string Config::_trim(const std::string& str, const std::string& set) {
   tmp.erase(0, tmp.find_first_not_of(set));
 
   return (tmp);
+}
+
+void Config::_trim_line(std::string* str, const std::string& set) {
+  std::istringstream is(*str);
+  std::string line;
+
+  str->erase();
+  while (std::getline(is, line)) {
+    str->append(_trim(line, set));
+    str->append("\n");
+  }
 }
 
 std::vector<std::string> Config::_split(const std::string& str,
