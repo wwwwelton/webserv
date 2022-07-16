@@ -63,9 +63,6 @@ size_t Config::size(void) {
 std::string Config::_sanitize(const std::string& file_content) {
   std::string tmp(file_content);
 
-  //   tmp.erase(std::remove(tmp.begin(), tmp.end(), '\n'), tmp.end());
-  //   tmp.erase(std::remove(tmp.begin(), tmp.end(), '\t'), tmp.end());
-
   _replace_all(&tmp, "\n", " ");
   _replace_all(&tmp, "\t", " ");
 
