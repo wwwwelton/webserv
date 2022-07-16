@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
       loop(argc, argv);
       break;
     } catch (std::exception& e) {
-      WebServ::log.error() << e.what();
+      WebServ::log.error() << e.what() << "\n";
       WebServ::log.error() << "EXCEPTION HANDLED REINITIALIZING...\n";
     }
   }
