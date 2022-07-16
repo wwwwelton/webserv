@@ -53,3 +53,50 @@ int Server::_connect(int backlog) {
   _listen(backlog);
   return 0;
 }
+
+void Server::print(void) {
+  static size_t n = 1;
+
+  std::cout << "====VHOST " << n << "====\n";
+
+  in_addr t;
+  t.s_addr = ip;
+  std::cout << "ip: =>" << inet_ntoa(t) << "<=\n";
+
+  std::cout << "port: =>" << ntohs(port) << "<=\n";
+
+  for (size_t i = 0; i < server_name.size(); i++) {
+    std::cout << "server name: =>" << server_name[i] << "<=\n";
+  }
+
+  std::cout << "root: =>" << root << "<=\n";
+
+  for (size_t i = 0; i < index.size(); i++) {
+    std::cout << "index: =>" << index[i] << "<=\n";
+  }
+
+  for (std::map<int, std::string>::const_iterator it = error_page.begin();
+       it != error_page.end();
+       it++) {
+    std::cout << "error_page: =>" << it->second << "<=\n";
+  }
+
+  std::cout << "timeout: =>" << timeout << "<=\n";
+
+  for (std::map<std::string, server_location>::const_iterator
+           it = location.begin();
+       it != location.end();
+       it++) {
+    std::cout << "location name: =>" << it->first << "<=\n";
+    std::cout << "    root: =>" << it->second.root << "<=\n";
+    std::cout << "    limit_except: =>" << it->second.limit_except << "<=\n";
+    std::cout << "    client_max_body_size: =>" << it->second.client_max_body_size << "<=\n";
+    std::cout << "    upload: =>" << it->second.upload << "<=\n";
+    std::cout << "    upload_store: =>" << it->second.upload_store << "<=\n";
+  }
+
+  std::cout << "sockfd: =>" << sockfd << "<=\n";
+
+  std::cout << "\n";
+  n++;
+}

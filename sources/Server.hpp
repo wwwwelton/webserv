@@ -39,6 +39,7 @@ class Server {
   void _bind(void);
   void _listen(int backlog);
   int _connect(int backlog);
+  void print(void);
 };
 
 #endif  // SERVER_HPP

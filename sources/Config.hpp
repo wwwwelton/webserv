@@ -55,8 +55,6 @@ class Config {
 
   size_t _stoi(const std::string& str);
 
-  void _print_server(const Server* srv);
-
  public:
   int backlog;
 };

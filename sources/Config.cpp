@@ -216,7 +216,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   }
   srv->sockfd = -1;
 
-  _print_server(srv);
+  // srv->print();
 
   return (srv);
 }
@@ -262,51 +262,4 @@ size_t Config::_stoi(const std::string& str) {
   size_t n;
   std::istringstream(str) >> n;
   return (n);
-}
-
-void Config::_print_server(const Server* srv) {
-  static size_t n = 1;
-
-  std::cout << "====VHOST " << n << "====\n";
-
-  in_addr t;
-  t.s_addr = srv->ip;
-  std::cout << "ip: =>" << inet_ntoa(t) << "<=\n";
-
-  std::cout << "port: =>" << ntohs(srv->port) << "<=\n";
-
-  for (size_t i = 0; i < srv->server_name.size(); i++) {
-    std::cout << "server name: =>" << srv->server_name[i] << "<=\n";
-  }
-
-  std::cout << "root: =>" << srv->root << "<=\n";
-
-  for (size_t i = 0; i < srv->index.size(); i++) {
-    std::cout << "index: =>" << srv->index[i] << "<=\n";
-  }
-
-  for (std::map<int, std::string>::const_iterator it = srv->error_page.begin();
-       it != srv->error_page.end();
-       it++) {
-    std::cout << "error_page: =>" << it->second << "<=\n";
-  }
-
-  std::cout << "timeout: =>" << srv->timeout << "<=\n";
-
-  for (std::map<std::string, server_location>::const_iterator
-           it = srv->location.begin();
-       it != srv->location.end();
-       it++) {
-    std::cout << "location name: =>" << it->first << "<=\n";
-    std::cout << "    root: =>" << it->second.root << "<=\n";
-    std::cout << "    limit_except: =>" << it->second.limit_except << "<=\n";
-    std::cout << "    client_max_body_size: =>" << it->second.client_max_body_size << "<=\n";
-    std::cout << "    upload: =>" << it->second.upload << "<=\n";
-    std::cout << "    upload_store: =>" << it->second.upload_store << "<=\n";
-  }
-
-  std::cout << "sockfd: =>" << srv->sockfd << "<=\n";
-
-  std::cout << "\n";
-  n++;
 }
