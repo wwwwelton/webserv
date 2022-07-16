@@ -25,7 +25,7 @@ WebServ::WebServ(int argc, char **argv) {
   clientlist.reserve(1024);
   clientlist.resize(1024);
 
-  configs = Config(argv);
+  configs = Config(argv[1]);
 
   for (i = 0; i < configs.size(); i++) {
     configs[i]->_connect(configs.backlog);
