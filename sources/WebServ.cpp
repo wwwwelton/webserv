@@ -39,7 +39,7 @@ WebServ::WebServ(int argc, char **argv) {
     log.error() << "Please provide one config file!\n";
     exit(1);
   } else {
-    log.info() << "Config file: " << argv[1] << "\n";
+    log.info() << "WebServ Loaded " << argv[1] << "\n";
   }
   configs = Config(argv[1]);
 
