@@ -214,10 +214,14 @@ int Response::validate_limit_except(void) {
   // std::cout << method << "\n";
   // server->print();
   if (location->limit_except.size()) {
-    if (location->limit_except == "ALL")
+    if (location->limit_except[0] == "ALL")
       return 0;
-    if (location->limit_except.find(method) != std::string::npos)
-      return 0;
+    if (std::find(location->limit_except.begin(),
+                  location->limit_except.end(),
+                  method) != location->limit_except.end())
+       return 0;
+    // if (location->limit_except.find(method) != std::string::npos)
+    //   return 0;
     return METHOD_NOT_ALLOWED;
   }
   return 0;

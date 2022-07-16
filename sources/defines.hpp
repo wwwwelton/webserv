@@ -10,7 +10,7 @@
 
 #define DFL_ADDRESS "127.0.0.1"
 #define DFL_TIMEOUT 300
-#define DFL_ROUTE_METHOD "ALL"
+#define DFL_LIM_EXCEPT "ALL"
 #define DFL_ROOT "root"
 #define DFL_CLI_MAX_BODY_SIZE 1
 #define DFL_SERVER_ROOT "./"

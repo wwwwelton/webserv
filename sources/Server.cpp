@@ -93,7 +93,9 @@ void Server::print(void) {
        it++) {
     std::cout << "location name: =>" << it->first << "<=\n";
     std::cout << "    root: =>" << it->second.root << "<=\n";
-    std::cout << "    limit_except: =>" << it->second.limit_except << "<=\n";
+    for (size_t i = 0; i < it->second.limit_except.size(); i++) {
+      std::cout << "    limit_except: =>" << it->second.limit_except[i] << "<=\n";
+    }
     std::cout << "    client_max_body_size: =>" << it->second.client_max_body_size << "<=\n";
     std::cout << "    upload: =>" << it->second.upload << "<=\n";
     std::cout << "    upload_store: =>" << it->second.upload_store << "<=\n";

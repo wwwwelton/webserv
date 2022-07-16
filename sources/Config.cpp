@@ -179,7 +179,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
 
       if (srv->location.find(index) == srv->location.end()) {
         srv->location[index].root = srv->root;
-        srv->location[index].limit_except = std::string(DFL_ROUTE_METHOD);
+        srv->location[index].limit_except.push_back(DFL_LIM_EXCEPT);
         srv->location[index].client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
         srv->location[index].upload = false;
         srv->location[index].upload_store = srv->root + "/uploads";
@@ -194,7 +194,12 @@ Server* Config::_parse_vhost(const std::string& vhost) {
           srv->location[index].root = _trim(std::string(tokens[1]), "/");
         }
         if (tokens[0] == "limit_except") {
-          srv->location[index].limit_except = tokens[1];
+          if (srv->location[index].limit_except[0] == DFL_LIM_EXCEPT) {
+            srv->location[index].limit_except.pop_back();
+          }
+          for (size_t i = 1; i < tokens.size(); i++) {
+            srv->location[index].limit_except.push_back(tokens[i]);
+          }
         }
         if (tokens[0] == "client_max_body_size") {
           srv->location[index].client_max_body_size = _stoi(tokens[1]);
@@ -213,7 +218,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   }
   srv->sockfd = -1;
 
-  // srv->print();
+//   srv->print();
 
   return (srv);
 }

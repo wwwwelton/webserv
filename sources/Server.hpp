@@ -23,7 +23,7 @@
 
 struct server_location {
   std::string root;
-  std::string limit_except;
+  std::vector<std::string> limit_except;
   int client_max_body_size;
   bool upload;
   std::string upload_store;
