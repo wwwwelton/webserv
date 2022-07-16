@@ -18,6 +18,14 @@ Logger WebServ::init_log(void) {
   return logger;
 }
 
+WebServ::~WebServ(void) {
+  log.debug() << "WebServ destructor called\n";
+  std::map<int, Server *>::iterator it = serverlist.begin();
+  std::map<int, Server *>::iterator ite = serverlist.end();
+  for (; it != ite; it++)
+    delete it->second;
+}
+
 WebServ::WebServ(int argc, char **argv) {
   log.info() << "Initializing WebServ\n";
   size_t i;
