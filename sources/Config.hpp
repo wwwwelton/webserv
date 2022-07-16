@@ -5,8 +5,8 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#ifndef SERVER_CONFIG_HPP_
-#define SERVER_CONFIG_HPP_
+#ifndef CONFIG_HPP_
+#define CONFIG_HPP_
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -62,4 +62,4 @@ class Config {
   int backlog;
 };
 
-#endif  // SERVER_CONFIG_HPP_
+#endif  // CONFIG_HPP_
