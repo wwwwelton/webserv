@@ -23,6 +23,8 @@ Config::Config(char* file) {
 
   str = _sanitize(ss.str());
 
+  //   std::cout << str << "\n";
+
   host = _sub_host(str);
   vhost = _sub_vhost(str);
 
@@ -73,6 +75,8 @@ std::string Config::_sanitize(const std::string& file_content) {
   _replace_all(&tmp, ";", ";\n");
   _replace_all(&tmp, "{", "{\n");
   _replace_all(&tmp, "}", "}\n");
+
+  _replace_unique(&tmp, ' ');
 
   return (tmp);
 }
@@ -211,7 +215,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   }
   srv->sockfd = -1;
 
-  // srv->print();
+  //   srv->print();
 
   return (srv);
 }
@@ -226,6 +230,18 @@ void Config::_replace_all(std::string* str,
     str->replace(pos, old_word.length(), new_word);
     pos = str->find(old_word, pos + new_word.length());
   }
+}
+
+void Config::_replace_unique(std::string* str, char pattern) {
+  std::string tmp("");
+
+  for (std::string::size_type i = 0; i < str->size() - 1; i++) {
+    if (str->at(i) == pattern && str->at(i + 1) == pattern) {
+      continue;
+    }
+    tmp += str->at(i);
+  }
+  *str = tmp;
 }
 
 std::string Config::_trim(const std::string& str, const std::string& set) {

@@ -48,6 +48,8 @@ class Config {
                     const std::string& old_word,
                     const std::string& new_word);
 
+  void _replace_unique(std::string* str, char pattern);
+
   std::string _trim(const std::string& str, const std::string& set);
 
   std::vector<std::string> _split(const std::string& str,
