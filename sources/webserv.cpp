@@ -6,6 +6,7 @@
 //##############################################################################
 
 #include "webserv.hpp"
+
 #include "Logger.hpp"
 
 Logger WebServ::log = WebServ::init_log();
@@ -25,6 +26,12 @@ WebServ::WebServ(int argc, char **argv) {
   clientlist.reserve(1024);
   clientlist.resize(1024);
 
+  if (argc != 2) {
+    log.error() << "Please provide one config file!\n";
+    exit(1);
+  } else {
+    log.info() << "Config file: " << argv[1] << "\n";
+  }
   configs = Config(argv[1]);
 
   for (i = 0; i < configs.size(); i++) {
