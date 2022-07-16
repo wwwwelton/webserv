@@ -198,6 +198,10 @@ Server* Config::_parse_vhost(const std::string& vhost) {
             srv->location[index].limit_except.pop_back();
           }
           for (size_t i = 1; i < tokens.size(); i++) {
+            std::transform(tokens[i].begin(),
+                           tokens[i].end(),
+                           tokens[i].begin(),
+                           ::toupper);
             srv->location[index].limit_except.push_back(tokens[i]);
           }
         }
@@ -218,7 +222,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   }
   srv->sockfd = -1;
 
-//   srv->print();
+  // srv->print();
 
   return (srv);
 }
