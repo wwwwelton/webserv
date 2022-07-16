@@ -1,8 +1,8 @@
 #pragma once
-#include "HttpRequest.hpp"
 #ifndef HTTP_REQUEST_PARSER_HPP
 #define HTTP_REQUEST_PARSER_HPP
 
+#include "HttpRequest.hpp"
 #include <exception>
 #include <string>
 #include <vector>
