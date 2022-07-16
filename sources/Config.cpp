@@ -32,7 +32,7 @@ Config::Config(char* file) {
 
   //   std::cout << host << "\n";
   for (size_t i = 0; i < vhost.size(); i++) {
-    _servers.push_back(_parse(vhost[i]));
+    _servers.push_back(_parse_vhost(vhost[i]));
     // std::cout << vhost[i] << "\n";
   }
 
@@ -130,26 +130,93 @@ void Config::_parse_host(const std::string& host) {
   }
 }
 
-Server* Config::_parse(const std::string& config) {
-  (void)config;
+Server* Config::_parse_vhost(const std::string& vhost) {
+  std::istringstream is(vhost);
+  std::string line;
+  std::vector<std::string> tokens;
+  std::vector<std::string> sub_tokens;
+
   Server* srv = new Server();
 
-  srv->ip = inet_addr(DEFAULT_ADDRESS);
-  srv->port = htons(PORT1);
-  srv->server_name.push_back(std::string("www.localhost"));
-  srv->server_name.push_back(std::string("localhost"));
-  srv->root = std::string(DEFAULT_SERVER_ROOT);
-  srv->index.push_back(std::string("index.html"));
-  srv->index.push_back(std::string("index2.html"));
-  srv->error_page[404] = std::string("custom_404.html");
-  srv->error_page[405] = std::string("custom_405.html");
-  srv->timeout = DEFAULT_TIMEOUT;
-  srv->location["/"].root = std::string(DEFAULT_SERVER_ROOT);
-  srv->location["/"].limit_except = std::string(DEFAULT_ROUTE_METHOD);
-  srv->location["/"].client_max_body_size = DEFAULT_CLI_MAX_BODY_SIZE;
-  srv->location["/"].upload = true;
-  srv->location["/"].upload_store = DEFAULT_SERVER_ROOT;
+  while (std::getline(is, line)) {
+    line = _trim(line, "; ");
+    tokens = _split(line, " ");
+
+    if (tokens[0] == "listen") {
+      if (tokens[1].find(":") != std::string::npos) {
+        sub_tokens = _split(tokens[1], ":");
+        srv->ip = inet_addr(sub_tokens[0].c_str());
+        srv->port = htons(_stoi(sub_tokens[1]));
+      } else {
+        srv->ip = inet_addr(DFL_ADDRESS);
+        srv->port = htons(_stoi(tokens[1]));
+      }
+    }
+
+    if (tokens[0] == "server_name") {
+      for (size_t i = 1; i < tokens.size(); i++) {
+        srv->server_name.push_back(tokens[i]);
+      }
+    }
+
+    if (tokens[0] == "root") {
+      srv->root = _trim(std::string(tokens[1]), "/");
+    }
+
+    if (tokens[0] == "index") {
+      for (size_t i = 1; i < tokens.size(); i++) {
+        srv->index.push_back(tokens[i]);
+      }
+    }
+
+    if (tokens[0] == "error_page") {
+      srv->error_page[_stoi(tokens[1])] = _trim(std::string(tokens[2]), "/");
+    }
+
+    if (tokens[0] == "timeout") {
+      srv->timeout = _stoi(tokens[1]);
+    }
+
+    if (tokens[0] == "location") {
+      std::string index = tokens[1];
+
+      if (srv->location.find(index) == srv->location.end()) {
+        srv->location[index].root = srv->root;
+        srv->location[index].limit_except = std::string(DFL_ROUTE_METHOD);
+        srv->location[index].client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
+        srv->location[index].upload = false;
+        srv->location[index].upload_store = srv->root + "/uploads";
+      }
+
+      while (std::getline(is, line)) {
+        line = _trim(line, "; ");
+        tokens = _split(line, " ");
+
+        if (tokens[0] == "root") {
+          srv->location[index].root = tokens[1];
+          srv->location[index].root = _trim(std::string(tokens[1]), "/");
+        }
+        if (tokens[0] == "limit_except") {
+          srv->location[index].limit_except = tokens[1];
+        }
+        if (tokens[0] == "client_max_body_size") {
+          srv->location[index].client_max_body_size = _stoi(tokens[1]);
+        }
+        if (tokens[0] == "upload") {
+          srv->location[index].upload = (tokens[1] == "on") ? true : false;
+        }
+        if (tokens[0] == "upload_store") {
+          srv->location[index].upload_store = _trim(std::string(tokens[1]), "/");
+        }
+        if (line == "}") {
+          break;
+        }
+      }
+    }
+  }
   srv->sockfd = -1;
+
+  _print_server(srv);
 
   return (srv);
 }
@@ -195,4 +262,51 @@ size_t Config::_stoi(const std::string& str) {
   size_t n;
   std::istringstream(str) >> n;
   return (n);
+}
+
+void Config::_print_server(const Server* srv) {
+  static size_t n = 1;
+
+  std::cout << "====VHOST " << n << "====\n";
+
+  in_addr t;
+  t.s_addr = srv->ip;
+  std::cout << "ip: =>" << inet_ntoa(t) << "<=\n";
+
+  std::cout << "port: =>" << ntohs(srv->port) << "<=\n";
+
+  for (size_t i = 0; i < srv->server_name.size(); i++) {
+    std::cout << "server name: =>" << srv->server_name[i] << "<=\n";
+  }
+
+  std::cout << "root: =>" << srv->root << "<=\n";
+
+  for (size_t i = 0; i < srv->index.size(); i++) {
+    std::cout << "index: =>" << srv->index[i] << "<=\n";
+  }
+
+  for (std::map<int, std::string>::const_iterator it = srv->error_page.begin();
+       it != srv->error_page.end();
+       it++) {
+    std::cout << "error_page: =>" << it->second << "<=\n";
+  }
+
+  std::cout << "timeout: =>" << srv->timeout << "<=\n";
+
+  for (std::map<std::string, server_location>::const_iterator
+           it = srv->location.begin();
+       it != srv->location.end();
+       it++) {
+    std::cout << "location name: =>" << it->first << "<=\n";
+    std::cout << "    root: =>" << it->second.root << "<=\n";
+    std::cout << "    limit_except: =>" << it->second.limit_except << "<=\n";
+    std::cout << "    client_max_body_size: =>" << it->second.client_max_body_size << "<=\n";
+    std::cout << "    upload: =>" << it->second.upload << "<=\n";
+    std::cout << "    upload_store: =>" << it->second.upload_store << "<=\n";
+  }
+
+  std::cout << "sockfd: =>" << srv->sockfd << "<=\n";
+
+  std::cout << "\n";
+  n++;
 }

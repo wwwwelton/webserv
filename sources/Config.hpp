@@ -9,9 +9,11 @@
 #define SERVER_CONFIG_HPP_
 
 #include <arpa/inet.h>
+#include <netinet/in.h>
 
 #include <algorithm>
 #include <fstream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -40,7 +42,7 @@ class Config {
   std::string _sub_host(const std::string& file_content);
   std::vector<std::string> _sub_vhost(const std::string& file_content);
   void _parse_host(const std::string& host);
-  Server* _parse(const std::string& config);
+  Server* _parse_vhost(const std::string& vhost);
 
   void _replace_all(std::string* str,
                     const std::string& old_word,
@@ -52,6 +54,8 @@ class Config {
                                   const std::string& del);
 
   size_t _stoi(const std::string& str);
+
+  void _print_server(const Server* srv);
 
  public:
   int backlog;
