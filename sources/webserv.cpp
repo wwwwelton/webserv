@@ -19,7 +19,6 @@ WebServ::WebServ(int argc, char **argv) {
   log.info() << "Initializing WebServ\n";
   size_t i;
   Config configs;
-  (void)argc;
 
   conn = 0;
   compress = false;
