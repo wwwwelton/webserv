@@ -280,7 +280,7 @@ void HttpRequestParser::parse() {
   if (finished)
     throw std::exception();
 
-  bytes_read = recv(fd, buffer, buff_max, MSG_WAITALL);
+  bytes_read = recv(fd, buffer, buff_max, 0);
 
   if (bytes_read == (size_t)-1) {
     perror("recv");
