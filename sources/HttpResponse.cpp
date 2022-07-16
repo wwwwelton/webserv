@@ -251,6 +251,7 @@ void Response::find_location(std::string path, Server *server) {
   while (path.size()) {
     if (server->location.count(path)) {
       location = &server->location[path];
+      return;
     }
     path = path.erase(path.find_last_of('/'));
   }
