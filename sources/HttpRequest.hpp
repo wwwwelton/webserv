@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                         João Rodriguez - VLN37                             #
+//#                         Paulo Sergio - psergio-                            #
+//#                         Welton Leite - wleite                              #
+//##############################################################################
+
 #pragma once
 #ifndef HTTP_REQUEST_HPP
 # define HTTP_REQUEST_HPP
@@ -17,6 +24,7 @@ struct Request {
   std::string host;
   std::string body;
   int body_size;
+  int finished;
 
   Request(int fd);
 
@@ -24,7 +32,9 @@ struct Request {
 
   bool is_valid() const ;
 
+  Request* receive(int fd);
 private:
+  int fd;
   bool valid;
   char *raw;
   size_t nbytes;

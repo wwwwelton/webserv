@@ -1,5 +1,11 @@
-#include "HttpBase.hpp"
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                         João Rodriguez - VLN37                             #
+//#                         Paulo Sergio - psergio-                            #
+//#                         Welton Leite - wleite                              #
+//##############################################################################
 
+#include "HttpBase.hpp"
 
 char HttpBase::buffer_req[512000] = "";
 char HttpBase::buffer_resp[512000] = "HTTP/1.1 200 OK\n"

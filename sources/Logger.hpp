@@ -1,3 +1,10 @@
+//##############################################################################
+//#              Copyright(c)2022 Turbo Development Design (TDD)               #
+//#                         João Rodriguez - VLN37                             #
+//#                         Paulo Sergio - psergio-                            #
+//#                         Welton Leite - wleite                              #
+//##############################################################################
+
 #pragma once
 #include <ostream>
 #ifndef LOGGER_HPP

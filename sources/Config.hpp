@@ -1,8 +1,8 @@
 //##############################################################################
 //#              Copyright(c)2022 Turbo Development Design (TDD)               #
-//#                           João Rodriguez                                   #
-//#                            Paulo Sergio                                    #
-//#                            Welton Leite                                    #
+//#                         João Rodriguez - VLN37                             #
+//#                         Paulo Sergio - psergio-                            #
+//#                         Welton Leite - wleite                              #
 //##############################################################################
 
 #ifndef SERVER_CONFIG_HPP_
@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "webserv.h"
+#include "webserv.hpp"
 
 class Server;
 
