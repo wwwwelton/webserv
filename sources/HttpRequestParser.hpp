@@ -79,6 +79,7 @@ public:
   Request &get_request();
 
 private:
+  bool valid;
   Request *_request;
   std::vector<Token> headers;
 

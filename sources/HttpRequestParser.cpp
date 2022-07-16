@@ -82,6 +82,7 @@ std::string HttpRequestParser::supported_version = "HTTP/1.1";
 
 HttpRequestParser::HttpRequestParser(int fd, size_t buff_max):
   finished(false),
+  valid(false),
   fd(fd),
   buffer(new char[buff_max]),
   bytes_read(),
@@ -93,6 +94,7 @@ HttpRequestParser::HttpRequestParser(int fd, size_t buff_max):
 
 HttpRequestParser::HttpRequestParser(const HttpRequestParser &other):
   finished(false),
+  valid(false),
   fd(other.fd),
   buffer(new char[other.buff_max]),
   bytes_read(other.bytes_read),
@@ -122,9 +124,10 @@ HttpRequestParser::~HttpRequestParser() {
 void HttpRequestParser::tokenize_partial_request(char *buff) {
   size_t i = 0;
 
+  buff[bytes_read] = '\0';
+  WebServ::log.debug() << "Incoming request data: [" << buff << "]" << std::endl;
   while (i < bytes_read) {
     char c = buff[i++];
-    WebServ::log.debug() << "current byte: " << c << std::endl;
     // WebServ::log.info() << "current request: " << *_request << std::endl;
 
     switch (current_state) {
@@ -236,7 +239,8 @@ void HttpRequestParser::tokenize_partial_request(char *buff) {
         if (c == '\r') { // header value finished
           current_state = S_HEADER_LINE_LF;
         } else if (c == '\n') {
-          current_state = S_HEADER_LINE_START;
+          _request->headers[_header_key] = _header_value;
+          current_state = S_HEADER_LINE_START; // check for a new header
         } else if (is_ctl(c)) {
           throw InvalidHttpRequestException();
         } else {
@@ -250,7 +254,7 @@ void HttpRequestParser::tokenize_partial_request(char *buff) {
           throw InvalidHttpRequestException();
 
         _request->headers[_header_key] = _header_value;
-        current_state = S_HEADER_LINE_START;
+        current_state = S_HEADER_LINE_START; // check for a new header
         break;
 
       case S_HEADERS_END_LF:
@@ -273,7 +277,6 @@ void HttpRequestParser::tokenize_partial_request(char *buff) {
       return;
     }
   }
-  finished = true;
 }
 
 void HttpRequestParser::parse() {
@@ -286,9 +289,11 @@ void HttpRequestParser::parse() {
     perror("recv");
     throw std::exception(); // TODO: implement proper error handling
   } else if (bytes_read == 0) {
+    finished = true;
     WebServ::log.error() << "recv returned 0" << std::endl;
-    throw std::exception(); // TODO: implement proper error handling
+    return ;
   }
+  // finished = true;
 
   try {
     tokenize_partial_request(buffer);
@@ -304,8 +309,8 @@ Request &HttpRequestParser::get_request() {
   _request->path = "/index.html";
   _request->http_version = "HTTP/1.1";
   _request->host = "localhost:3492";
-  _request->finished = true;
-  _request->valid = true;
+  _request->finished = this->finished;
+  _request->valid = this->valid;
   return *_request;
 }
 
