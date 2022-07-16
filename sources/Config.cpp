@@ -12,15 +12,13 @@ Config::Config(void) {
 }
 
 Config::Config(char* file) {
-  (void)file;
-
   std::ifstream ifs;
   std::stringstream ss;
   std::string str;
   std::string host;
   std::vector<std::string> vhost;
 
-  ifs.open("default.conf");
+  ifs.open(file);
   ss << ifs.rdbuf();
 
   str = _sanitize(ss.str());

@@ -11,7 +11,14 @@ int init(int argc,
 
   size_t i;
   Config configs;
+  Logger logger(LVL_DEBUG);
 
+  if (argc != 2) {
+    logger.error() << "please provide one config file!\n";
+    exit(1);
+  } else {
+    logger.debug() << "config file: " << argv[1] << "\n";
+  }
   configs = Config(argv[1]);
 
   for (i = 0; i < configs.size(); i++) {
