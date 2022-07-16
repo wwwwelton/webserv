@@ -27,7 +27,7 @@ WebServ::~WebServ(void) {
 }
 
 WebServ::WebServ(int argc, char **argv) {
-  log.info() << "Initializing WebServ\n";
+  log.info() << "WebServ Initializing\n";
   size_t i;
 
   conn = 0;
@@ -49,6 +49,7 @@ WebServ::WebServ(int argc, char **argv) {
     serverlist.insert(std::make_pair(configs[i]->sockfd, configs[i]));
     pollfds.push_back(_pollfd(configs[i]->sockfd, POLLIN));
   }
+  log.info() << "WebServ initialized. Listening..." << std::endl;
 }
 
 int WebServ::_poll(void) {

@@ -32,7 +32,9 @@ int main(int argc, char **argv) {
   while (true) {
     try {
       loop(argc, argv);
+      break;
     } catch (std::exception& e) {
+      WebServ::log.error() << e.what();
       WebServ::log.error() << "EXCEPTION HANDLED REINITIALIZING...\n";
     }
   }

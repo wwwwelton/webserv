@@ -173,16 +173,16 @@ void Response::assemble(std::string const& body_path) {
     in.get(buf, BUFFER_SIZE, 0);
     body += buf;
   }
-  // std::cout << body << "\n";
+  // WebServ::log.debug() << "Response body: " << body << "\n";
   str += body;
   ss << body.size();
   ss >> size;
   str.replace(str.find("LENGTH"), 6, size);
   std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
   HttpBase::size = str.size();
-  // std::cout << str.size() << "\n";
+  // WebServ::log.debug() << str.size() << "\n";
   in.close();
-  WebServ::log.debug() << "Host: " << req->host << "\n";
+  // WebServ::log.debug() << "Host: " << req->host << "\n";
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
