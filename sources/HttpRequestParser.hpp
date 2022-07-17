@@ -46,6 +46,12 @@ enum RequestStates {
   S_DEAD = 0
 };
 
+enum ParsingResult {
+  P_PARSING_COMPLETE,
+  P_PARSING_INCOMPLETE,
+  P_PARSING_INVALID
+};
+
 enum TokenType {
   TK_WORD,
   TK_NEWLINE,
@@ -62,7 +68,7 @@ public:
     const char* what() const throw() { return "invalid http request"; }
   };
 
-  HttpRequestParser(int fd = -1, size_t buff_max = 512);
+  HttpRequestParser(int fd = -1, size_t buff_max = 2000);
   HttpRequestParser(const HttpRequestParser &);
   HttpRequestParser &operator=(const HttpRequestParser &);
   ~HttpRequestParser();
@@ -79,6 +85,7 @@ public:
   Request &get_request();
 
 private:
+  size_t content_length;
   bool valid;
   Request *_request;
   std::vector<Token> headers;
@@ -97,7 +104,7 @@ private:
   static std::string supported_version;
   size_t supported_version_index;
 
-  void tokenize_partial_request(char *buff);
+  ParsingResult tokenize_partial_request(char *buff);
 };
 
 #endif // !HTTP_REQUEST_PARSER_HPP

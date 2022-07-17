@@ -3,6 +3,7 @@
 #include "WebServ.hpp"
 #include <cctype>
 #include <cstddef>
+#include <sstream>
 #include <sys/socket.h>
 #include <exception>
 
@@ -78,10 +79,27 @@ inline bool is_token(char c) {
   return (is_ascii(c) && !is_ctl(c) && !is_separator(c));
 }
 
+bool str_iequals(const std::string& str1, const std::string& str2) {
+  size_t size1 = str1.size();
+
+  if (size1 != str2.size())
+    return false;
+
+  const char *cstr1 = str1.c_str();
+  const char *cstr2 = str2.c_str();
+
+  for (size_t i = 0; i < size1; i++) {
+    if (std::toupper(cstr1[i]) != std::toupper(cstr2[i]))
+      return false;
+  }
+  return true;
+}
+
 std::string HttpRequestParser::supported_version = "HTTP/1.1";
 
 HttpRequestParser::HttpRequestParser(int fd, size_t buff_max):
   finished(false),
+  content_length(false),
   valid(false),
   fd(fd),
   buffer(new char[buff_max]),
@@ -93,8 +111,9 @@ HttpRequestParser::HttpRequestParser(int fd, size_t buff_max):
   }
 
 HttpRequestParser::HttpRequestParser(const HttpRequestParser &other):
-  finished(false),
-  valid(false),
+  finished(other.finished),
+  content_length(false),
+  valid(other.valid),
   fd(other.fd),
   buffer(new char[other.buff_max]),
   bytes_read(other.bytes_read),
@@ -121,11 +140,11 @@ HttpRequestParser::~HttpRequestParser() {
  * METHOD /uri.php HTTP/1.1\r\n
  * */
 
-void HttpRequestParser::tokenize_partial_request(char *buff) {
+ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
   size_t i = 0;
 
-  buff[bytes_read] = '\0';
-  WebServ::log.debug() << "Incoming request data: [" << buff << "]" << std::endl;
+  // buff[bytes_read] = '\0';
+  WebServ::log.debug() << "Incoming request data: [" << std::string(buff, bytes_read) << "]" << std::endl;
   while (i < bytes_read) {
     char c = buff[i++];
     // WebServ::log.info() << "current request: " << *_request << std::endl;
@@ -236,10 +255,16 @@ void HttpRequestParser::tokenize_partial_request(char *buff) {
         break;
 
       case S_HEADER_LINE_VALUE:
+        if (c == '\r' || c == '\n') {
+          _request->headers[_header_key] = _header_value;
+          if (str_iequals(_header_value, "content-length")) {
+            std::stringstream ss(_header_value);
+            ss >> content_length;
+          }
+        }
         if (c == '\r') { // header value finished
           current_state = S_HEADER_LINE_LF;
         } else if (c == '\n') {
-          _request->headers[_header_key] = _header_value;
           current_state = S_HEADER_LINE_START; // check for a new header
         } else if (is_ctl(c)) {
           throw InvalidHttpRequestException();
@@ -260,6 +285,11 @@ void HttpRequestParser::tokenize_partial_request(char *buff) {
       case S_HEADERS_END_LF:
         if (c != '\n')
           throw InvalidHttpRequestException();
+        if (_request->method == "GET") {
+          return P_PARSING_COMPLETE;
+        } else if (content_length == 0) {
+          return P_PARSING_COMPLETE;
+        } 
         current_state = S_BODY_START;
         break;
 
@@ -269,14 +299,13 @@ void HttpRequestParser::tokenize_partial_request(char *buff) {
         current_state = S_BODY;
         break;
       case S_BODY:
+        return P_PARSING_COMPLETE;
         break;
       default:
         throw std::exception();
     }
-    if (i == bytes_read) {
-      return;
-    }
   }
+  return P_PARSING_INCOMPLETE;
 }
 
 void HttpRequestParser::parse() {
@@ -291,24 +320,26 @@ void HttpRequestParser::parse() {
   } else if (bytes_read == 0) {
     finished = true;
     WebServ::log.error() << "recv returned 0" << std::endl;
-    return ;
+    return;
   }
-  // finished = true;
 
+  WebServ::log.debug()
+    << "Bytes read: " << bytes_read << std::endl;
   try {
-    tokenize_partial_request(buffer);
+    ParsingResult result = tokenize_partial_request(buffer);
+    if (result == P_PARSING_COMPLETE) {
+      finished = true;
+    }
   } catch(InvalidHttpRequestException& ) {
     WebServ::log.warning() << "Invalid http request" << std::endl;
+    finished = true;
   } catch(std::exception& e) {
     WebServ::log.error() << "Unexpected exception: " << e.what() << std::endl;
+    finished = true;
   }
 }
 
 Request &HttpRequestParser::get_request() {
-  _request->method = "GET";
-  _request->path = "/index.html";
-  _request->http_version = "HTTP/1.1";
-  _request->host = "localhost:3492";
   _request->finished = this->finished;
   _request->valid = this->valid;
   return *_request;
