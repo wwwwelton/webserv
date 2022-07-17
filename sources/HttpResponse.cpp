@@ -189,18 +189,21 @@ void Response::assemble(std::string const& body_path) {
 int Response::_post(void) {
   std::string   file;
   std::ofstream ofile;
-  int           code;
-  size_t        index;
-  size_t        end;
+  std::stringstream stream(req_body);
 
-  index = req_body.find('=');
-  end = req_body.find('&');
-  file = req_body.substr(index + 1, end - index - 1);
+  std::getline(stream, file, '\n');
+  std::getline(stream, file, '\n');
+  std::getline(stream, file, '\n');
+  std::getline(stream, file, '\n');
   file = location->upload_store + "/" + file;
-  code = access(file.c_str(), W_OK);
-  if (code == EACCES)
+  access(file.c_str(), W_OK);
+  if (errno == EACCES)
     return FORBIDDEN;
   ofile.open(file.c_str(), ofile.out | ofile.trunc);
+  if (!ofile.good()) {
+    WebServ::log.warning() << "file creation failed returning 500\n";
+    return INTERNAL_SERVER_ERROR;
+  }
   ofile << req_body;
   return CREATED;
 }
@@ -210,18 +213,13 @@ int Response::_delete(void) {
 }
 
 int Response::validate_limit_except(void) {
-  // std::cout << location->limit_except << "\n";
-  // std::cout << method << "\n";
-  // server->print();
   if (location->limit_except.size()) {
     if (location->limit_except[0] == "ALL")
       return 0;
-    if (std::find(location->limit_except.begin(),
-                  location->limit_except.end(),
-                  method) != location->limit_except.end())
+    std::vector<std::string>::iterator it = location->limit_except.begin();
+    std::vector<std::string>::iterator ite = location->limit_except.end();
+    if (std::find(it, ite, method) != location->limit_except.end())
        return 0;
-    // if (location->limit_except.find(method) != std::string::npos)
-    //   return 0;
     return METHOD_NOT_ALLOWED;
   }
   return 0;
