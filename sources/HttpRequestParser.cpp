@@ -135,6 +135,23 @@ HttpRequestParser::~HttpRequestParser() {
   delete _request;
 }
 
+void print_chunk(const std::string &str, size_t start, size_t size) {
+  std::ostream& out = std::cout;
+  for (size_t i = start; size > 0; size--) {
+    char c = str[i++];
+    if (std::isprint(c)) {
+      out << c;
+    } else {
+      if (c == '\r')
+        out << "\\r";
+      else if (c == '\n')
+        out << "\\n";
+      else
+        out << '.';
+    }
+  }
+}
+
 /*
  * the request header starts with
  * METHOD /uri.php HTTP/1.1\r\n
@@ -144,7 +161,9 @@ ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
   size_t i = 0;
 
   // buff[bytes_read] = '\0';
-  WebServ::log.debug() << "Incoming request data: [" << std::string(buff, bytes_read) << "]" << std::endl;
+  WebServ::log.debug() << "Incoming request data: [";
+  print_chunk(buff, 0, bytes_read);
+  std::cout << "]" << std::endl;
   while (i < bytes_read) {
     char c = buff[i++];
     // WebServ::log.info() << "current request: " << *_request << std::endl;
@@ -257,7 +276,7 @@ ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
       case S_HEADER_LINE_VALUE:
         if (c == '\r' || c == '\n') {
           _request->headers[_header_key] = _header_value;
-          if (str_iequals(_header_value, "content-length")) {
+          if (str_iequals(_header_key, "content-length")) {
             std::stringstream ss(_header_value);
             ss >> content_length;
           }
@@ -296,10 +315,16 @@ ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
       case S_BODY_START:
         WebServ::log.debug() << "Initializing body parsing" << std::endl;
         WebServ::log.debug() << "Current request: " << *_request << std::endl;
+        content_length--;
+        _request->body.push_back(c);
         current_state = S_BODY;
         break;
+
       case S_BODY:
-        return P_PARSING_COMPLETE;
+        content_length--;
+        _request->body.push_back(c);
+        if (content_length == 0)
+          return P_PARSING_COMPLETE;
         break;
       default:
         throw std::exception();

@@ -27,9 +27,13 @@ std::ostream& operator<<(std::ostream& out, const Request& request) {
     }
     out << "  }\n";
   }
-  out << "vvv     body    vvv\n\n";
-  out << request.body;
-  out << "\n\n^^^ end of body ^^^\n";
+  if (request.body.size()) {
+    out << "vvv     body    vvv\n\n";
+    out << request.body;
+    out << "\n\n^^^ end of body ^^^\n";
+  } else {
+    out << "  body: empty\n";
+  }
   out << "}" << std::endl;
   return out;
 }

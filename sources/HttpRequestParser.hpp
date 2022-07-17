@@ -42,6 +42,9 @@ enum RequestStates {
 
   S_BODY_START,
   S_BODY,
+  S_BODY_CRLF,
+  S_BODY_CR,
+  S_BODY_LF,
 
   S_DEAD = 0
 };
