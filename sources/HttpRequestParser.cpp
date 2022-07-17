@@ -135,7 +135,7 @@ HttpRequestParser::~HttpRequestParser() {
   delete _request;
 }
 
-void print_chunk(const std::string &str, size_t start, size_t size) {
+void print_chunk(const char *str, size_t start, size_t size) {
   std::ostream& out = std::cout;
   for (size_t i = start; size > 0; size--) {
     char c = str[i++];
@@ -313,8 +313,8 @@ ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
         break;
 
       case S_BODY_START:
-        WebServ::log.debug() << "Initializing body parsing" << std::endl;
         WebServ::log.debug() << "Current request: " << *_request << std::endl;
+        WebServ::log.debug() << "Initializing body parsing" << std::endl;
         content_length--;
         _request->body.push_back(c);
         current_state = S_BODY;
@@ -326,6 +326,7 @@ ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
         if (content_length == 0)
           return P_PARSING_COMPLETE;
         break;
+
       default:
         throw std::exception();
     }
@@ -354,6 +355,7 @@ void HttpRequestParser::parse() {
     ParsingResult result = tokenize_partial_request(buffer);
     if (result == P_PARSING_COMPLETE) {
       finished = true;
+      WebServ::log.debug() << "Finished request: " << *_request << std::endl;
     }
   } catch(InvalidHttpRequestException& ) {
     WebServ::log.warning() << "Invalid http request" << std::endl;
