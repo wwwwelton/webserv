@@ -61,7 +61,7 @@ enum TokenType {
   TK_COLON
 };
 
-class HttpRequestParser
+class RequestParser
 {
 public:
   bool finished;
@@ -71,10 +71,10 @@ public:
     const char* what() const throw() { return "invalid http request"; }
   };
 
-  HttpRequestParser(int fd = -1, size_t buff_max = 2000);
-  HttpRequestParser(const HttpRequestParser &);
-  HttpRequestParser &operator=(const HttpRequestParser &);
-  ~HttpRequestParser();
+  RequestParser(int fd = -1, size_t buff_max = 2000);
+  RequestParser(const RequestParser &);
+  RequestParser &operator=(const RequestParser &);
+  ~RequestParser();
 
   struct Token {
     const char *value;

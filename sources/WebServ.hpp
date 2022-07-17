@@ -9,7 +9,7 @@
 #ifndef WEBSERV_HPP
 #define WEBSERV_HPP
 
-#include "HttpRequestParser.hpp"
+#include "RequestParser.hpp"
 #define PORT1 3492
 #define PORT2 3493
 
@@ -47,7 +47,7 @@ typedef struct s_request {
   s_request();
   s_request(Server *_server, int fd);
   Server  *server;
-  HttpRequestParser *request_parser;
+  RequestParser *request_parser;
 } req;
 
 class WebServ {

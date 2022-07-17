@@ -10,7 +10,7 @@
 s_request::s_request(void)
   : server(NULL), request_parser(NULL) { }
 s_request::s_request(Server *_server, int fd)
-  : server(_server), request_parser(new HttpRequestParser(fd)) { }
+  : server(_server), request_parser(new RequestParser(fd)) { }
 
 Logger WebServ::log = WebServ::init_log();
 Logger WebServ::init_log(void) {
@@ -65,7 +65,7 @@ void WebServ::_accept(int i) {
   log.info() << "Events detected in socket " << pollfds[i].fd << "\n";
   new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
-    clientlist[new_sd].request_parser = new HttpRequestParser(new_sd);
+    clientlist[new_sd].request_parser = new RequestParser(new_sd);
     clientlist[new_sd].server = host;
     pollfds.push_back(_pollfd(new_sd, POLLIN));
     log.info() << host->server_name[0]
@@ -79,7 +79,7 @@ void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
   Response req_handler;
   
-  HttpRequestParser& parser = *clientlist[fd].request_parser;
+  RequestParser& parser = *clientlist[fd].request_parser;
   try {
     parser.parse();
 

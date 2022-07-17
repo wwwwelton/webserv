@@ -1,4 +1,4 @@
-#include "HttpRequestParser.hpp"
+#include "RequestParser.hpp"
 #include "HttpRequest.hpp"
 #include "WebServ.hpp"
 #include <cctype>
@@ -95,9 +95,9 @@ bool str_iequals(const std::string& str1, const std::string& str2) {
   return true;
 }
 
-std::string HttpRequestParser::supported_version = "HTTP/1.1";
+std::string RequestParser::supported_version = "HTTP/1.1";
 
-HttpRequestParser::HttpRequestParser(int fd, size_t buff_max):
+RequestParser::RequestParser(int fd, size_t buff_max):
   finished(false),
   content_length(false),
   valid(false),
@@ -110,7 +110,7 @@ HttpRequestParser::HttpRequestParser(int fd, size_t buff_max):
     _request = new Request();
   }
 
-HttpRequestParser::HttpRequestParser(const HttpRequestParser &other):
+RequestParser::RequestParser(const RequestParser &other):
   finished(other.finished),
   content_length(false),
   valid(other.valid),
@@ -121,7 +121,7 @@ HttpRequestParser::HttpRequestParser(const HttpRequestParser &other):
   current_state(other.current_state),
   supported_version_index(other.supported_version_index) { }
 
-HttpRequestParser& HttpRequestParser::operator=(const HttpRequestParser &other) {
+RequestParser& RequestParser::operator=(const RequestParser &other) {
   delete[] buffer;
   buffer = new char[other.buff_max];
   buff_max = other.buff_max;
@@ -130,7 +130,7 @@ HttpRequestParser& HttpRequestParser::operator=(const HttpRequestParser &other) 
   return *this;
 }
 
-HttpRequestParser::~HttpRequestParser() {
+RequestParser::~RequestParser() {
   delete[] buffer;
   delete _request;
 }
@@ -157,7 +157,7 @@ void print_chunk(const char *str, size_t start, size_t size) {
  * METHOD /uri.php HTTP/1.1\r\n
  * */
 
-ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
+ParsingResult RequestParser::tokenize_partial_request(char *buff) {
   size_t i = 0;
 
   // buff[bytes_read] = '\0';
@@ -334,7 +334,7 @@ ParsingResult HttpRequestParser::tokenize_partial_request(char *buff) {
   return P_PARSING_INCOMPLETE;
 }
 
-void HttpRequestParser::parse() {
+void RequestParser::parse() {
   if (finished)
     throw std::exception();
 
@@ -366,11 +366,11 @@ void HttpRequestParser::parse() {
   }
 }
 
-Request &HttpRequestParser::get_request() {
+Request &RequestParser::get_request() {
   _request->finished = this->finished;
   _request->valid = this->valid;
   return *_request;
 }
 
-HttpRequestParser::Token::Token(const char *value, size_t size, TokenType type)
+RequestParser::Token::Token(const char *value, size_t size, TokenType type)
   : value(value), size(size), type(type) { }
