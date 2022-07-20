@@ -108,7 +108,7 @@ void Response::assemble(std::string const& body_path) {
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
-void Response::get_directory_listing(void) {
+void Response::create_directory_listing(void) {
   std::string _template("<a href=\"PATH\">LINK</a>");
   std::stringstream ss;
   std::ifstream infile;
@@ -116,20 +116,24 @@ void Response::get_directory_listing(void) {
   std::string tmp;
 
   infile.open("./sources/templates/index.html");
-  outfile.open("./tmp.html", outfile.out | outfile.trunc);
+  outfile.open(DFL_TMPFILE, outfile.out | outfile.trunc);
 
   std::getline(infile, tmp);
+  tmp.push_back('\n');
   while (tmp.find("<h1>") == std::string::npos) {
     outfile << tmp;
     std::getline(infile, tmp);
+    tmp.push_back('\n');
   }
   tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
   outfile << tmp;
 
   std::getline(infile, tmp);
+  tmp.push_back('\n');
   while (tmp.find("PATH") == std::string::npos) {
     outfile << tmp;
     std::getline(infile, tmp);
+    tmp.push_back('\n');
   }
   _template = tmp;
 
@@ -155,21 +159,29 @@ void Response::get_directory_listing(void) {
   closedir(directory);
   infile.close();
   outfile.close();
+  remove_tmp = true;
+}
+
+void Response::create_error_page(void) {
+  std::string       content;
+  std::ifstream     infile;
+  std::ofstream     outfile;
+
+  infile.open("./sources/templates/error.html");
+  outfile.open(DFL_TMPFILE, outfile.trunc);
+  content.assign(std::istreambuf_iterator<char>(infile),
+                 std::istreambuf_iterator<char>());
+  content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
+  outfile << content;
+  response_path = DFL_TMPFILE;
+  remove_tmp = true;
+  infile.close();
+  outfile.close();
 }
 
 void Response::set_statuscode(int code) {
   std::stringstream ss;
 
-  if (folder_request) {
-    get_directory_listing();
-    response_path = "./tmp.html";
-  }
-  else if (response_code >= BAD_REQUEST) {
-    if (server->error_page.count(response_code))
-      response_path = root + server->error_page[response_code];
-    else
-      response_path = root + server->error_page[NOT_FOUND];
-  }
   statuscode.clear();
   ss << code;
   ss >> statuscode;
@@ -178,6 +190,17 @@ void Response::set_statuscode(int code) {
     statusmsg = statuslist[response_code];
   else
     statusmsg = statuslist[(response_code / 100) * 100];
+
+  if (folder_request) {
+    create_directory_listing();
+    response_path = DFL_TMPFILE;
+  }
+  else if (response_code >= BAD_REQUEST) {
+    if (server->error_page.count(response_code))
+      response_path = root + server->error_page[response_code];
+    else
+      create_error_page();
+  }
 }
 
 void Response::process(void) {
@@ -187,7 +210,7 @@ void Response::process(void) {
     response_code = (this->*method_map[method])();
   set_statuscode(response_code);
   dispatch(response_path);
-  if (location->autoindex)
+  if (remove_tmp)
     unlink("tmp.html");
 }
 

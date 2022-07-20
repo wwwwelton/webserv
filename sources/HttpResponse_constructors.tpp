@@ -32,6 +32,7 @@ Response::Response(Request const& _req, Server *_server)
   //   std::cout << it->first << " " << it->second << "\n";
   // }
   folder_request = false;
+  remove_tmp = false;
   find_location(_req.path, _server);
   server = _server;
   path = "./" + location->root + _req.path;

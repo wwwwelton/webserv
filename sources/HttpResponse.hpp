@@ -35,6 +35,8 @@ class Logger;
 class server_location;
 class Request;
 
+#define DFL_TMPFILE "./tmp.html"
+
 class Response {
 typedef void(Response::*funcptr)(void);
 typedef std::map<std::string, int (Response::*)(void)> meth_map;
@@ -67,6 +69,7 @@ private:
   Request const* req;
   bool        folder_request;
   bool        valid;
+  bool        remove_tmp;
   server_location* location;
 
   int validate_limit_except(void);
@@ -82,7 +85,8 @@ private:
   int _post(void);
   int _delete(void);
   void find_location(std::string path, Server *_server);
-  void get_directory_listing(void);
+  void create_error_page(void);
+  void create_directory_listing(void);
 
 public:
   Response(Request const& req, Server *_server);
