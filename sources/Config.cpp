@@ -197,6 +197,10 @@ Server* Config::_parse_vhost(const std::string& vhost) {
       srv->cgi["." + tokens[1]] = tokens[2];
     }
 
+    if (tokens[0] == "return") {
+      srv->redirect[_stoi(tokens[1])] = tokens[2];
+    }
+
     if (tokens[0] == "location") {
       std::string index = tokens[1];
 
@@ -206,6 +210,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         srv->location[index].client_max_body_size = srv->client_max_body_size;
         srv->location[index].log = srv->log;
         srv->location[index].cgi = srv->cgi;
+        srv->location[index].redirect = srv->redirect;
 
         // TODO(wleite): remove
         srv->location[index].upload = false;
@@ -250,6 +255,12 @@ Server* Config::_parse_vhost(const std::string& vhost) {
 
         if (tokens[0] == "cgi") {
           srv->location[index].cgi["." + tokens[1]] = tokens[2];
+        }
+
+        if (tokens[0] == "return") {
+          if (!srv->location[index].redirect.size()) {
+            srv->location[index].redirect[_stoi(tokens[1])] = tokens[2];
+          }
         }
 
         // TODO(wleite): remove

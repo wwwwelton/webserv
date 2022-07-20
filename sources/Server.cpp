@@ -101,6 +101,12 @@ void Server::print(void) {
     std::cout << "cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
   }
 
+  for (std::map<int, std::string>::const_iterator it = redirect.begin();
+       it != redirect.end();
+       it++) {
+    std::cout << "redirect: =>" << it->first << "<= =>" << it->second << "<=\n";
+  }
+
   for (std::map<std::string, server_location>::const_iterator
            it = location.begin();
        it != location.end();
@@ -128,6 +134,13 @@ void Server::print(void) {
          it != location[index].cgi.end();
          it++) {
       std::cout << "    cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
+    }
+
+    for (std::map<int, std::string>::const_iterator
+             it = location[index].redirect.begin();
+         it != location[index].redirect.end();
+         it++) {
+      std::cout << "    redirect: =>" << it->first << "<= =>" << it->second << "<=\n";
     }
 
     // TODO(wleite): remove

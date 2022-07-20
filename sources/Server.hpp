@@ -27,6 +27,7 @@ struct server_location {
   int client_max_body_size;
   std::map<std::string, std::string> log;
   std::map<std::string, std::string> cgi;
+  std::map<int, std::string> redirect;
   bool autoindex;
 
   // TODO(wleite): remove
@@ -46,6 +47,7 @@ class Server {
   int client_max_body_size;
   std::map<std::string, std::string> log;
   std::map<std::string, std::string> cgi;
+  std::map<int, std::string> redirect;
   std::map<std::string, server_location> location;
   bool autoindex;
   int sockfd;
