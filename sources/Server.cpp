@@ -117,6 +117,10 @@ void Server::print(void) {
 
     std::cout << "    root: =>" << location[index].root << "<=\n";
 
+    for (size_t i = 0; i < location[index].index.size(); i++) {
+      std::cout << "    index: =>" << location[index].index[i] << "<=\n";
+    }
+
     for (size_t i = 0; i < location[index].limit_except.size(); i++) {
       std::cout << "    limit_except: =>" << location[index].limit_except[i] << "<=\n";
     }

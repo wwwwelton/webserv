@@ -23,6 +23,7 @@
 
 struct server_location {
   std::string root;
+  std::vector<std::string> index;
   std::vector<std::string> limit_except;
   int client_max_body_size;
   std::map<std::string, std::string> cgi;
