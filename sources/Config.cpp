@@ -211,10 +211,6 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         srv->location[index].client_max_body_size = srv->client_max_body_size;
         srv->location[index].cgi = srv->cgi;
         srv->location[index].redirect = srv->redirect;
-
-        // TODO(wleite): remove
-        srv->location[index].upload = false;
-        srv->location[index].upload_store = srv->root + "/uploads";
       }
 
       while (std::getline(is, line)) {
@@ -263,13 +259,6 @@ Server* Config::_parse_vhost(const std::string& vhost) {
           }
         }
 
-        // TODO(wleite): remove
-        if (tokens[0] == "upload") {
-          srv->location[index].upload = (tokens[1] == "on") ? true : false;
-        }
-        if (tokens[0] == "upload_store") {
-          srv->location[index].upload_store = _trim(std::string(tokens[1]), "/");
-        }
         if (line == "}") {
           break;
         }
@@ -278,7 +267,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   }
   srv->sockfd = -1;
 
-//   srv->print();
+  //   srv->print();
 
   return (srv);
 }

@@ -29,10 +29,6 @@ struct server_location {
   std::map<std::string, std::string> cgi;
   std::map<int, std::string> redirect;
   bool autoindex;
-
-  // TODO(wleite): remove
-  bool upload;
-  std::string upload_store;
 };
 
 class Server {

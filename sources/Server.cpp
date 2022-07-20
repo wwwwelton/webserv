@@ -142,10 +142,6 @@ void Server::print(void) {
          it++) {
       std::cout << "    redirect: =>" << it->first << "<= =>" << it->second << "<=\n";
     }
-
-    // TODO(wleite): remove
-    std::cout << "    upload: =>" << location[index].upload << "<=\n";
-    std::cout << "    upload_store: =>" << location[index].upload_store << "<=\n";
   }
 
   std::cout << "sockfd: =>" << sockfd << "<=\n";
