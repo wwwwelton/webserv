@@ -27,7 +27,7 @@ Response::status_map Response::init_status_map(void) {
   return _map;
 }
 
-Response::meth_map Response::methodptr = Response::init_map();
+Response::meth_map Response::method_map = Response::init_map();
 Response::meth_map Response::init_map(void) {
   meth_map _map;
 
@@ -37,7 +37,7 @@ Response::meth_map Response::init_map(void) {
   return _map;
 }
 
-Response::function_vector Response::pre_method = Response::init_pre();
+Response::function_vector Response::validation_functions = Response::init_pre();
 Response::function_vector Response::init_pre(void) {
   function_vector vec;
 
@@ -46,7 +46,7 @@ Response::function_vector Response::init_pre(void) {
   return vec;
 }
 
-Response::function_vector Response::get_method = Response::init_get();
+Response::function_vector Response::get_functions = Response::init_get();
 Response::function_vector Response::init_get(void) {
   function_vector vec;
 
@@ -101,8 +101,8 @@ int Response::validate_path(void) {
 int Response::_get(void) {
   int code = 0;
 
-  for (size_t i = 0; i < get_method.size() && code == 0; i++)
-    code = (this->*get_method[i])();
+  for (size_t i = 0; i < get_functions.size() && code == 0; i++)
+    code = (this->*get_functions[i])();
   if (code)
     return code;
   WebServ::log.warning() << "Unexpected outcome in Response::_get\n";
@@ -245,10 +245,10 @@ void Response::set_statuscode(int code) {
 }
 
 void Response::process(void) {
-  for (size_t i = 0; i < pre_method.size() && response_code == 0; i++)
-  response_code = (this->*pre_method[i])();
+  for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)
+  response_code = (this->*validation_functions[i])();
   if (response_code == 0)
-    response_code = (this->*methodptr[method])();
+    response_code = (this->*method_map[method])();
   set_statuscode(response_code);
   dispatch(response_path);
 }

@@ -41,9 +41,9 @@ typedef std::map<int, std::string> status_map;
 
 private:
   static std::map<int, std::string> statuslist;
-  static meth_map methodptr;
-  static function_vector pre_method;
-  static function_vector get_method;
+  static meth_map        method_map;
+  static function_vector validation_functions;
+  static function_vector get_functions;
 
   static meth_map        init_map();
   static function_vector init_pre();
