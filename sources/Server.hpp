@@ -26,6 +26,7 @@ struct server_location {
   std::vector<std::string> limit_except;
   int client_max_body_size;
   std::map<std::string, std::string> log;
+  std::map<std::string, std::string> cgi;
   bool autoindex;
 
   // TODO(wleite): remove
@@ -44,6 +45,7 @@ class Server {
   int timeout;
   int client_max_body_size;
   std::map<std::string, std::string> log;
+  std::map<std::string, std::string> cgi;
   std::map<std::string, server_location> location;
   bool autoindex;
   int sockfd;

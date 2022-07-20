@@ -95,6 +95,12 @@ void Server::print(void) {
 
   std::cout << "autoindex: =>" << autoindex << "<=\n";
 
+  for (std::map<std::string, std::string>::const_iterator it = cgi.begin();
+       it != cgi.end();
+       it++) {
+    std::cout << "cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
+  }
+
   for (std::map<std::string, server_location>::const_iterator
            it = location.begin();
        it != location.end();
@@ -116,6 +122,13 @@ void Server::print(void) {
     std::cout << "    error_log: =>" << location[index].log["error_log"] << "<=\n";
 
     std::cout << "    autoindex: =>" << location[index].autoindex << "<=\n";
+
+    for (std::map<std::string, std::string>::const_iterator
+             it = location[index].cgi.begin();
+         it != location[index].cgi.end();
+         it++) {
+      std::cout << "    cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
+    }
 
     // TODO(wleite): remove
     std::cout << "    upload: =>" << location[index].upload << "<=\n";

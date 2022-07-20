@@ -193,6 +193,10 @@ Server* Config::_parse_vhost(const std::string& vhost) {
       srv->autoindex = (tokens[1] == "on") ? true : false;
     }
 
+    if (tokens[0] == "cgi") {
+      srv->cgi["." + tokens[1]] = tokens[2];
+    }
+
     if (tokens[0] == "location") {
       std::string index = tokens[1];
 
@@ -201,6 +205,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         srv->location[index].limit_except.push_back(DFL_LIM_EXCEPT);
         srv->location[index].client_max_body_size = srv->client_max_body_size;
         srv->location[index].log = srv->log;
+        srv->location[index].cgi = srv->cgi;
 
         // TODO(wleite): remove
         srv->location[index].upload = false;
@@ -240,7 +245,11 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         }
 
         if (tokens[0] == "autoindex") {
-           srv->location[index].autoindex = (tokens[1] == "on") ? true : false;
+          srv->location[index].autoindex = (tokens[1] == "on") ? true : false;
+        }
+
+        if (tokens[0] == "cgi") {
+          srv->location[index].cgi["." + tokens[1]] = tokens[2];
         }
 
         // TODO(wleite): remove
