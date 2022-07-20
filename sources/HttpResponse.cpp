@@ -142,7 +142,7 @@ void Response::get_directory_listing(void) {
   directory = opendir(path.c_str());
   dir = readdir(directory);
   while (dir != NULL) {
-    tmp.replace(tmp.find("PATH"), 4, dir->d_name);
+    tmp.replace(tmp.find("PATH"), 4, req->path + "/" + dir->d_name);
     tmp.replace(tmp.find("LINK"), 4, dir->d_name);
     outfile << tmp;
     tmp = _template;

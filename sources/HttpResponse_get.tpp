@@ -25,7 +25,8 @@ int Response::validate_path(void) {
 
 int Response::validate_folder(void) {
   struct stat path_stat;
-  stat(path.c_str(), &path_stat);
+  if (stat(path.c_str(), &path_stat) == -1)
+    return NOT_FOUND;
   if (S_ISREG(path_stat.st_mode)) {
     return 0;
   }
@@ -43,7 +44,7 @@ int Response::validate_folder(void) {
     return OK;
   }
   WebServ::log.warning() << "Unexpected outcome in Response::validate_folder\n";
-  return NOT_FOUND;
+  return 0;
 }
 
 
