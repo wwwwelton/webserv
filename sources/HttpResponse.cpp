@@ -7,96 +7,20 @@
 
 #include "HttpResponse.hpp"
 
-Response::status_map Response::statuslist = Response::init_status_map();
-Response::status_map Response::init_status_map(void) {
-  status_map _map;
-
-  _map[200] = "OK\n";
-  _map[201] = "CREATED\n";
-  _map[202] = "ACCEPTED\n";
-  _map[300] = "MULTIPLE CHOICE\n";
-  _map[400] = "BAD REQUEST\n";
-  _map[401] = "UNAUTHORIZED\n";
-  _map[403] = "FORBIDDEN\n";
-  _map[404] = "NOT FOUND\n";
-  _map[405] = "METHOD NOT ALLOWED\n";
-  _map[415] = "UNSUPPORTED MEDIA TYPE\n";
-  _map[500] = "INTERNAL SERVER ERROR\n";
-  _map[502] = "BAD GATEWAY\n";
-  _map[504] = "GATEWAY TIMEOUT\n";
-  _map[506] = "HTTP VERSION UNSUPPORTED\n";
-  return _map;
-}
-
-Response::meth_map Response::method_map = Response::init_map();
-Response::meth_map Response::init_map(void) {
-  meth_map _map;
-
-  _map["GET"] = &Response::_get;
-  _map["POST"] = &Response::_post;
-  _map["DELETE"] = &Response::_delete;
-  return _map;
-}
-
-Response::function_vector Response::validation_functions = Response::init_pre();
-Response::function_vector Response::init_pre(void) {
-  function_vector vec;
-
-  vec.push_back(&Response::validate_limit_except);
-  vec.push_back(&Response::validate_http_version);
-  return vec;
-}
-
-Response::function_vector Response::get_functions = Response::init_get();
-Response::function_vector Response::init_get(void) {
-  function_vector vec;
-
-  vec.push_back(&Response::validate_index);
-  vec.push_back(&Response::validate_folder);
-  vec.push_back(&Response::validate_path);
-  return vec;
-}
-
 void Response::_send(int fd) {
   send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
   WebServ::log.info() << "Response sent to client " << fd << "\n";
 }
 
-int Response::validate_folder(void) {
-  struct stat path_stat;
-  stat(path.c_str(), &path_stat);
-  if (S_ISREG(path_stat.st_mode)) {
-    return 0;
-  }
-  else if (S_ISDIR(path_stat.st_mode)) {
-    if (!location->autoindex) {
-      if (path == root)
-        return FORBIDDEN;
-      else
-        return NOT_FOUND;
-    }
-    folder_request = true;
-    return OK;
-  }
-  WebServ::log.warning() << "Unexpected outcome in Response::validate_folder\n";
-  return NOT_FOUND;
-}
-
-int Response::validate_index(void) {
-  if (path == root) {
-    for (size_t i = 0; i < server->index.size(); i++) {
-      std::string indexpath = root + server->index[i];
-      if (!access(indexpath.c_str(), R_OK)) {
-        response_path = indexpath;
-        return OK;
-      }
-    }
-    if (location->autoindex)
+int Response::validate_limit_except(void) {
+  if (location->limit_except.size()) {
+    if (location->limit_except[0] == "ALL")
       return 0;
-    if (errno == ENOENT)
-      return NOT_FOUND;
-    if (errno == EACCES)
-      return FORBIDDEN;
+    std::vector<std::string>::iterator it = location->limit_except.begin();
+    std::vector<std::string>::iterator ite = location->limit_except.end();
+    if (std::find(it, ite, method) != location->limit_except.end())
+       return 0;
+    return METHOD_NOT_ALLOWED;
   }
   return 0;
 }
@@ -105,32 +29,6 @@ int Response::validate_http_version(void) {
   if (req->http_version != "HTTP/1.1")
     return HTTP_VERSION_UNSUPPORTED;
   return 0;
-}
-
-int Response::validate_path(void) {
-  if (!access(path.c_str(), R_OK)) {
-    response_path = path;
-    return OK;
-  }
-  if (errno == ENOENT)
-    return NOT_FOUND;
-  else if (errno == EACCES)
-    return FORBIDDEN;
-  else {
-    WebServ::log.warning() << "Unexpected outcome in Response::validate_path\n";
-    return NOT_FOUND;
-  }
-}
-
-int Response::_get(void) {
-  int code = 0;
-
-  for (size_t i = 0; i < get_functions.size() && code == 0; i++)
-    code = (this->*get_functions[i])();
-  if (code)
-    return code;
-  WebServ::log.warning() << "Unexpected outcome in Response::_get\n";
-  return NOT_FOUND;
 }
 
 void Response::php_cgi(std::string const& body_path) {
@@ -210,45 +108,6 @@ void Response::assemble(std::string const& body_path) {
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
-int Response::_post(void) {
-  std::string   file;
-  std::ofstream ofile;
-  std::stringstream stream(req_body);
-
-  std::getline(stream, file, '\n');
-  std::getline(stream, file, '\n');
-  std::getline(stream, file, '\n');
-  std::getline(stream, file, '\n');
-  file = location->upload_store + "/" + file;
-  access(file.c_str(), W_OK);
-  if (errno == EACCES)
-    return FORBIDDEN;
-  ofile.open(file.c_str(), ofile.out | ofile.trunc);
-  if (!ofile.good()) {
-    WebServ::log.warning() << "file creation failed returning 500\n";
-    return INTERNAL_SERVER_ERROR;
-  }
-  ofile << req_body;
-  return CREATED;
-}
-
-int Response::_delete(void) {
-  return 0;
-}
-
-int Response::validate_limit_except(void) {
-  if (location->limit_except.size()) {
-    if (location->limit_except[0] == "ALL")
-      return 0;
-    std::vector<std::string>::iterator it = location->limit_except.begin();
-    std::vector<std::string>::iterator ite = location->limit_except.end();
-    if (std::find(it, ite, method) != location->limit_except.end())
-       return 0;
-    return METHOD_NOT_ALLOWED;
-  }
-  return 0;
-}
-
 void Response::set_statuscode(int code) {
   std::stringstream ss;
 
@@ -277,35 +136,8 @@ void Response::process(void) {
   dispatch(response_path);
 }
 
-void Response::find_location(std::string path, Server *server) {
-  while (path.size()) {
-    if (server->location.count(path)) {
-      location = &server->location[path];
-      return;
-    }
-    path = path.erase(path.find_last_of('/'));
-  }
-  location = &server->location["/"];
-}
-
-Response::Response(void): req(NULL) { }
-Response::Response(Request const& _req, Server *_server)
-: httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n"), req(&_req)
-{
-  if (_req.body.size()) {
-    WebServ::log.debug() << "Request body:\n" << _req.body << "\n";
-    req_body = req->body;
-  }
-  // std::map<int, std::string>::iterator it = location->redirect.begin();
-  // std::map<int, std::string>::iterator ite = location->redirect.end();
-  // for(; it != ite; it++) {
-  //   std::cout << it->first << " " << it->second << "\n";
-  // }
-  folder_request = false;
-  find_location(_req.path, _server);
-  server = _server;
-  path = "./" + location->root + _req.path;
-  root = "./" + location->root + "/";
-  method = req->method;
-  response_code = 0;
-}
+#include "HttpResponse_static.tpp"
+#include "HttpResponse_constructors.tpp"
+#include "HttpResponse_delete.tpp"
+#include "HttpResponse_get.tpp"
+#include "HttpResponse_post.tpp"

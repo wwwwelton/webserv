@@ -8,25 +8,25 @@ NAME    = webserv
 SRC     = main.cpp \
           WebServ.cpp \
           HttpBase.cpp \
-          HttpResponse.cpp \
           HttpRequest.cpp \
           RequestParser.cpp \
           Pollfd.cpp \
           Server.cpp \
           Config.cpp \
           Logger.cpp \
-          # init_servers.cpp \
+          HttpResponse.cpp \
+
 
 INC     = defines.hpp \
           WebServ.hpp \
           HttpBase.hpp \
-          HttpResponse.hpp \
           HttpRequest.hpp \
           RequestParser.hpp \
           Pollfd.hpp \
           Server.hpp \
           Config.hpp \
           Logger.hpp \
+          HttpResponse.hpp \
 
 OBJDIR  = objects
 SRC_DIR =	sources
