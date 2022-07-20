@@ -136,6 +136,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   Server* srv = new Server();
 
   srv->client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
+  srv->autoindex = false;
 
   while (std::getline(is, line)) {
     line = _trim(line, "; ");
@@ -188,6 +189,10 @@ Server* Config::_parse_vhost(const std::string& vhost) {
       srv->log["error_log"] = tokens[1];
     }
 
+    if (tokens[0] == "autoindex") {
+      srv->autoindex = (tokens[1] == "on") ? true : false;
+    }
+
     if (tokens[0] == "location") {
       std::string index = tokens[1];
 
@@ -227,11 +232,15 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         }
 
         if (tokens[0] == "access_log") {
-          srv->log["access_log"] = tokens[1];
+          srv->location[index].log["access_log"] = tokens[1];
         }
 
         if (tokens[0] == "error_log") {
-          srv->log["error_log"] = tokens[1];
+          srv->location[index].log["error_log"] = tokens[1];
+        }
+
+        if (tokens[0] == "autoindex") {
+           srv->location[index].autoindex = (tokens[1] == "on") ? true : false;
         }
 
         // TODO(wleite): remove

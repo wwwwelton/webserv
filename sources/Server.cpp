@@ -93,6 +93,8 @@ void Server::print(void) {
 
   std::cout << "error_log: =>" << log["error_log"] << "<=\n";
 
+  std::cout << "autoindex: =>" << autoindex << "<=\n";
+
   for (std::map<std::string, server_location>::const_iterator
            it = location.begin();
        it != location.end();
@@ -112,6 +114,8 @@ void Server::print(void) {
     std::cout << "    access_log: =>" << location[index].log["access_log"] << "<=\n";
 
     std::cout << "    error_log: =>" << location[index].log["error_log"] << "<=\n";
+
+    std::cout << "    autoindex: =>" << location[index].autoindex << "<=\n";
 
     // TODO(wleite): remove
     std::cout << "    upload: =>" << location[index].upload << "<=\n";

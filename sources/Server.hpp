@@ -26,6 +26,7 @@ struct server_location {
   std::vector<std::string> limit_except;
   int client_max_body_size;
   std::map<std::string, std::string> log;
+  bool autoindex;
 
   // TODO(wleite): remove
   bool upload;
@@ -44,6 +45,7 @@ class Server {
   int client_max_body_size;
   std::map<std::string, std::string> log;
   std::map<std::string, server_location> location;
+  bool autoindex;
   int sockfd;
 
   Server(void);
