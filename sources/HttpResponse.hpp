@@ -9,6 +9,7 @@
 # define HTTPRESPONSE_HPP
 
 #define BUFFER_SIZE 100
+#define DFL_TMPFILE "./tmp.html"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -35,7 +36,6 @@ class Logger;
 class server_location;
 class Request;
 
-#define DFL_TMPFILE "./tmp.html"
 
 class Response {
 typedef void(Response::*funcptr)(void);
@@ -86,6 +86,7 @@ private:
   int _delete(void);
   void find_location(std::string path, Server *_server);
   void create_error_page(void);
+  void create_redir_page(void);
   void create_directory_listing(void);
 
 public:

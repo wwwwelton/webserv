@@ -179,6 +179,26 @@ void Response::create_error_page(void) {
   outfile.close();
 }
 
+void Response::create_redir_page(void) {
+  std::string       content;
+  std::ifstream     infile;
+  std::ofstream     outfile;
+
+  infile.open("./sources/templates/redirect.html");
+  outfile.open(DFL_TMPFILE, outfile.trunc);
+  content.assign(std::istreambuf_iterator<char>(infile),
+                 std::istreambuf_iterator<char>());
+  WebServ::log.error() << content;
+  content.replace(content.find("$URL"), 4, location->redirect.second);
+  content.replace(content.find("$URL"), 4, location->redirect.second);
+  WebServ::log.error() << content;
+  outfile << content;
+  response_path = DFL_TMPFILE;
+  remove_tmp = true;
+  infile.close();
+  outfile.close();
+}
+
 void Response::set_statuscode(int code) {
   std::stringstream ss;
 
@@ -200,6 +220,12 @@ void Response::set_statuscode(int code) {
       response_path = root + server->error_page[response_code];
     else
       create_error_page();
+  }
+  else if (response_code >= MOVED_PERMANENTLY) {
+    if (server->error_page.count(response_code))
+      response_path = root + server->error_page[response_code];
+    else
+      create_redir_page();
   }
 }
 

@@ -15,6 +15,8 @@ Response::status_map Response::init_status_map(void) {
   _map[201] = "CREATED\n";
   _map[202] = "ACCEPTED\n";
   _map[300] = "MULTIPLE CHOICE\n";
+  _map[301] = "MOVED PERMANENTLY\n";
+  _map[302] = "FOUND\n";
   _map[400] = "BAD REQUEST\n";
   _map[401] = "UNAUTHORIZED\n";
   _map[403] = "FORBIDDEN\n";

@@ -38,5 +38,5 @@ Response::Response(Request const& _req, Server *_server)
   path = "./" + location->root + _req.path;
   root = "./" + location->root + "/";
   method = req->method;
-  response_code = 0;
+  response_code = location->redirect.first;
 }
