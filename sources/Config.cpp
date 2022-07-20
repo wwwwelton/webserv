@@ -208,7 +208,6 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         srv->location[index].root = srv->root;
         srv->location[index].limit_except.push_back(DFL_LIM_EXCEPT);
         srv->location[index].client_max_body_size = srv->client_max_body_size;
-        srv->location[index].log = srv->log;
         srv->location[index].cgi = srv->cgi;
         srv->location[index].redirect = srv->redirect;
 
@@ -239,14 +238,6 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         }
         if (tokens[0] == "client_max_body_size") {
           srv->location[index].client_max_body_size = _stoi(tokens[1]);
-        }
-
-        if (tokens[0] == "access_log") {
-          srv->location[index].log["access_log"] = tokens[1];
-        }
-
-        if (tokens[0] == "error_log") {
-          srv->location[index].log["error_log"] = tokens[1];
         }
 
         if (tokens[0] == "autoindex") {

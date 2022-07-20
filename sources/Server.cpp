@@ -123,10 +123,6 @@ void Server::print(void) {
 
     std::cout << "    client_max_body_size: =>" << location[index].client_max_body_size << "<=\n";
 
-    std::cout << "    access_log: =>" << location[index].log["access_log"] << "<=\n";
-
-    std::cout << "    error_log: =>" << location[index].log["error_log"] << "<=\n";
-
     std::cout << "    autoindex: =>" << location[index].autoindex << "<=\n";
 
     for (std::map<std::string, std::string>::const_iterator

@@ -25,7 +25,6 @@ struct server_location {
   std::string root;
   std::vector<std::string> limit_except;
   int client_max_body_size;
-  std::map<std::string, std::string> log;
   std::map<std::string, std::string> cgi;
   std::map<int, std::string> redirect;
   bool autoindex;
