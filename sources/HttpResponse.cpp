@@ -119,21 +119,17 @@ void Response::get_directory_listing(void) {
   outfile.open("./tmp.html", outfile.out | outfile.trunc);
 
   std::getline(infile, tmp);
-  tmp.push_back('\n');
   while (tmp.find("<h1>") == std::string::npos) {
     outfile << tmp;
     std::getline(infile, tmp);
-    tmp.push_back('\n');
   }
   tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
   outfile << tmp;
 
   std::getline(infile, tmp);
-  tmp.push_back('\n');
   while (tmp.find("PATH") == std::string::npos) {
     outfile << tmp;
     std::getline(infile, tmp);
-    tmp.push_back('\n');
   }
   _template = tmp;
 
@@ -171,7 +167,7 @@ void Response::set_statuscode(int code) {
   else if (response_code >= BAD_REQUEST) {
     if (server->error_page.count(response_code))
       response_path = root + server->error_page[response_code];
-    else // TODO(welton) default error pages
+    else
       response_path = root + server->error_page[NOT_FOUND];
   }
   statuscode.clear();
