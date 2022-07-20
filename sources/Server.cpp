@@ -97,23 +97,25 @@ void Server::print(void) {
            it = location.begin();
        it != location.end();
        it++) {
-    std::cout << "location name: =>" << it->first << "<=\n";
+    std::string index = it->first;
 
-    std::cout << "    root: =>" << it->second.root << "<=\n";
+    std::cout << "location name: =>" << index << "<=\n";
 
-    for (size_t i = 0; i < it->second.limit_except.size(); i++) {
-      std::cout << "    limit_except: =>" << it->second.limit_except[i] << "<=\n";
+    std::cout << "    root: =>" << location[index].root << "<=\n";
+
+    for (size_t i = 0; i < location[index].limit_except.size(); i++) {
+      std::cout << "    limit_except: =>" << location[index].limit_except[i] << "<=\n";
     }
 
-    std::cout << "    client_max_body_size: =>" << it->second.client_max_body_size << "<=\n";
+    std::cout << "    client_max_body_size: =>" << location[index].client_max_body_size << "<=\n";
 
-    // std::cout << "    access_log: =>" << it->second.log["access_log"] << "<=\n";
+    std::cout << "    access_log: =>" << location[index].log["access_log"] << "<=\n";
 
-    // std::cout << "    error_log: =>" << it->second.log["error_log"] << "<=\n";
+    std::cout << "    error_log: =>" << location[index].log["error_log"] << "<=\n";
 
     // TODO(wleite): remove
-    std::cout << "    upload: =>" << it->second.upload << "<=\n";
-    std::cout << "    upload_store: =>" << it->second.upload_store << "<=\n";
+    std::cout << "    upload: =>" << location[index].upload << "<=\n";
+    std::cout << "    upload_store: =>" << location[index].upload_store << "<=\n";
   }
 
   std::cout << "sockfd: =>" << sockfd << "<=\n";
