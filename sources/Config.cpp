@@ -278,7 +278,7 @@ Server* Config::_parse_vhost(const std::string& vhost) {
   }
   srv->sockfd = -1;
 
-  srv->print();
+//   srv->print();
 
   return (srv);
 }
