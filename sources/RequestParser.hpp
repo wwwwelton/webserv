@@ -55,6 +55,8 @@ enum TokenType {
 
 class RequestParser
 {
+  RequestParser(const RequestParser &);
+  RequestParser &operator=(const RequestParser &);
 public:
   bool finished;
 
@@ -64,8 +66,6 @@ public:
   };
 
   RequestParser(int fd = -1, size_t buff_max = 2000);
-  RequestParser(const RequestParser &);
-  RequestParser &operator=(const RequestParser &);
   ~RequestParser();
 
   struct Token {

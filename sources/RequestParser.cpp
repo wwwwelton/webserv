@@ -111,26 +111,9 @@ RequestParser::RequestParser(int fd, size_t buff_max):
     _request = new Request();
   }
 
-RequestParser::RequestParser(const RequestParser &other):
-  finished(other.finished),
-  content_length(false),
-  chunked(false),
-  valid(other.valid),
-  fd(other.fd),
-  buffer(new char[other.buff_max]),
-  bytes_read(other.bytes_read),
-  buff_max(other.buff_max),
-  current_state(other.current_state),
-  supported_version_index(other.supported_version_index) { }
+RequestParser::RequestParser(const RequestParser &){ }
 
-RequestParser& RequestParser::operator=(const RequestParser &other) {
-  delete[] buffer;
-  buffer = new char[other.buff_max];
-  buff_max = other.buff_max;
-  bytes_read = other.bytes_read;
-  finished = other.finished;
-  return *this;
-}
+RequestParser& RequestParser::operator=(const RequestParser &) { return *this; }
 
 RequestParser::~RequestParser() {
   delete[] buffer;
