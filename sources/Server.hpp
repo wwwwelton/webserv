@@ -25,6 +25,7 @@ struct server_location {
   std::string root;
   std::vector<std::string> limit_except;
   int client_max_body_size;
+  std::map<std::string, std::string> log;
 
   // TODO(wleite): remove
   bool upload;
@@ -37,10 +38,11 @@ class Server {
   int port;
   std::vector<std::string> server_name;
   std::string root;
-  int client_max_body_size;
   std::vector<std::string> index;
   std::map<int, std::string> error_page;
   int timeout;
+  int client_max_body_size;
+  std::map<std::string, std::string> log;
   std::map<std::string, server_location> location;
   int sockfd;
 

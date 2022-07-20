@@ -162,10 +162,6 @@ Server* Config::_parse_vhost(const std::string& vhost) {
       srv->root = _trim(std::string(tokens[1]), "/");
     }
 
-    if (tokens[0] == "client_max_body_size") {
-      srv->client_max_body_size = _stoi(tokens[1]);
-    }
-
     if (tokens[0] == "index") {
       for (size_t i = 1; i < tokens.size(); i++) {
         srv->index.push_back(tokens[i]);
@@ -180,6 +176,18 @@ Server* Config::_parse_vhost(const std::string& vhost) {
       srv->timeout = _stoi(tokens[1]);
     }
 
+    if (tokens[0] == "client_max_body_size") {
+      srv->client_max_body_size = _stoi(tokens[1]);
+    }
+
+    if (tokens[0] == "access_log") {
+      srv->log["access_log"] = tokens[1];
+    }
+
+    if (tokens[0] == "error_log") {
+      srv->log["error_log"] = tokens[1];
+    }
+
     if (tokens[0] == "location") {
       std::string index = tokens[1];
 
@@ -187,6 +195,9 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         srv->location[index].root = srv->root;
         srv->location[index].limit_except.push_back(DFL_LIM_EXCEPT);
         srv->location[index].client_max_body_size = srv->client_max_body_size;
+        srv->location[index].log = srv->log;
+
+        // TODO(wleite): remove
         srv->location[index].upload = false;
         srv->location[index].upload_store = srv->root + "/uploads";
       }
@@ -214,6 +225,16 @@ Server* Config::_parse_vhost(const std::string& vhost) {
         if (tokens[0] == "client_max_body_size") {
           srv->location[index].client_max_body_size = _stoi(tokens[1]);
         }
+
+        if (tokens[0] == "access_log") {
+          srv->log["access_log"] = tokens[1];
+        }
+
+        if (tokens[0] == "error_log") {
+          srv->log["error_log"] = tokens[1];
+        }
+
+        // TODO(wleite): remove
         if (tokens[0] == "upload") {
           srv->location[index].upload = (tokens[1] == "on") ? true : false;
         }

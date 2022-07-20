@@ -75,8 +75,6 @@ void Server::print(void) {
 
   std::cout << "root: =>" << root << "<=\n";
 
-  std::cout << "client_max_body_size: =>" << client_max_body_size << "<=\n";
-
   for (size_t i = 0; i < index.size(); i++) {
     std::cout << "index: =>" << index[i] << "<=\n";
   }
@@ -89,16 +87,31 @@ void Server::print(void) {
 
   std::cout << "timeout: =>" << timeout << "<=\n";
 
+  std::cout << "client_max_body_size: =>" << client_max_body_size << "<=\n";
+
+  std::cout << "access_log: =>" << log["access_log"] << "<=\n";
+
+  std::cout << "error_log: =>" << log["error_log"] << "<=\n";
+
   for (std::map<std::string, server_location>::const_iterator
            it = location.begin();
        it != location.end();
        it++) {
     std::cout << "location name: =>" << it->first << "<=\n";
+
     std::cout << "    root: =>" << it->second.root << "<=\n";
+
     for (size_t i = 0; i < it->second.limit_except.size(); i++) {
       std::cout << "    limit_except: =>" << it->second.limit_except[i] << "<=\n";
     }
+
     std::cout << "    client_max_body_size: =>" << it->second.client_max_body_size << "<=\n";
+
+    // std::cout << "    access_log: =>" << it->second.log["access_log"] << "<=\n";
+
+    // std::cout << "    error_log: =>" << it->second.log["error_log"] << "<=\n";
+
+    // TODO(wleite): remove
     std::cout << "    upload: =>" << it->second.upload << "<=\n";
     std::cout << "    upload_store: =>" << it->second.upload_store << "<=\n";
   }
