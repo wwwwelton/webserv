@@ -30,7 +30,10 @@ int Response::validate_folder(void) {
     return 0;
   }
   else if (S_ISDIR(path_stat.st_mode)) {
+    //todo(Welton) configfile is not returning autoindex as expected
+    location->autoindex = true;
     if (!location->autoindex) {
+      WebServ::log.error() << "here\n";
       if (path == root)
         return FORBIDDEN;
       else

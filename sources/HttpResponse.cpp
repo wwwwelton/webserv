@@ -108,10 +108,67 @@ void Response::assemble(std::string const& body_path) {
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
+void Response::get_directory_listing(void) {
+  std::string _template("<a href=\"PATH\">LINK</a>");
+  std::stringstream ss;
+  std::ifstream infile;
+  std::ofstream outfile;
+  std::string tmp;
+
+  infile.open("./sources/templates/index.html");
+  outfile.open("./tmp.html", outfile.out | outfile.trunc);
+
+  std::getline(infile, tmp);
+  tmp.push_back('\n');
+  while (tmp.find("<h1>") == std::string::npos) {
+    outfile << tmp;
+    std::getline(infile, tmp);
+    tmp.push_back('\n');
+  }
+  tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
+  outfile << tmp;
+
+  std::getline(infile, tmp);
+  tmp.push_back('\n');
+  while (tmp.find("PATH") == std::string::npos) {
+    outfile << tmp;
+    std::getline(infile, tmp);
+    tmp.push_back('\n');
+  }
+  _template = tmp;
+
+  struct dirent *dir;
+  DIR* directory;
+  directory = opendir(path.c_str());
+  dir = readdir(directory);
+  while (dir != NULL) {
+    tmp.replace(tmp.find("PATH"), 4, dir->d_name);
+    tmp.replace(tmp.find("LINK"), 4, dir->d_name);
+    outfile << tmp;
+    tmp = _template;
+    dir = readdir(directory);
+  }
+
+  std::getline(infile, tmp);
+  while (tmp.size()) {
+    tmp.push_back('\n');
+    outfile << tmp;
+    std::getline(infile, tmp);
+  }
+
+  closedir(directory);
+  infile.close();
+  outfile.close();
+}
+
 void Response::set_statuscode(int code) {
   std::stringstream ss;
 
-  if (response_code >= BAD_REQUEST) {
+  if (folder_request) {
+    get_directory_listing();
+    response_path = "./tmp.html";
+  }
+  else if (response_code >= BAD_REQUEST) {
     if (server->error_page.count(response_code))
       response_path = root + server->error_page[response_code];
     else // TODO(welton) default error pages
@@ -134,6 +191,8 @@ void Response::process(void) {
     response_code = (this->*method_map[method])();
   set_statuscode(response_code);
   dispatch(response_path);
+  if (location->autoindex)
+    unlink("tmp.html");
 }
 
 #include "HttpResponse_static.tpp"

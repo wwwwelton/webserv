@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <dirent.h>
 
 #include <iostream>
 #include <fstream>
@@ -81,6 +82,7 @@ private:
   int _post(void);
   int _delete(void);
   void find_location(std::string path, Server *_server);
+  void get_directory_listing(void);
 
 public:
   Response(Request const& req, Server *_server);
