@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <stdio.h>
 
 #include <iostream>
@@ -63,6 +64,7 @@ private:
   std::string root;
   Server*     server;
   Request const* req;
+  bool        folder_request;
   bool        valid;
   server_location* location;
 
@@ -71,6 +73,7 @@ private:
   int _get(void);
   int validate_index(void);
   int validate_path(void);
+  int validate_folder(void);
   void set_statuscode(int code);
   void assemble(std::string const& body_path);
   void php_cgi(std::string const& body_path);

@@ -20,6 +20,7 @@ Response::status_map Response::init_status_map(void) {
   _map[403] = "FORBIDDEN\n";
   _map[404] = "NOT FOUND\n";
   _map[405] = "METHOD NOT ALLOWED\n";
+  _map[415] = "UNSUPPORTED MEDIA TYPE\n";
   _map[500] = "INTERNAL SERVER ERROR\n";
   _map[502] = "BAD GATEWAY\n";
   _map[504] = "GATEWAY TIMEOUT\n";
@@ -51,6 +52,7 @@ Response::function_vector Response::init_get(void) {
   function_vector vec;
 
   vec.push_back(&Response::validate_index);
+  vec.push_back(&Response::validate_folder);
   vec.push_back(&Response::validate_path);
   return vec;
 }
@@ -58,6 +60,26 @@ Response::function_vector Response::init_get(void) {
 void Response::_send(int fd) {
   send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
   WebServ::log.info() << "Response sent to client " << fd << "\n";
+}
+
+int Response::validate_folder(void) {
+  struct stat path_stat;
+  stat(path.c_str(), &path_stat);
+  if (S_ISREG(path_stat.st_mode)) {
+    return 0;
+  }
+  else if (S_ISDIR(path_stat.st_mode)) {
+    if (!location->autoindex) {
+      if (path == root)
+        return FORBIDDEN;
+      else
+        return NOT_FOUND;
+    }
+    folder_request = true;
+    return OK;
+  }
+  WebServ::log.warning() << "Unexpected outcome in Response::validate_folder\n";
+  return NOT_FOUND;
 }
 
 int Response::validate_index(void) {
@@ -69,6 +91,8 @@ int Response::validate_index(void) {
         return OK;
       }
     }
+    if (location->autoindex)
+      return 0;
     if (errno == ENOENT)
       return NOT_FOUND;
     if (errno == EACCES)
@@ -272,6 +296,12 @@ Response::Response(Request const& _req, Server *_server)
     WebServ::log.debug() << "Request body:\n" << _req.body << "\n";
     req_body = req->body;
   }
+  // std::map<int, std::string>::iterator it = location->redirect.begin();
+  // std::map<int, std::string>::iterator ite = location->redirect.end();
+  // for(; it != ite; it++) {
+  //   std::cout << it->first << " " << it->second << "\n";
+  // }
+  folder_request = false;
   find_location(_req.path, _server);
   server = _server;
   path = "./" + location->root + _req.path;
