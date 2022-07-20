@@ -81,6 +81,7 @@ public:
 
 private:
   size_t content_length;
+  bool chunked;
   bool valid;
   Request *_request;
   std::vector<Token> headers;

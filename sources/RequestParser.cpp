@@ -100,6 +100,7 @@ std::string RequestParser::supported_version = "HTTP/1.1";
 RequestParser::RequestParser(int fd, size_t buff_max):
   finished(false),
   content_length(false),
+  chunked(false),
   valid(false),
   fd(fd),
   buffer(new char[buff_max]),
@@ -113,6 +114,7 @@ RequestParser::RequestParser(int fd, size_t buff_max):
 RequestParser::RequestParser(const RequestParser &other):
   finished(other.finished),
   content_length(false),
+  chunked(false),
   valid(other.valid),
   fd(other.fd),
   buffer(new char[other.buff_max]),
@@ -279,6 +281,9 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           if (str_iequals(_header_key, "content-length")) {
             std::stringstream ss(_header_value);
             ss >> content_length;
+          } else if (str_iequals(_header_key, "transfer-coding")) {
+            if (_header_value == "chunked")
+              chunked = true;
           }
         }
         if (c == '\r') { // header value finished
@@ -320,6 +325,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         current_state = S_BODY;
         break;
 
+      // body won't be a multipart payload
       case S_BODY:
         content_length--;
         _request->body.push_back(c);
