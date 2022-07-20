@@ -75,6 +75,8 @@ void Server::print(void) {
 
   std::cout << "root: =>" << root << "<=\n";
 
+  std::cout << "client_max_body_size: =>" << client_max_body_size << "<=\n";
+
   for (size_t i = 0; i < index.size(); i++) {
     std::cout << "index: =>" << index[i] << "<=\n";
   }

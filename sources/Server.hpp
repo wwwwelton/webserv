@@ -9,14 +9,14 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <fcntl.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <fcntl.h>
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "Config.hpp"
 #include "defines.hpp"
@@ -25,6 +25,8 @@ struct server_location {
   std::string root;
   std::vector<std::string> limit_except;
   int client_max_body_size;
+
+  // TODO(wleite): remove
   bool upload;
   std::string upload_store;
 };
@@ -35,6 +37,7 @@ class Server {
   int port;
   std::vector<std::string> server_name;
   std::string root;
+  int client_max_body_size;
   std::vector<std::string> index;
   std::map<int, std::string> error_page;
   int timeout;
