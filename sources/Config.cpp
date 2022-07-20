@@ -23,18 +23,11 @@ Config::Config(char* file) {
 
   str = _sanitize(ss.str());
 
-  // std::cout << str << "\n";
-
   host = _sub_host(str);
   vhost = _sub_vhost(str);
 
   _parse_host(host);
-
-  //   std::cout << host << "\n";
-  for (size_t i = 0; i < vhost.size(); i++) {
-    _servers.push_back(_parse_vhost(vhost[i]));
-    // std::cout << vhost[i] << "\n";
-  }
+  _parse_vhost(vhost);
 
   return;
 }
@@ -48,7 +41,9 @@ Config::~Config(void) {
 }
 
 Config& Config::operator=(const Config& rhs) {
-  this->_servers = rhs._servers;
+  if (this != &rhs) {
+    this->_servers = rhs._servers;
+  }
   return (*this);
 }
 
@@ -127,149 +122,151 @@ void Config::_parse_host(const std::string& host) {
   }
 }
 
-Server* Config::_parse_vhost(const std::string& vhost) {
-  std::istringstream is(vhost);
-  std::string line;
-  std::vector<std::string> tokens;
-  std::vector<std::string> sub_tokens;
+void Config::_parse_vhost(const std::vector<std::string>& vhost) {
+  for (size_t i = 0; i < vhost.size(); i++) {
+    std::istringstream is(vhost[i]);
+    std::string line;
+    std::vector<std::string> tokens;
+    std::vector<std::string> sub_tokens;
 
-  Server* srv = new Server();
+    Server* srv = new Server();
 
-  srv->client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
-  srv->autoindex = false;
+    srv->client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
+    srv->autoindex = false;
 
-  while (std::getline(is, line)) {
-    line = _trim(line, "; ");
-    tokens = _split(line, " ");
+    while (std::getline(is, line)) {
+      line = _trim(line, "; ");
+      tokens = _split(line, " ");
 
-    if (tokens[0] == "listen") {
-      if (tokens[1].find(":") != std::string::npos) {
-        sub_tokens = _split(tokens[1], ":");
-        srv->ip = inet_addr(sub_tokens[0].c_str());
-        srv->port = htons(_stoi(sub_tokens[1]));
-      } else {
-        srv->ip = inet_addr(DFL_ADDRESS);
-        srv->port = htons(_stoi(tokens[1]));
-      }
-    }
-
-    if (tokens[0] == "server_name") {
-      for (size_t i = 1; i < tokens.size(); i++) {
-        srv->server_name.push_back(tokens[i]);
-      }
-    }
-
-    if (tokens[0] == "root") {
-      srv->root = _trim(std::string(tokens[1]), "/");
-    }
-
-    if (tokens[0] == "index") {
-      for (size_t i = 1; i < tokens.size(); i++) {
-        srv->index.push_back(tokens[i]);
-      }
-    }
-
-    if (tokens[0] == "error_page") {
-      srv->error_page[_stoi(tokens[1])] = _trim(std::string(tokens[2]), "/");
-    }
-
-    if (tokens[0] == "timeout") {
-      srv->timeout = _stoi(tokens[1]);
-    }
-
-    if (tokens[0] == "client_max_body_size") {
-      srv->client_max_body_size = _stoi(tokens[1]);
-    }
-
-    if (tokens[0] == "access_log") {
-      srv->log["access_log"] = tokens[1];
-    }
-
-    if (tokens[0] == "error_log") {
-      srv->log["error_log"] = tokens[1];
-    }
-
-    if (tokens[0] == "autoindex") {
-      srv->autoindex = (tokens[1] == "on") ? true : false;
-    }
-
-    if (tokens[0] == "cgi") {
-      srv->cgi["." + tokens[1]] = tokens[2];
-    }
-
-    if (tokens[0] == "return") {
-      srv->redirect[_stoi(tokens[1])] = tokens[2];
-    }
-
-    if (tokens[0] == "location") {
-      std::string index = tokens[1];
-
-      if (srv->location.find(index) == srv->location.end()) {
-        srv->location[index].root = srv->root;
-        srv->location[index].index = srv->index;
-        srv->location[index].limit_except.push_back(DFL_LIM_EXCEPT);
-        srv->location[index].client_max_body_size = srv->client_max_body_size;
-        srv->location[index].cgi = srv->cgi;
-        srv->location[index].redirect = srv->redirect;
+      if (tokens[0] == "listen") {
+        if (tokens[1].find(":") != std::string::npos) {
+          sub_tokens = _split(tokens[1], ":");
+          srv->ip = inet_addr(sub_tokens[0].c_str());
+          srv->port = htons(_stoi(sub_tokens[1]));
+        } else {
+          srv->ip = inet_addr(DFL_ADDRESS);
+          srv->port = htons(_stoi(tokens[1]));
+        }
       }
 
-      while (std::getline(is, line)) {
-        line = _trim(line, "; ");
-        tokens = _split(line, " ");
+      if (tokens[0] == "server_name") {
+        for (size_t i = 1; i < tokens.size(); i++) {
+          srv->server_name.push_back(tokens[i]);
+        }
+      }
 
-        if (tokens[0] == "root") {
-          srv->location[index].root = tokens[1];
-          srv->location[index].root = _trim(std::string(tokens[1]), "/");
+      if (tokens[0] == "root") {
+        srv->root = _trim(std::string(tokens[1]), "/");
+      }
+
+      if (tokens[0] == "index") {
+        for (size_t i = 1; i < tokens.size(); i++) {
+          srv->index.push_back(tokens[i]);
+        }
+      }
+
+      if (tokens[0] == "error_page") {
+        srv->error_page[_stoi(tokens[1])] = _trim(std::string(tokens[2]), "/");
+      }
+
+      if (tokens[0] == "timeout") {
+        srv->timeout = _stoi(tokens[1]);
+      }
+
+      if (tokens[0] == "client_max_body_size") {
+        srv->client_max_body_size = _stoi(tokens[1]);
+      }
+
+      if (tokens[0] == "access_log") {
+        srv->log["access_log"] = tokens[1];
+      }
+
+      if (tokens[0] == "error_log") {
+        srv->log["error_log"] = tokens[1];
+      }
+
+      if (tokens[0] == "autoindex") {
+        srv->autoindex = (tokens[1] == "on") ? true : false;
+      }
+
+      if (tokens[0] == "cgi") {
+        srv->cgi["." + tokens[1]] = tokens[2];
+      }
+
+      if (tokens[0] == "return") {
+        srv->redirect[_stoi(tokens[1])] = tokens[2];
+      }
+
+      if (tokens[0] == "location") {
+        std::string index = tokens[1];
+
+        if (srv->location.find(index) == srv->location.end()) {
+          srv->location[index].root = srv->root;
+          srv->location[index].index = srv->index;
+          srv->location[index].limit_except.push_back(DFL_LIM_EXCEPT);
+          srv->location[index].client_max_body_size = srv->client_max_body_size;
+          srv->location[index].cgi = srv->cgi;
+          srv->location[index].redirect = srv->redirect;
         }
 
-        if (tokens[0] == "index") {
-          for (size_t i = 1; i < tokens.size(); i++) {
-            srv->location[index].index.push_back(tokens[i]);
+        while (std::getline(is, line)) {
+          line = _trim(line, "; ");
+          tokens = _split(line, " ");
+
+          if (tokens[0] == "root") {
+            srv->location[index].root = tokens[1];
+            srv->location[index].root = _trim(std::string(tokens[1]), "/");
+          }
+
+          if (tokens[0] == "index") {
+            for (size_t i = 1; i < tokens.size(); i++) {
+              srv->location[index].index.push_back(tokens[i]);
+            }
+          }
+
+          if (tokens[0] == "limit_except") {
+            if (srv->location[index].limit_except[0] == DFL_LIM_EXCEPT) {
+              srv->location[index].limit_except.pop_back();
+            }
+            for (size_t i = 1; i < tokens.size(); i++) {
+              std::transform(tokens[i].begin(),
+                             tokens[i].end(),
+                             tokens[i].begin(),
+                             ::toupper);
+              srv->location[index].limit_except.push_back(tokens[i]);
+            }
+          }
+
+          if (tokens[0] == "client_max_body_size") {
+            srv->location[index].client_max_body_size = _stoi(tokens[1]);
+          }
+
+          if (tokens[0] == "autoindex") {
+            srv->location[index].autoindex = (tokens[1] == "on") ? true : false;
+          }
+
+          if (tokens[0] == "cgi") {
+            srv->location[index].cgi["." + tokens[1]] = tokens[2];
+          }
+
+          if (tokens[0] == "return") {
+            if (!srv->location[index].redirect.size()) {
+              srv->location[index].redirect[_stoi(tokens[1])] = tokens[2];
+            }
+          }
+
+          if (line == "}") {
+            break;
           }
         }
-
-        if (tokens[0] == "limit_except") {
-          if (srv->location[index].limit_except[0] == DFL_LIM_EXCEPT) {
-            srv->location[index].limit_except.pop_back();
-          }
-          for (size_t i = 1; i < tokens.size(); i++) {
-            std::transform(tokens[i].begin(),
-                           tokens[i].end(),
-                           tokens[i].begin(),
-                           ::toupper);
-            srv->location[index].limit_except.push_back(tokens[i]);
-          }
-        }
-
-        if (tokens[0] == "client_max_body_size") {
-          srv->location[index].client_max_body_size = _stoi(tokens[1]);
-        }
-
-        if (tokens[0] == "autoindex") {
-          srv->location[index].autoindex = (tokens[1] == "on") ? true : false;
-        }
-
-        if (tokens[0] == "cgi") {
-          srv->location[index].cgi["." + tokens[1]] = tokens[2];
-        }
-
-        if (tokens[0] == "return") {
-          if (!srv->location[index].redirect.size()) {
-            srv->location[index].redirect[_stoi(tokens[1])] = tokens[2];
-          }
-        }
-
-        if (line == "}") {
-          break;
-        }
       }
     }
+    srv->sockfd = -1;
+
+    // srv->print();
+
+    _servers.push_back(srv);
   }
-  srv->sockfd = -1;
-
-  //   srv->print();
-
-  return (srv);
 }
 
 void Config::_replace_all(std::string* str,
