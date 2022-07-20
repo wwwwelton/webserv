@@ -101,11 +101,7 @@ void Server::print(void) {
     std::cout << "cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
   }
 
-  for (std::map<int, std::string>::const_iterator it = redirect.begin();
-       it != redirect.end();
-       it++) {
-    std::cout << "redirect: =>" << it->first << "<= =>" << it->second << "<=\n";
-  }
+  std::cout << "redirect: =>" << redirect.first << "<= =>" << redirect.second << "<=\n";
 
   for (std::map<std::string, server_location>::const_iterator
            it = location.begin();
@@ -136,12 +132,8 @@ void Server::print(void) {
       std::cout << "    cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
     }
 
-    for (std::map<int, std::string>::const_iterator
-             it = location[index].redirect.begin();
-         it != location[index].redirect.end();
-         it++) {
-      std::cout << "    redirect: =>" << it->first << "<= =>" << it->second << "<=\n";
-    }
+    std::cout << "    redirect: =>" << location[index].redirect.first
+              << "<= =>" << location[index].redirect.second << "<=\n";
   }
 
   std::cout << "sockfd: =>" << sockfd << "<=\n";

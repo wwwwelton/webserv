@@ -133,6 +133,8 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
 
     srv->client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
     srv->autoindex = false;
+    srv->redirect.first = 0;
+    srv->redirect.second = "";
 
     while (std::getline(is, line)) {
       line = _trim(line, "; ");
@@ -194,7 +196,8 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "return") {
-        srv->redirect[_stoi(tokens[1])] = tokens[2];
+        srv->redirect.first = _stoi(tokens[1]);
+        srv->redirect.second = tokens[2];
       }
 
       if (tokens[0] == "location") {
@@ -250,8 +253,9 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           }
 
           if (tokens[0] == "return") {
-            if (!srv->location[index].redirect.size()) {
-              srv->location[index].redirect[_stoi(tokens[1])] = tokens[2];
+            if (srv->location[index].redirect.first == 0) {
+              srv->location[index].redirect.first = _stoi(tokens[1]);
+              srv->location[index].redirect.second = tokens[2];
             }
           }
 

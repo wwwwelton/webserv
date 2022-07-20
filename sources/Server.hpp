@@ -16,6 +16,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Config.hpp"
@@ -27,7 +28,7 @@ struct server_location {
   std::vector<std::string> limit_except;
   int client_max_body_size;
   std::map<std::string, std::string> cgi;
-  std::map<int, std::string> redirect;
+  std::pair<int, std::string> redirect;
   bool autoindex;
 };
 
@@ -43,7 +44,7 @@ class Server {
   int client_max_body_size;
   std::map<std::string, std::string> log;
   std::map<std::string, std::string> cgi;
-  std::map<int, std::string> redirect;
+  std::pair<int, std::string> redirect;
   std::map<std::string, server_location> location;
   bool autoindex;
   int sockfd;
