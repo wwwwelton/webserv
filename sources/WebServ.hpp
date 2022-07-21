@@ -57,7 +57,6 @@ class WebServ {
   void _respond(int fd);
   void purge_conns(void);
   static Logger init_log(void);
-  void init_signals(void);
 
  public:
   Config configs;
@@ -70,6 +69,7 @@ class WebServ {
 
  private:
   bool _valid_input(int argc, char **argv);
+  void _init_signals(void);
 };
 
 void sighandler(const int signal, void *ptr);

@@ -30,7 +30,7 @@ WebServ::WebServ(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
   size_t i;
 
-  init_signals();
+  _init_signals();
   log.info() << "WebServ Signals Initialized\n";
 
   if (_valid_input(argc, argv)) {
@@ -153,7 +153,7 @@ bool WebServ::_valid_input(int argc, char **argv) {
   return (true);
 }
 
-void WebServ::init_signals(void) {
+void WebServ::_init_signals(void) {
   void *func = NULL;
   func = reinterpret_cast<void *>(sighandler);
   std::signal(SIGINT, reinterpret_cast<__sighandler_t>(func));
