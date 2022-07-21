@@ -8,9 +8,9 @@
 #include "WebServ.hpp"
 
 s_request::s_request(void)
-  : server(NULL), request_parser(NULL) { }
+    : server(NULL), request_parser(NULL) {}
 s_request::s_request(Server *_server, int fd)
-  : server(_server), request_parser(new RequestParser(fd)) { }
+    : server(_server), request_parser(new RequestParser(fd)) {}
 
 Logger WebServ::log = WebServ::init_log();
 Logger WebServ::init_log(void) {
@@ -30,18 +30,14 @@ WebServ::WebServ(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
   size_t i;
 
+  if (_valid_input(argc, argv)) {
+    configs = Config(argv[1]);
+  }
+
   conn = 0;
   compress = false;
   clientlist.reserve(1024);
   clientlist.resize(1024);
-
-  if (argc != 2) {
-    log.error() << "Please provide one config file!\n";
-    exit(1);
-  } else {
-    log.info() << "WebServ Loaded " << argv[1] << "\n";
-  }
-  configs = Config(argv[1]);
 
   for (i = 0; i < configs.size(); i++) {
     configs[i]->_connect(configs.backlog);
@@ -78,16 +74,15 @@ void WebServ::_accept(int i) {
 void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
   Response req_handler;
-  
-  RequestParser& parser = *clientlist[fd].request_parser;
+
+  RequestParser &parser = *clientlist[fd].request_parser;
   try {
     parser.parse();
-
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     WebServ::log.error()
-      << "exception caught while tokenizing request: "
-      << e.what() << std::endl;
-    return ;
+        << "exception caught while tokenizing request: "
+        << e.what() << std::endl;
+    return;
   }
 
   if (parser.finished) {
@@ -116,4 +111,39 @@ void WebServ::purge_conns(void) {
         break;
     }
   }
+}
+
+bool WebServ::_valid_input(int argc, char **argv) {
+  if (argc < 2) {
+    log.error() << "Failed to read config file: No file provided!\n";
+    exit(1);
+  }
+  if (argc > 2) {
+    log.error() << "Failed to read config file: Too many arguments!\n";
+    exit(1);
+  }
+  if (argv[1][0] == '\0') {
+    log.error() << "Failed to read config file: No file provided!\n";
+    exit(1);
+  }
+  std::string file(argv[1]);
+  std::string::size_type pos = file.find(".");
+  if (pos == std::string::npos) {
+    log.error() << "Failed to read config file: Invalid file extension!\n";
+    exit(1);
+  }
+  std::string ext = file.substr(pos);
+  if (ext != CFG_FILE_EXT) {
+    log.error() << "Failed to read config file: Invalid file extension!\n";
+    exit(1);
+  }
+  std::ifstream ifs;
+  ifs.open(argv[1]);
+  if (ifs.fail()) {
+    log.error() << "Failed to read config file: " << strerror(errno) << "!\n";
+    exit(1);
+  }
+  ifs.close();
+  log.info() << "WebServ Loaded " << argv[1] << "\n";
+  return (true);
 }

@@ -18,6 +18,8 @@
 
 #define LOG_LEVEL LVL_DEBUG
 
+#define CFG_FILE_EXT ".conf"
+
 #define OK 200
 #define CREATED 201
 #define ACCEPTED 202
