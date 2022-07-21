@@ -19,6 +19,8 @@
 #define LOG_LEVEL LVL_DEBUG
 
 #define CFG_FILE_EXT ".conf"
+// file size in Kilobytes (KB), 1000KB => 1 Megabytes (MB)
+#define CFG_FILE_MAX_SIZE 50
 
 #define OK 200
 #define CREATED 201
@@ -37,5 +39,5 @@
 #define HTTP_VERSION_UNSUPPORTED 506
 
 #define DFL_CONTENTTYPE "Content-Type: text/html; charset=utf-8\n"
-#define DFL_CONTENTLEN  "Content-Length: LENGTH\n\n"
+#define DFL_CONTENTLEN "Content-Length: LENGTH\n\n"
 #endif  // DEFINES_H

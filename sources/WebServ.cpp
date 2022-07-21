@@ -137,10 +137,13 @@ bool WebServ::_valid_input(int argc, char **argv) {
     log.error() << "Failed to read config file: Invalid file extension!\n";
     exit(1);
   }
-  std::ifstream ifs;
-  ifs.open(argv[1]);
+  std::ifstream ifs(argv[1], std::ios::binary | std::ios::ate);
   if (ifs.fail()) {
     log.error() << "Failed to read config file: " << strerror(errno) << "!\n";
+    exit(1);
+  }
+  if (ifs.tellg() > (CFG_FILE_MAX_SIZE * 1000)) {
+    log.error() << "Failed to read config file: File too large!\n";
     exit(1);
   }
   ifs.close();
