@@ -22,7 +22,7 @@ Server::Server(void) {
   log = std::map<std::string, std::string>();
   cgi = std::map<std::string, std::string>();
   redirect = std::make_pair(0, "");
-  location = std::map<std::string, Server::Location>();
+  location = std::map<std::string, ServerLocation>();
   autoindex = DFL_AUTO_INDEX;
   sockfd = DFL_SOCK_FD;
 }
@@ -146,7 +146,7 @@ void Server::print(void) {
 
   std::cout << "sockfd: =>" << sockfd << "<=\n";
 
-  for (std::map<std::string, Server::Location>::const_iterator
+  for (std::map<std::string, ServerLocation>::const_iterator
            it = location.begin();
        it != location.end();
        it++) {

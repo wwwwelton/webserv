@@ -6,55 +6,25 @@
 //##############################################################################
 
 #pragma once
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef SERVERLOCATION_HPP
+#define SERVERLOCATION_HPP
 
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <unistd.h>
-
-#include <cerrno>
-#include <cstdlib>
-#include <iostream>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ServerLocation.hpp"
 #include "defines.hpp"
 
-class Server {
+class ServerLocation {
  public:
-  in_addr_t ip;
-  int port;
-  std::vector<std::string> server_name;
   std::string root;
   std::vector<std::string> index;
-  std::map<int, std::string> error_page;
-  int timeout;
+  std::vector<std::string> limit_except;
   int client_max_body_size;
-  std::map<std::string, std::string> log;
   std::map<std::string, std::string> cgi;
   std::pair<int, std::string> redirect;
-  std::map<std::string, ServerLocation> location;
   bool autoindex;
-  int sockfd;
-
-  Server(void);
-  Server(const Server& src);
-  ~Server(void);
-
-  Server& operator=(const Server& rhs);
-
-  void _socket(void);
-  void _bind(void);
-  void _listen(int backlog);
-  int _connect(int backlog);
-  void print(void);
 };
 
-#endif  // SERVER_HPP
+#endif  // SERVERLOCATION_HPP

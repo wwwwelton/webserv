@@ -36,6 +36,7 @@
 #include "Pollfd.hpp"
 #include "RequestParser.hpp"
 #include "Server.hpp"
+#include "ServerLocation.hpp"
 #include "defines.hpp"
 
 class Request;

@@ -71,7 +71,7 @@ private:
   std::string root;
 
   Server*     server;
-  Server::Location* location;
+  ServerLocation* location;
 
   bool        folder_request;
   bool        valid;
