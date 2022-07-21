@@ -269,7 +269,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
     }
 
-    srv->print();
+    // srv->print();
 
     _servers.push_back(srv);
   }
