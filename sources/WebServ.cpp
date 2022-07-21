@@ -127,7 +127,7 @@ bool WebServ::_valid_input(int argc, char **argv) {
     exit(1);
   }
   std::string file(argv[1]);
-  std::string::size_type pos = file.find(".");
+  std::string::size_type pos = file.find_last_of(".");
   if (pos == std::string::npos) {
     log.error() << "Failed to read config file: Invalid file extension!\n";
     exit(1);
