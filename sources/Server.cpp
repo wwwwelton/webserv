@@ -19,6 +19,26 @@ Server::~Server(void) {
   close(sockfd);
 }
 
+Server& Server::operator=(const Server& rhs) {
+  if (this != &rhs) {
+    ip = rhs.ip;
+    port = rhs.port;
+    server_name = rhs.server_name;
+    root = rhs.root;
+    index = rhs.index;
+    error_page = rhs.error_page;
+    timeout = rhs.timeout;
+    client_max_body_size = rhs.client_max_body_size;
+    log = rhs.log;
+    cgi = rhs.cgi;
+    redirect = rhs.redirect;
+    location = rhs.location;
+    autoindex = rhs.autoindex;
+    sockfd = rhs.sockfd;
+  }
+  return (*this);
+}
+
 void Server::_socket(void) {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd == -1) {

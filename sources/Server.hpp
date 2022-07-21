@@ -53,6 +53,8 @@ class Server {
   Server(const Server& src);
   ~Server(void);
 
+  Server& operator=(const Server& rhs);
+
   void _socket(void);
   void _bind(void);
   void _listen(int backlog);
