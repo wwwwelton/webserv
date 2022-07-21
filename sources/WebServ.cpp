@@ -33,6 +33,7 @@ WebServ::WebServ(int argc, char **argv) {
   if (_valid_input(argc, argv)) {
     configs = Config(argv[1]);
   }
+  log.info() << "WebServ Loaded " << argv[1] << "\n";
 
   conn = 0;
   compress = false;
@@ -41,7 +42,6 @@ WebServ::WebServ(int argc, char **argv) {
 
   for (i = 0; i < configs.size(); i++) {
     configs[i]->_connect(configs.backlog);
-
     serverlist.insert(std::make_pair(configs[i]->sockfd, configs[i]));
     pollfds.push_back(_pollfd(configs[i]->sockfd, POLLIN));
   }
@@ -147,6 +147,5 @@ bool WebServ::_valid_input(int argc, char **argv) {
     exit(1);
   }
   ifs.close();
-  log.info() << "WebServ Loaded " << argv[1] << "\n";
   return (true);
 }
