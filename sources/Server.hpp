@@ -50,6 +50,7 @@ class Server {
   int sockfd;
 
   Server(void);
+  Server(const Server& src);
   ~Server(void);
 
   void _socket(void);

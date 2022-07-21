@@ -11,6 +11,10 @@ Server::Server(void) {
   return;
 }
 
+Server::Server(const Server& src) {
+  *this = src;
+}
+
 Server::~Server(void) {
   close(sockfd);
 }
