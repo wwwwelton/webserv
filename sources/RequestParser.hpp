@@ -34,8 +34,6 @@ enum RequestStates {
 
   S_BODY_START,
   S_BODY,
-  S_BODY_CRLF,
-  S_BODY_CR,
   S_BODY_LF,
 
   S_CHUNK_START,
@@ -44,7 +42,6 @@ enum RequestStates {
   S_CHUNK_SIZE_LF,
   S_CHUNK_DATA_START,
   S_CHUNK_DATA,
-  S_CHUNK_DATA_CRLF,
   S_CHUNK_DATA_LF,
   S_LAST_CHUNK,
   S_LAST_CHUNK_LF,
