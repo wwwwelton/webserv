@@ -44,9 +44,10 @@ WebServ::WebServ(int argc, char **argv) {
   clientlist.resize(1024);
 
   for (i = 0; i < configs.size(); i++) {
-    configs[i]->_connect(configs.backlog);
-    serverlist.insert(std::make_pair(configs[i]->sockfd, configs[i]));
-    pollfds.push_back(_pollfd(configs[i]->sockfd, POLLIN));
+    Server *srv = new Server(configs[i]);
+    srv->_connect(configs.backlog);
+    serverlist.insert(std::make_pair(srv->sockfd, srv));
+    pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
   }
   log.info() << "WebServ initialized. Listening..." << std::endl;
 }

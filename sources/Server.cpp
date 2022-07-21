@@ -32,7 +32,8 @@ Server::Server(const Server& src) {
 }
 
 Server::~Server(void) {
-  close(sockfd);
+  if (sockfd > 0)
+    close(sockfd);
 }
 
 Server& Server::operator=(const Server& rhs) {

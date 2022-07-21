@@ -30,12 +30,12 @@ class Config {
   ~Config(void);
 
   Config& operator=(const Config& rhs);
-  Server* operator[](size_t n);
+  const Server& operator[](size_t n);
 
   size_t size(void);
 
  private:
-  std::vector<Server*> _servers;
+  std::vector<Server> _servers;
 
  private:
   std::string _sanitize(const std::string& file_content);

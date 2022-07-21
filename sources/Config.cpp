@@ -9,7 +9,7 @@
 
 Config::Config(void) {
   backlog = DFL_BACKLOG;
-  _servers = std::vector<Server*>();
+  _servers = std::vector<Server>();
 }
 
 Config::Config(char* file) {
@@ -48,7 +48,7 @@ Config& Config::operator=(const Config& rhs) {
   return (*this);
 }
 
-Server* Config::operator[](size_t n) {
+const Server& Config::operator[](size_t n) {
   return (_servers[n]);
 }
 
@@ -129,7 +129,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
     std::string line;
     std::vector<std::string> tokens;
 
-    Server* srv = new Server();
+    Server srv;
 
     while (std::getline(is, line)) {
       line = _trim(line, "; ");
@@ -138,81 +138,81 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       if (tokens[0] == "listen") {
         if (tokens[1].find(":") != std::string::npos) {
           tokens = _split(tokens[1], ":");
-          srv->ip = inet_addr(tokens[0].c_str());
-          srv->port = htons(_stoi(tokens[1]));
+          srv.ip = inet_addr(tokens[0].c_str());
+          srv.port = htons(_stoi(tokens[1]));
         } else {
-          srv->ip = inet_addr(DFL_ADDRESS);
-          srv->port = htons(_stoi(tokens[1]));
+          srv.ip = inet_addr(DFL_ADDRESS);
+          srv.port = htons(_stoi(tokens[1]));
         }
       }
 
       if (tokens[0] == "server_name") {
-        if (srv->server_name[0] == DFL_SERVER_NAME1 &&
-            srv->server_name[1] == DFL_SERVER_NAME2) {
-          srv->server_name.clear();
+        if (srv.server_name[0] == DFL_SERVER_NAME1 &&
+            srv.server_name[1] == DFL_SERVER_NAME2) {
+          srv.server_name.clear();
         }
         for (size_t i = 1; i < tokens.size(); i++) {
-          srv->server_name.push_back(tokens[i]);
+          srv.server_name.push_back(tokens[i]);
         }
       }
 
       if (tokens[0] == "root") {
-        srv->root = _trim(std::string(tokens[1]), "/");
+        srv.root = _trim(std::string(tokens[1]), "/");
       }
 
       if (tokens[0] == "index") {
-        if (srv->index[0] == DFL_SERVER_INDEX_PAGE1 &&
-            srv->index[1] == DFL_SERVER_INDEX_PAGE2) {
-          srv->index.clear();
+        if (srv.index[0] == DFL_SERVER_INDEX_PAGE1 &&
+            srv.index[1] == DFL_SERVER_INDEX_PAGE2) {
+          srv.index.clear();
         }
         for (size_t i = 1; i < tokens.size(); i++) {
-          srv->index.push_back(tokens[i]);
+          srv.index.push_back(tokens[i]);
         }
       }
 
       if (tokens[0] == "error_page") {
-        srv->error_page[_stoi(tokens[1])] = _trim(std::string(tokens[2]), "/");
+        srv.error_page[_stoi(tokens[1])] = _trim(std::string(tokens[2]), "/");
       }
 
       if (tokens[0] == "timeout") {
-        srv->timeout = _stoi(tokens[1]);
+        srv.timeout = _stoi(tokens[1]);
       }
 
       if (tokens[0] == "client_max_body_size") {
-        srv->client_max_body_size = _stoi(tokens[1]);
+        srv.client_max_body_size = _stoi(tokens[1]);
       }
 
       if (tokens[0] == "access_log") {
-        srv->log["access_log"] = tokens[1];
+        srv.log["access_log"] = tokens[1];
       }
 
       if (tokens[0] == "error_log") {
-        srv->log["error_log"] = tokens[1];
+        srv.log["error_log"] = tokens[1];
       }
 
       if (tokens[0] == "autoindex") {
-        srv->autoindex = (tokens[1] == "on") ? true : false;
+        srv.autoindex = (tokens[1] == "on") ? true : false;
       }
 
       if (tokens[0] == "cgi") {
-        srv->cgi["." + tokens[1]] = tokens[2];
+        srv.cgi["." + tokens[1]] = tokens[2];
       }
 
       if (tokens[0] == "return") {
-        srv->redirect.first = _stoi(tokens[1]);
-        srv->redirect.second = tokens[2];
+        srv.redirect.first = _stoi(tokens[1]);
+        srv.redirect.second = tokens[2];
       }
 
       if (tokens[0] == "location") {
         std::string index = tokens[1];
 
-        if (srv->location.find(index) == srv->location.end()) {
-          srv->location[index].root = srv->root;
-          srv->location[index].index = srv->index;
-          srv->location[index].limit_except.push_back(DFL_LIM_EXCEPT);
-          srv->location[index].client_max_body_size = srv->client_max_body_size;
-          srv->location[index].cgi = srv->cgi;
-          srv->location[index].redirect = srv->redirect;
+        if (srv.location.find(index) == srv.location.end()) {
+          srv.location[index].root = srv.root;
+          srv.location[index].index = srv.index;
+          srv.location[index].limit_except.push_back(DFL_LIM_EXCEPT);
+          srv.location[index].client_max_body_size = srv.client_max_body_size;
+          srv.location[index].cgi = srv.cgi;
+          srv.location[index].redirect = srv.redirect;
         }
 
         while (std::getline(is, line)) {
@@ -220,45 +220,45 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           tokens = _split(line, " ");
 
           if (tokens[0] == "root") {
-            srv->location[index].root = _trim(std::string(tokens[1]), "/");
+            srv.location[index].root = _trim(std::string(tokens[1]), "/");
           }
 
           if (tokens[0] == "index") {
             for (size_t i = 1; i < tokens.size(); i++) {
-              srv->location[index].index.push_back(tokens[i]);
+              srv.location[index].index.push_back(tokens[i]);
             }
           }
 
           if (tokens[0] == "limit_except") {
-            if (srv->location[index].limit_except[0] == DFL_LIM_EXCEPT) {
-              srv->location[index].limit_except.pop_back();
+            if (srv.location[index].limit_except[0] == DFL_LIM_EXCEPT) {
+              srv.location[index].limit_except.pop_back();
             }
             for (size_t i = 1; i < tokens.size(); i++) {
               std::transform(tokens[i].begin(),
                              tokens[i].end(),
                              tokens[i].begin(),
                              ::toupper);
-              srv->location[index].limit_except.push_back(tokens[i]);
+              srv.location[index].limit_except.push_back(tokens[i]);
             }
           }
 
           if (tokens[0] == "client_max_body_size") {
-            srv->location[index].client_max_body_size = _stoi(tokens[1]);
+            srv.location[index].client_max_body_size = _stoi(tokens[1]);
           }
 
           if (tokens[0] == "autoindex") {
-            srv->location[index].autoindex = (tokens[1] == "on") ? true : false;
+            srv.location[index].autoindex = (tokens[1] == "on") ? true : false;
           }
 
           if (tokens[0] == "cgi") {
-            srv->location[index].cgi["." + tokens[1]] = tokens[2];
+            srv.location[index].cgi["." + tokens[1]] = tokens[2];
           }
 
           if (tokens[0] == "return") {
-            if (srv->location[index].redirect.first == 0 &&
-                srv->location[index].redirect.second.empty()) {
-              srv->location[index].redirect.first = _stoi(tokens[1]);
-              srv->location[index].redirect.second = tokens[2];
+            if (srv.location[index].redirect.first == 0 &&
+                srv.location[index].redirect.second.empty()) {
+              srv.location[index].redirect.first = _stoi(tokens[1]);
+              srv.location[index].redirect.second = tokens[2];
             }
           }
 
@@ -269,7 +269,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
     }
 
-    // srv->print();
+    // srv.print();
 
     _servers.push_back(srv);
   }
