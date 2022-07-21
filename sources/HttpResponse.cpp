@@ -15,20 +15,20 @@ void Response::_send(int fd) {
 int Response::validate_limit_except(void) {
   if (location->limit_except.size()) {
     if (location->limit_except[0] == "ALL")
-      return 0;
+      return CONTINUE;
     std::vector<std::string>::iterator it = location->limit_except.begin();
     std::vector<std::string>::iterator ite = location->limit_except.end();
     if (std::find(it, ite, method) != location->limit_except.end())
-       return 0;
+       return CONTINUE;
     return METHOD_NOT_ALLOWED;
   }
-  return 0;
+  return CONTINUE;
 }
 
 int Response::validate_http_version(void) {
   if (req->http_version != "HTTP/1.1")
     return HTTP_VERSION_UNSUPPORTED;
-  return 0;
+  return CONTINUE;
 }
 
 void Response::php_cgi(std::string const& body_path) {
@@ -58,23 +58,17 @@ void Response::dispatch(std::string const& body_path) {
     extension = "text";
   else
     extension = body_path.substr(body_path.find_last_of('.'));
-  if (extension == "text") {
-    contenttype = "Content-Type: text/plain\n";
-    assemble(body_path);
-  }
-  else if (extension == ".html") {
-    contenttype = "Content-Type: text/html; charset=utf-8\n";
-    assemble(body_path);
-  }
-  else if (extension == ".css") {
-    contenttype = "Content-Type: text/css; charset=utf-8\n";
-    assemble(body_path);
-  }
-  else if (extension == ".php") {
+
+  // TODO(VLN37) change to dynamic extension
+  if (location->cgi.count(extension)) {
     contenttype = "Content-Type: text/html; charset=utf-8\n";
     php_cgi(body_path);
   }
-  else // TODO(VLN37) return 500 default page
+  else if (mimetypes.count(extension)) {
+    contenttype = mimetypes[extension];
+    assemble(body_path);
+  }
+  else
     WebServ::log.warning() << extension << " support not yet implemented\n";
 }
 
@@ -91,11 +85,13 @@ void Response::assemble(std::string const& body_path) {
 
   char buf[BUFFER_SIZE + 1];
   in.open(body_path.c_str());
-  while (in.good()) {
+  while (!in.eof()) {
     in.get(buf, BUFFER_SIZE, 0);
     body += buf;
   }
   // WebServ::log.debug() << "Response body: " << body << "\n";
+
+  // std::cout << "body:\n\n" << body;
   str += body;
   ss << body.size();
   ss >> size;
@@ -188,10 +184,10 @@ void Response::create_redir_page(void) {
   outfile.open(DFL_TMPFILE, outfile.trunc);
   content.assign(std::istreambuf_iterator<char>(infile),
                  std::istreambuf_iterator<char>());
-  WebServ::log.error() << content;
+  // WebServ::log.error() << content;
   content.replace(content.find("$URL"), 4, location->redirect.second);
   content.replace(content.find("$URL"), 4, location->redirect.second);
-  WebServ::log.error() << content;
+  // WebServ::log.error() << content;
   outfile << content;
   response_path = DFL_TMPFILE;
   remove_tmp = true;
@@ -237,7 +233,7 @@ void Response::process(void) {
   set_statuscode(response_code);
   dispatch(response_path);
   if (remove_tmp)
-    unlink("tmp.html");
+    unlink(DFL_TMPFILE);
 }
 
 #include "HttpResponse_static.tpp"

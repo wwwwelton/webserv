@@ -33,6 +33,7 @@
 // file size in Kilobytes (KB), 1000KB => 1 Megabytes (MB)
 #define CFG_FILE_MAX_SIZE 50
 
+#define CONTINUE 0
 #define OK 200
 #define CREATED 201
 #define ACCEPTED 202

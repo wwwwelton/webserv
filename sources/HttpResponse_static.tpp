@@ -30,6 +30,17 @@ Response::status_map Response::init_status_map(void) {
   return _map;
 }
 
+Response::mimetypes_map Response::mimetypes = Response::init_mimetypes();
+Response::mimetypes_map Response::init_mimetypes(void) {
+  mimetypes_map _map;
+
+  _map["text"] = "Content-Type: text/plain\n";
+  _map[".html"] = "Content-Type: text/html; charset=utf-8\n";
+  _map[".css"] = "Content-Type: text/css; charset=utf-8\n";
+  _map[".php"] = "Content-Type: text/plain; charset=utf-8\n";
+  return _map;
+}
+
 Response::meth_map Response::method_map = Response::init_map();
 Response::meth_map Response::init_map(void) {
   meth_map _map;
