@@ -34,7 +34,7 @@ ServerLocation::ServerLocation(std::string root,
       cgi(cgi),
       redirect(redirect),
       autoindex(autoindex),
-      filled(filled) {
+      filled(true) {
   return;
 }
 
