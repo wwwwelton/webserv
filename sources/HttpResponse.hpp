@@ -39,12 +39,14 @@ class Request;
 
 class Response {
 typedef void(Response::*funcptr)(void);
-typedef std::map<std::string, int (Response::*)(void)> meth_map;
-typedef std::vector<int (Response::*)(void)> function_vector;
-typedef std::map<int, std::string> status_map;
+typedef std::map<std::string, int (Response::*)(void)>    meth_map;
+typedef std::vector<int (Response::*)(void)>              function_vector;
+typedef std::map<int, std::string>                        status_map;
+typedef std::map<std::string, std::string>                mimetypes_map;
 
 private:
-  static std::map<int, std::string> statuslist;
+  static status_map      statuslist;
+  static mimetypes_map   mimetypes;
   static meth_map        method_map;
   static function_vector validation_functions;
   static function_vector get_functions;
@@ -53,6 +55,7 @@ private:
   static function_vector init_pre();
   static function_vector init_get();
   static status_map      init_status_map();
+  static mimetypes_map   init_mimetypes();
 
   std::string response_path;
   int         response_code;
@@ -62,15 +65,18 @@ private:
   std::string statusmsg;
   std::string contenttype;
   std::string method;
+
+  Request const* req;
   std::string req_body;
   std::string path;
   std::string root;
+
   Server*     server;
-  Request const* req;
+  server_location* location;
+
   bool        folder_request;
   bool        valid;
   bool        remove_tmp;
-  server_location* location;
 
   int validate_limit_except(void);
   int validate_http_version(void);

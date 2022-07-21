@@ -27,7 +27,9 @@ struct server_location {
   std::vector<std::string> index;
   std::vector<std::string> limit_except;
   int client_max_body_size;
+  // extension | cgi binary i.e.: .php | php-cgi
   std::map<std::string, std::string> cgi;
+  // if int = true: return code | url to redirect to
   std::pair<int, std::string> redirect;
   bool autoindex;
 };
