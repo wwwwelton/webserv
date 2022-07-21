@@ -35,6 +35,31 @@ inline bool is_crlf(char c) {
   return (c == '\r' && (c + 1) == '\n');
 }
 
+inline int get_hex(char c) {
+  switch (c) {
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+      return (c - '0');
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+      return (c - 'A' + 10);
+    default:
+      return -1;
+  }
+}
+
 bool is_separator(char c) {
   switch (c) {
     case '(':
@@ -101,6 +126,7 @@ RequestParser::RequestParser(int fd, size_t buff_max):
   finished(false),
   content_length(false),
   chunked(false),
+  chunk_size(),
   valid(false),
   fd(fd),
   buffer(new char[buff_max]),
@@ -230,9 +256,6 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
             throw InvalidHttpRequestException();
         } else {
           _header_key.clear();
-          WebServ::log.debug()
-            << "header key capacity after clear: "
-            << _header_key.capacity() << std::endl;
           _header_key.push_back(c);
           current_state = S_HEADER_LINE_KEY;
         }
@@ -264,7 +287,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           if (str_iequals(_header_key, "content-length")) {
             std::stringstream ss(_header_value);
             ss >> content_length;
-          } else if (str_iequals(_header_key, "transfer-coding")) {
+          } else if (str_iequals(_header_key, "transfer-encoding")) {
             if (_header_value == "chunked")
               chunked = true;
           }
@@ -294,10 +317,13 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           throw InvalidHttpRequestException();
         if (_request->method == "GET") {
           return P_PARSING_COMPLETE;
+        } else if (chunked) {
+          current_state = S_CHUNK_START;
         } else if (content_length == 0) {
           return P_PARSING_COMPLETE;
-        } 
-        current_state = S_BODY_START;
+        } else {
+          current_state = S_BODY_START;
+        }
         break;
 
       case S_BODY_START:
@@ -306,6 +332,98 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         content_length--;
         _request->body.push_back(c);
         current_state = S_BODY;
+        break;
+
+      case S_CHUNK_START:
+        chunk_size = get_hex(c);
+        if (chunk_size == (size_t)-1) {
+          throw InvalidHttpRequestException();
+        }
+        if (chunk_size == 0)
+          current_state = S_LAST_CHUNK;
+        else
+          current_state = S_CHUNK_SIZE;
+        break;
+
+      // TODO: parse chunk-extensions
+      case S_CHUNK_SIZE:
+        {
+          if (c == ';') {
+            current_state = S_CHUNK_EXTENSIONS;
+          } else  if (c == '\r') {
+            if (chunk_size == 0) {
+              current_state = S_LAST_CHUNK_LF;
+            } else {
+              current_state = S_CHUNK_SIZE_LF;
+            }
+
+          } else {
+            int _hex = get_hex(c);
+
+            if (_hex == -1) {
+              throw InvalidHttpRequestException();
+
+            } else {
+              chunk_size = chunk_size * 16 + _hex;
+            }
+          }
+          break ;
+        }
+
+      case S_CHUNK_EXTENSIONS:
+        if (c == '\r') {
+          current_state = S_CHUNK_SIZE_LF;
+        } else if (c == '\n') {
+          current_state = S_CHUNK_DATA;
+        } else if (!is_token(c))
+          throw InvalidHttpRequestException();
+        break;
+
+      case S_CHUNK_SIZE_LF:
+        if (c != '\n') {
+          throw InvalidHttpRequestException();
+        }
+        current_state = S_CHUNK_DATA;
+        break;
+
+      case S_CHUNK_DATA:
+        if (chunk_size == 0) {
+          if (c != '\r') {
+            throw InvalidHttpRequestException();
+          }
+          current_state = S_CHUNK_DATA_LF;
+        } else {
+          chunk_size--;
+          chunk_data.push_back(c);
+        }
+        break;
+
+      case S_CHUNK_DATA_LF:
+        if (c != '\n':)
+          throw InvalidHttpRequestException();
+        current_state = S_CHUNK_START;
+        break;
+
+      case S_LAST_CHUNK:
+        current_state = S_LAST_CHUNK_LF;
+        break;
+
+      case S_LAST_CHUNK_LF:
+        if (c != '\n')
+          throw InvalidHttpRequestException();
+        current_state = S_CHUNK_END;
+        break;
+
+      case S_CHUNK_END:
+        if (c != '\r')
+          throw InvalidHttpRequestException();
+        current_state = S_CHUNK_END_LF;
+        break;
+
+      case S_CHUNK_END_LF:
+        if (c != '\n')
+          throw InvalidHttpRequestException();
+        return P_PARSING_COMPLETE;
         break;
 
       // body won't be a multipart payload
@@ -343,11 +461,15 @@ void RequestParser::parse() {
   try {
     ParsingResult result = tokenize_partial_request(buffer);
     if (result == P_PARSING_COMPLETE) {
+      if (chunked) {
+        _request->body.assign(chunk_data.begin(), chunk_data.end());
+      }
       finished = true;
       WebServ::log.debug() << "Finished request: " << *_request << std::endl;
     }
   } catch(InvalidHttpRequestException& ) {
     WebServ::log.warning() << "Invalid http request" << std::endl;
+    _request->valid = false;
     finished = true;
   } catch(std::exception& e) {
     WebServ::log.error() << "Unexpected exception: " << e.what() << std::endl;

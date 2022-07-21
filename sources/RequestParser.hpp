@@ -38,6 +38,19 @@ enum RequestStates {
   S_BODY_CR,
   S_BODY_LF,
 
+  S_CHUNK_START,
+  S_CHUNK_SIZE,
+  S_CHUNK_EXTENSIONS,
+  S_CHUNK_SIZE_LF,
+  S_CHUNK_DATA_START,
+  S_CHUNK_DATA,
+  S_CHUNK_DATA_CRLF,
+  S_CHUNK_DATA_LF,
+  S_LAST_CHUNK,
+  S_LAST_CHUNK_LF,
+  S_CHUNK_END,
+  S_CHUNK_END_LF,
+
   S_DEAD = 0
 };
 
@@ -82,6 +95,8 @@ public:
 private:
   size_t content_length;
   bool chunked;
+  size_t chunk_size;
+  std::vector<char> chunk_data;
   bool valid;
   Request *_request;
   std::vector<Token> headers;
