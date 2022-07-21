@@ -33,7 +33,6 @@
 
 class Server;
 class Logger;
-class server_location;
 class Request;
 
 
@@ -72,7 +71,7 @@ private:
   std::string root;
 
   Server*     server;
-  server_location* location;
+  Server::Location* location;
 
   bool        folder_request;
   bool        valid;

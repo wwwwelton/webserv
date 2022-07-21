@@ -22,19 +22,19 @@
 #include "Config.hpp"
 #include "defines.hpp"
 
-struct server_location {
-  std::string root;
-  std::vector<std::string> index;
-  std::vector<std::string> limit_except;
-  int client_max_body_size;
-  // extension | cgi binary i.e.: .php | php-cgi
-  std::map<std::string, std::string> cgi;
-  // if int = true: return code | url to redirect to
-  std::pair<int, std::string> redirect;
-  bool autoindex;
-};
-
 class Server {
+ public:
+  class Location {
+   public:
+    std::string root;
+    std::vector<std::string> index;
+    std::vector<std::string> limit_except;
+    int client_max_body_size;
+    std::map<std::string, std::string> cgi;
+    std::pair<int, std::string> redirect;
+    bool autoindex;
+  };
+
  public:
   in_addr_t ip;
   int port;
@@ -47,7 +47,7 @@ class Server {
   std::map<std::string, std::string> log;
   std::map<std::string, std::string> cgi;
   std::pair<int, std::string> redirect;
-  std::map<std::string, server_location> location;
+  std::map<std::string, Server::Location> location;
   bool autoindex;
   int sockfd;
 
