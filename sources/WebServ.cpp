@@ -30,6 +30,9 @@ WebServ::WebServ(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
   size_t i;
 
+  init_signals();
+  log.info() << "WebServ Signals Initialized\n";
+
   if (_valid_input(argc, argv)) {
     configs = Config(argv[1]);
   }
@@ -148,4 +151,12 @@ bool WebServ::_valid_input(int argc, char **argv) {
   }
   ifs.close();
   return (true);
+}
+
+void WebServ::init_signals(void) {
+  void *func = NULL;
+  func = reinterpret_cast<void *>(sighandler);
+  std::signal(SIGINT, reinterpret_cast<__sighandler_t>(func));
+  std::signal(SIGQUIT, reinterpret_cast<__sighandler_t>(func));
+  sighandler(0, this);
 }

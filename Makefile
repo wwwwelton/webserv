@@ -15,6 +15,7 @@ SRC     = main.cpp \
           Config.cpp \
           Logger.cpp \
           HttpResponse.cpp \
+          signal.cpp \
 
 
 INC     = defines.hpp \

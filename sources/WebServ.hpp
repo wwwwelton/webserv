@@ -17,6 +17,7 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -55,7 +56,8 @@ class WebServ {
   void _accept(int fd);
   void _respond(int fd);
   void purge_conns(void);
-  static Logger init_log();
+  static Logger init_log(void);
+  void init_signals(void);
 
  public:
   Config configs;
@@ -69,5 +71,7 @@ class WebServ {
  private:
   bool _valid_input(int argc, char **argv);
 };
+
+void sighandler(const int signal, void *ptr);
 
 #endif  // WEBSERV_HPP
