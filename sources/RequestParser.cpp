@@ -399,7 +399,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         break;
 
       case S_CHUNK_DATA_LF:
-        if (c != '\n':)
+        if (c != '\n')
           throw InvalidHttpRequestException();
         current_state = S_CHUNK_START;
         break;
