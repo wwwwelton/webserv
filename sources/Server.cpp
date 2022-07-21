@@ -8,7 +8,23 @@
 #include "Server.hpp"
 
 Server::Server(void) {
-  return;
+  ip = inet_addr(DFL_ADDRESS);
+  port = htons(DFL_PORT);
+  server_name.push_back(DFL_SERVER_NAME1);
+  server_name.push_back(DFL_SERVER_NAME2);
+  root = DFL_SERVER_ROOT;
+  index.push_back(DFL_SERVER_INDEX_PAGE1);
+  index.push_back(DFL_SERVER_INDEX_PAGE2);
+  error_page[404] = DFL_404_PAGE;
+  error_page[405] = DFL_405_PAGE;
+  timeout = DFL_TIMEOUT;
+  client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
+  log = std::map<std::string, std::string>();
+  cgi = std::map<std::string, std::string>();
+  redirect = std::make_pair(0, "");
+  location = std::map<std::string, server_location>();
+  autoindex = DFL_AUTO_INDEX;
+  sockfd = DFL_SOCK_FD;
 }
 
 Server::Server(const Server& src) {
@@ -68,8 +84,7 @@ void Server::_bind(void) {
 }
 
 void Server::_listen(int backlog) {
-  (void)backlog;
-  if (listen(sockfd, 500)) {
+  if (listen(sockfd, backlog)) {
     perror("listen");
     exit(errno);
   }
@@ -125,7 +140,10 @@ void Server::print(void) {
     std::cout << "cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
   }
 
-  std::cout << "redirect: =>" << redirect.first << "<= =>" << redirect.second << "<=\n";
+  std::cout << "redirect: =>" << redirect.first << "<= =>"
+            << redirect.second << "<=\n";
+
+  std::cout << "sockfd: =>" << sockfd << "<=\n";
 
   for (std::map<std::string, server_location>::const_iterator
            it = location.begin();
@@ -142,10 +160,12 @@ void Server::print(void) {
     }
 
     for (size_t i = 0; i < location[index].limit_except.size(); i++) {
-      std::cout << "    limit_except: =>" << location[index].limit_except[i] << "<=\n";
+      std::cout << "    limit_except: =>"
+                << location[index].limit_except[i] << "<=\n";
     }
 
-    std::cout << "    client_max_body_size: =>" << location[index].client_max_body_size << "<=\n";
+    std::cout << "    client_max_body_size: =>"
+              << location[index].client_max_body_size << "<=\n";
 
     std::cout << "    autoindex: =>" << location[index].autoindex << "<=\n";
 
@@ -153,14 +173,13 @@ void Server::print(void) {
              it = location[index].cgi.begin();
          it != location[index].cgi.end();
          it++) {
-      std::cout << "    cgi: =>" << it->first << "<= =>" << it->second << "<=\n";
+      std::cout << "    cgi: =>" << it->first << "<= =>"
+                << it->second << "<=\n";
     }
 
     std::cout << "    redirect: =>" << location[index].redirect.first
               << "<= =>" << location[index].redirect.second << "<=\n";
   }
-
-  std::cout << "sockfd: =>" << sockfd << "<=\n";
 
   std::cout << "\n";
   n++;

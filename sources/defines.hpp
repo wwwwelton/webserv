@@ -8,13 +8,24 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define DFL_ADDRESS "127.0.0.1"
-#define DFL_TIMEOUT 300
-#define DFL_LIM_EXCEPT "ALL"
-#define DFL_ROOT "root"
-#define DFL_CLI_MAX_BODY_SIZE 1
-#define DFL_SERVER_ROOT "./"
+// Server host default
 #define DFL_BACKLOG 500;
+// Server vhost default
+#define DFL_ADDRESS "127.0.0.1"
+#define DFL_PORT 8080
+#define DFL_SERVER_NAME1 "localhost"
+#define DFL_SERVER_NAME2 "www.localhost"
+#define DFL_SERVER_ROOT "server_root"
+#define DFL_SERVER_INDEX_PAGE1 "index.html"
+#define DFL_SERVER_INDEX_PAGE2 "index.php"
+#define DFL_404_PAGE "custom_404.html"
+#define DFL_405_PAGE "custom_405.html"
+#define DFL_TIMEOUT 300
+#define DFL_CLI_MAX_BODY_SIZE 1
+#define DFL_AUTO_INDEX 0
+#define DFL_SOCK_FD -1
+// Server vhost location default
+#define DFL_LIM_EXCEPT "ALL"
 
 #define LOG_LEVEL LVL_DEBUG
 

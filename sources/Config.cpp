@@ -8,7 +8,8 @@
 #include "Config.hpp"
 
 Config::Config(void) {
-  return;
+  backlog = DFL_BACKLOG;
+  _servers = std::vector<Server*>();
 }
 
 Config::Config(char* file) {
@@ -127,14 +128,8 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
     std::istringstream is(vhost[i]);
     std::string line;
     std::vector<std::string> tokens;
-    std::vector<std::string> sub_tokens;
 
     Server* srv = new Server();
-
-    srv->client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
-    srv->autoindex = false;
-    srv->redirect.first = 0;
-    srv->redirect.second = "";
 
     while (std::getline(is, line)) {
       line = _trim(line, "; ");
@@ -142,9 +137,9 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
 
       if (tokens[0] == "listen") {
         if (tokens[1].find(":") != std::string::npos) {
-          sub_tokens = _split(tokens[1], ":");
-          srv->ip = inet_addr(sub_tokens[0].c_str());
-          srv->port = htons(_stoi(sub_tokens[1]));
+          tokens = _split(tokens[1], ":");
+          srv->ip = inet_addr(tokens[0].c_str());
+          srv->port = htons(_stoi(tokens[1]));
         } else {
           srv->ip = inet_addr(DFL_ADDRESS);
           srv->port = htons(_stoi(tokens[1]));
@@ -152,6 +147,10 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "server_name") {
+        if (srv->server_name[0] == DFL_SERVER_NAME1 &&
+            srv->server_name[1] == DFL_SERVER_NAME2) {
+          srv->server_name.clear();
+        }
         for (size_t i = 1; i < tokens.size(); i++) {
           srv->server_name.push_back(tokens[i]);
         }
@@ -162,6 +161,10 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "index") {
+        if (srv->index[0] == DFL_SERVER_INDEX_PAGE1 &&
+            srv->index[1] == DFL_SERVER_INDEX_PAGE2) {
+          srv->index.clear();
+        }
         for (size_t i = 1; i < tokens.size(); i++) {
           srv->index.push_back(tokens[i]);
         }
@@ -217,7 +220,6 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           tokens = _split(line, " ");
 
           if (tokens[0] == "root") {
-            srv->location[index].root = tokens[1];
             srv->location[index].root = _trim(std::string(tokens[1]), "/");
           }
 
@@ -253,7 +255,8 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           }
 
           if (tokens[0] == "return") {
-            if (srv->location[index].redirect.first == 0) {
+            if (srv->location[index].redirect.first == 0 &&
+                srv->location[index].redirect.second.empty()) {
               srv->location[index].redirect.first = _stoi(tokens[1]);
               srv->location[index].redirect.second = tokens[2];
             }
@@ -265,9 +268,8 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
         }
       }
     }
-    srv->sockfd = -1;
 
-    // srv->print();
+    srv->print();
 
     _servers.push_back(srv);
   }
