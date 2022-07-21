@@ -78,25 +78,19 @@ public:
   RequestParser(int fd = -1, size_t buff_max = 2000);
   ~RequestParser();
 
-  struct Token {
-    const char *value;
-    const size_t size;
-    const TokenType type;
-      
-    Token(const char *value, size_t size, TokenType type);
-  };
-
   void parse();
   Request &get_request();
 
 private:
+  bool valid;
+
   size_t content_length;
+
   bool chunked;
   size_t chunk_size;
   std::vector<char> chunk_data;
-  bool valid;
+
   Request *_request;
-  std::vector<Token> headers;
 
   int fd;
   char *buffer;
@@ -105,7 +99,6 @@ private:
 
   std::string _header_key;
   std::string _header_value;
-  std::vector<Token> tokens;
 
   RequestStates current_state;
 

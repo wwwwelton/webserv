@@ -345,7 +345,6 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           current_state = S_CHUNK_SIZE;
         break;
 
-      // TODO: parse chunk-extensions
       case S_CHUNK_SIZE:
         {
           if (c == ';') {
