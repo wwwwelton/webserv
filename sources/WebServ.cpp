@@ -88,6 +88,18 @@ void WebServ::_accept(int i) {
   }
 }
 
+void WebServ::end_connection(int i) {
+  int fd = pollfds[i].fd;
+
+  delete clientlist[i].request_parser;
+  clientlist[fd].request_parser = NULL;
+  clientlist[fd].server = NULL;
+  close(pollfds[i].fd);
+  log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
+  pollfds[i].fd = -1;
+  compress = true;
+}
+
 void WebServ::_receive(int i) {
   int fd = pollfds[i].fd;
   RequestParser &parser = *clientlist[fd].request_parser;
@@ -100,12 +112,14 @@ void WebServ::_receive(int i) {
     WebServ::log.error()
         << "exception caught while tokenizing request: "
         << e.what() << std::endl;
+    end_connection(fd);
     return;
   }
 }
 
 void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
+
   RequestParser &parser = *clientlist[fd].request_parser;
 
   if (parser.finished) {
@@ -114,13 +128,7 @@ void WebServ::_respond(int i) {
     req_handler = Response(ptr, clientlist[fd].server);
     req_handler.process();
     req_handler._send(fd);
-    delete clientlist[fd].request_parser;
-    clientlist[fd].request_parser = NULL;
-    clientlist[fd].server = NULL;
-    close(pollfds[i].fd);
-    log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
-    pollfds[i].fd = -1;
-    compress = true;
+    end_connection(i);
   }
 }
 

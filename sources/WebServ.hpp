@@ -57,6 +57,7 @@ class WebServ {
   void _accept(int fd);
   void _receive(int fd);
   void _respond(int fd);
+  void end_connection(int fd);
   void purge_conns(void);
   static Logger init_log(void);
 
