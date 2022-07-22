@@ -60,7 +60,7 @@ class WebServ {
   static Logger init_log(void);
 
  public:
-  Config configs;
+  Config conf;
   std::map<int, Server *> serverlist;
   std::vector<req> clientlist;
   std::vector<_pollfd> pollfds;

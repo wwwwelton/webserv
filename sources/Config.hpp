@@ -25,7 +25,6 @@ class Server;
 class Config {
  public:
   Config(void);
-  explicit Config(char* file);
   Config(const Config& src);
   ~Config(void);
 
@@ -33,6 +32,8 @@ class Config {
   const Server& operator[](size_t n);
 
   size_t size(void);
+
+  void parse(char* file);
 
   const std::string& get_error(void);
 
@@ -62,8 +63,8 @@ class Config {
 
  private:
   std::vector<Server> _servers;
-  int failed;
-  std::string error;
+  int _error;
+  std::string _str_error;
 };
 
 #endif  // CONFIG_HPP_

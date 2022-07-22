@@ -34,7 +34,12 @@ WebServ::WebServ(int argc, char **argv) {
   log.info() << "WebServ Signals Initialized\n";
 
   if (_valid_input(argc, argv)) {
-    configs = Config(argv[1]);
+    try {
+      conf.parse(argv[1]);
+    } catch (const std::exception &e) {
+      log.error() << "Failed to read config file: " << e.what() << std::endl;
+      exit(1);
+    }
   }
   log.info() << "WebServ Loaded " << argv[1] << "\n";
 
@@ -43,9 +48,9 @@ WebServ::WebServ(int argc, char **argv) {
   clientlist.reserve(1024);
   clientlist.resize(1024);
 
-  for (i = 0; i < configs.size(); i++) {
-    Server *srv = new Server(configs[i]);
-    srv->_connect(configs.backlog);
+  for (i = 0; i < conf.size(); i++) {
+    Server *srv = new Server(conf[i]);
+    srv->_connect(conf.backlog);
     serverlist.insert(std::make_pair(srv->sockfd, srv));
     pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
   }

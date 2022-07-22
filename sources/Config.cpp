@@ -10,34 +10,8 @@
 Config::Config(void) {
   backlog = DFL_BACKLOG;
 
-  failed = 0;
-  error = "";
-}
-
-Config::Config(char* file) {
-  std::ifstream ifs;
-  std::stringstream ss;
-  std::string str;
-  std::string host;
-  std::vector<std::string> vhost;
-
-  backlog = DFL_BACKLOG;
-
-  failed = 0;
-  error = "";
-
-  ifs.open(file);
-  ss << ifs.rdbuf();
-
-  str = _sanitize(ss.str());
-
-  host = _sub_host(str);
-  vhost = _sub_vhost(str);
-
-  _parse_host(host);
-  _parse_vhost(vhost);
-
-  return;
+  _error = 0;
+  _str_error = "";
 }
 
 Config::Config(const Config& src) {
@@ -63,8 +37,32 @@ size_t Config::size(void) {
   return (_servers.size());
 }
 
+void Config::parse(char* file) {
+  std::ifstream ifs;
+  std::stringstream ss;
+  std::string str;
+  std::string host;
+  std::vector<std::string> vhost;
+
+  backlog = DFL_BACKLOG;
+
+  _error = 0;
+  _str_error = "";
+
+  ifs.open(file);
+  ss << ifs.rdbuf();
+
+  str = _sanitize(ss.str());
+
+  host = _sub_host(str);
+  vhost = _sub_vhost(str);
+
+  _parse_host(host);
+  _parse_vhost(vhost);
+}
+
 const std::string& Config::get_error(void) {
-  return (error);
+  return (_str_error);
 }
 
 std::string Config::_sanitize(const std::string& file_content) {
