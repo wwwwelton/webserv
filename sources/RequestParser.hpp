@@ -57,12 +57,6 @@ enum ParsingResult {
   P_PARSING_INVALID
 };
 
-enum TokenType {
-  TK_WORD,
-  TK_NEWLINE,
-  TK_COLON
-};
-
 class RequestParser
 {
   RequestParser(const RequestParser &);
