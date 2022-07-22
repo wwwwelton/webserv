@@ -8,7 +8,7 @@
 #include "HttpResponse.hpp"
 
 void Response::find_location(std::string path, Server *server) {
-  while (path.size()) {
+  while (path.find('/') != std::string::npos) {
     if (server->location.count(path)) {
       location = &server->location[path];
       return;
