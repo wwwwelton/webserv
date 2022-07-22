@@ -122,10 +122,13 @@ bool str_iequals(const std::string& str1, const std::string& str2) {
 
 std::string RequestParser::supported_version = "HTTP/1.1";
 
-RequestParser::RequestParser(int fd, size_t buff_max):
+RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
   finished(false),
   valid(false),
   content_length(false),
+  max_content_length(max_body_size),
+  bytes_consumed(),
+  parsing_body(false),
   chunked(false),
   chunk_size(),
   fd(fd),
@@ -287,6 +290,8 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           if (str_iequals(_header_key, "content-length")) {
             std::stringstream ss(_header_value);
             ss >> content_length;
+            if (content_length > max_content_length)
+              throw InvalidHttpRequestException(RequestEntityTooLarge);
           } else if (str_iequals(_header_key, "transfer-encoding")) {
             if (_header_value == "chunked")
               chunked = true;
@@ -319,10 +324,12 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           return P_PARSING_COMPLETE;
         } else if (chunked) {
           current_state = S_CHUNK_START;
+          parsing_body = true;
         } else if (content_length == 0) {
           return P_PARSING_COMPLETE;
         } else {
           current_state = S_BODY_START;
+          parsing_body = true;
         }
         break;
 

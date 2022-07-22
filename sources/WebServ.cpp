@@ -65,8 +65,9 @@ void WebServ::_accept(int i) {
   log.info() << "Events detected in socket " << pollfds[i].fd << "\n";
   new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
-    clientlist[new_sd].request_parser = new RequestParser(new_sd);
     clientlist[new_sd].server = host;
+    int max_body_size = host->client_max_body_size;
+    clientlist[new_sd].request_parser = new RequestParser(new_sd, max_body_size);
     pollfds.push_back(_pollfd(new_sd, POLLIN));
     log.info() << host->server_name[0]
                << " accepted connection of client "
