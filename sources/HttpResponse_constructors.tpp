@@ -39,4 +39,6 @@ Response::Response(Request const& _req, Server *_server)
   root = "./" + location->root + "/";
   method = req->method;
   response_code = location->redirect.first;
+  if (req->error)
+    response_code = req->error;
 }
