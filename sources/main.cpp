@@ -36,6 +36,10 @@ int main(int argc, char **argv) {
     } catch (std::exception& e) {
       WebServ::log.error() << e.what() << "\n";
       WebServ::log.error() << "EXCEPTION HANDLED REINITIALIZING...\n";
+    } catch (LoadException& e) {
+      WebServ::log.error() << "Failed to read config file: " << e.what()
+                           << std::endl;
+      return (1);
     }
   }
 }

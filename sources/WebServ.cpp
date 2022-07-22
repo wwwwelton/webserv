@@ -33,14 +33,8 @@ WebServ::WebServ(int argc, char **argv) {
   _init_signals();
   log.info() << "WebServ Signals Initialized\n";
 
-  if (_valid_input(argc, argv)) {
-    try {
-      conf.parse(argv[1]);
-    } catch (const std::exception &e) {
-      log.error() << "Failed to read config file: " << e.what() << std::endl;
-      exit(1);
-    }
-  }
+  _validate_input(argc, argv);
+  conf.parse(argv[1]);
   log.info() << "WebServ Loaded " << argv[1] << "\n";
 
   conn = 0;
@@ -122,41 +116,29 @@ void WebServ::purge_conns(void) {
   }
 }
 
-bool WebServ::_valid_input(int argc, char **argv) {
-  if (argc < 2) {
-    log.error() << "Failed to read config file: No file provided!\n";
-    exit(1);
-  }
-  if (argc > 2) {
-    log.error() << "Failed to read config file: Too many arguments!\n";
-    exit(1);
-  }
-  if (argv[1][0] == '\0') {
-    log.error() << "Failed to read config file: No file provided!\n";
-    exit(1);
-  }
+void WebServ::_validate_input(int argc, char **argv) {
+  if (argc < 2)
+    throw LoadException("no file provided");
+  if (argc > 2)
+    throw LoadException("too many arguments");
+  if (argv[1][0] == '\0')
+    throw LoadException("no file provided");
   std::string file(argv[1]);
   std::string::size_type pos = file.find_last_of(".");
-  if (pos == std::string::npos) {
-    log.error() << "Failed to read config file: Invalid file extension!\n";
-    exit(1);
-  }
+  if (pos == std::string::npos)
+    throw LoadException("invalid file extension");
   std::string ext = file.substr(pos);
-  if (ext != CFG_FILE_EXT) {
-    log.error() << "Failed to read config file: Invalid file extension!\n";
-    exit(1);
-  }
+  if (ext != CFG_FILE_EXT)
+    throw LoadException("invalid file extension");
   std::ifstream ifs(argv[1], std::ios::binary | std::ios::ate);
   if (ifs.fail()) {
-    log.error() << "Failed to read config file: " << strerror(errno) << "!\n";
-    exit(1);
+    ifs.close();
+    throw LoadException(strerror(errno));
   }
   if (ifs.tellg() > (CFG_FILE_MAX_SIZE * 1000)) {
-    log.error() << "Failed to read config file: File too large!\n";
-    exit(1);
+    ifs.close();
+    throw LoadException("file too large");
   }
-  ifs.close();
-  return (true);
 }
 
 void WebServ::_init_signals(void) {

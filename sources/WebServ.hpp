@@ -32,6 +32,7 @@
 #include "HttpBase.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "LoadException.hpp"
 #include "Logger.hpp"
 #include "Pollfd.hpp"
 #include "RequestParser.hpp"
@@ -69,7 +70,7 @@ class WebServ {
   int compress;
 
  private:
-  bool _valid_input(int argc, char **argv);
+  void _validate_input(int argc, char **argv);
   void _init_signals(void);
 };
 
