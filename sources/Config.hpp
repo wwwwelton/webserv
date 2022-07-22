@@ -34,8 +34,7 @@ class Config {
 
   size_t size(void);
 
- private:
-  std::vector<Server> _servers;
+  const std::string& get_error(void);
 
  private:
   std::string _sanitize(const std::string& file_content);
@@ -60,6 +59,11 @@ class Config {
 
  public:
   int backlog;
+
+ private:
+  std::vector<Server> _servers;
+  int failed;
+  std::string error;
 };
 
 #endif  // CONFIG_HPP_

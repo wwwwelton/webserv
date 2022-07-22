@@ -9,7 +9,9 @@
 
 Config::Config(void) {
   backlog = DFL_BACKLOG;
-  _servers = std::vector<Server>();
+
+  failed = 0;
+  error = "";
 }
 
 Config::Config(char* file) {
@@ -18,6 +20,11 @@ Config::Config(char* file) {
   std::string str;
   std::string host;
   std::vector<std::string> vhost;
+
+  backlog = DFL_BACKLOG;
+
+  failed = 0;
+  error = "";
 
   ifs.open(file);
   ss << ifs.rdbuf();
@@ -54,6 +61,10 @@ const Server& Config::operator[](size_t n) {
 
 size_t Config::size(void) {
   return (_servers.size());
+}
+
+const std::string& Config::get_error(void) {
+  return (error);
 }
 
 std::string Config::_sanitize(const std::string& file_content) {
