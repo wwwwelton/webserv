@@ -75,6 +75,12 @@ class RequestParser
 public:
   bool finished;
 
+  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 2000);
+  ~RequestParser();
+
+  void parse();
+  Request &get_request();
+
   class InvalidHttpRequestException: public std::exception {
     RequestErrors _error;
   public:
@@ -83,11 +89,18 @@ public:
     RequestErrors get_error() const;
   };
 
-  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 2000);
-  ~RequestParser();
+  class RequestFinishedException: public std::exception {
+  public:
+    const char* what() const throw();
+  };
 
-  void parse();
-  Request &get_request();
+  class ReadException: public std::exception {
+    std::string _message;
+  public:
+    ReadException(const std::string& message);
+    const char* what() const throw();
+    virtual ~ReadException() throw();
+  };
 
 private:
   bool valid;

@@ -449,21 +449,21 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 
 void RequestParser::parse() {
   if (finished)
-    throw std::exception();
+    throw RequestFinishedException();
 
   bytes_read = recv(fd, buffer, buff_max, 0);
 
   if (bytes_read == (size_t)-1) {
-    perror("recv");
-    throw std::exception(); // TODO: implement proper error handling
+    char *error = strerror(errno);
+    throw ReadException(error);
   } else if (bytes_read == 0) {
     finished = true;
-    WebServ::log.error() << "recv returned 0" << std::endl;
+    WebServ::log.error() << "RequestParser: read 0 bytes" << std::endl;
     return;
   }
 
-  WebServ::log.debug()
-    << "Bytes read: " << bytes_read << std::endl;
+  WebServ::log.debug() << "Bytes read: " << bytes_read << std::endl;
+
   try {
     ParsingResult result = tokenize_partial_request(buffer);
     if (result == P_PARSING_COMPLETE) {
@@ -479,7 +479,9 @@ void RequestParser::parse() {
     _request->error = ex.get_error();
     finished = true;
   } catch(std::exception& e) {
-    WebServ::log.error() << "Unexpected exception: " << e.what() << std::endl;
+    WebServ::log.error()
+      << "Unexpected exception on RequestParser: "
+      << e.what() << std::endl;
     finished = true;
   }
 }
@@ -491,7 +493,7 @@ Request &RequestParser::get_request() {
 
 RequestParser::InvalidHttpRequestException::InvalidHttpRequestException(RequestErrors error) {
   _error = error;
-} 
+}
 
 const char *RequestParser::InvalidHttpRequestException::what() const throw() {
   switch (_error) {
@@ -515,3 +517,18 @@ const char *RequestParser::InvalidHttpRequestException::what() const throw() {
 RequestErrors RequestParser::InvalidHttpRequestException::get_error() const {
   return _error;
 }
+
+const char* RequestParser::RequestFinishedException::what() const throw()  {
+  return "This request has already been finished";
+}
+
+RequestParser::ReadException::ReadException(const std::string& mes)
+  : _message(std::string("Read returned an error: ") + mes) {
+  
+}
+
+const char* RequestParser::ReadException::what() const throw()  {
+  return _message.c_str();
+}
+
+RequestParser::ReadException::~ReadException() throw() { }
