@@ -65,7 +65,7 @@ WebServ::WebServ(int argc, char **argv) {
 }
 
 int WebServ::_poll(void) {
-  conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), -1);
+  conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 5000);
   log.info() << "returned connections: " << conn << '\n';
   return conn;
 }
@@ -91,7 +91,7 @@ void WebServ::_accept(int i) {
 void WebServ::end_connection(int i) {
   int fd = pollfds[i].fd;
 
-  delete clientlist[i].request_parser;
+  delete clientlist[fd].request_parser;
   clientlist[fd].request_parser = NULL;
   clientlist[fd].server = NULL;
   close(pollfds[i].fd);
@@ -112,7 +112,7 @@ void WebServ::_receive(int i) {
     WebServ::log.error()
         << "exception caught while tokenizing request: "
         << e.what() << std::endl;
-    end_connection(fd);
+    end_connection(i);
     return;
   }
 }
