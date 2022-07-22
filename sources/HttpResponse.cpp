@@ -105,56 +105,42 @@ void Response::assemble(std::string const& body_path) {
 }
 
 void Response::create_directory_listing(void) {
-  std::string _template("<a href=\"PATH\">LINK</a>");
-  std::stringstream ss;
-  std::ifstream infile;
-  std::ofstream outfile;
-  std::string tmp;
+  std::string       _template;
+  std::ifstream     in;
+  std::ofstream     out;
+  std::string       tmp;
 
-  infile.open("./sources/templates/index.html");
-  outfile.open(DFL_TMPFILE, outfile.out | outfile.trunc);
+  in.open("./sources/templates/index.html");
+  out.open(DFL_TMPFILE, out.out | out.trunc | std::ios::binary);
 
-  std::getline(infile, tmp);
+  in.get(*(out.rdbuf()), '$');
+  in.ignore();
+  std::getline(in, tmp);
   tmp.push_back('\n');
-  while (tmp.find("<h1>") == std::string::npos) {
-    outfile << tmp;
-    std::getline(infile, tmp);
-    tmp.push_back('\n');
-  }
   tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
-  outfile << tmp;
+  out << tmp;
 
-  std::getline(infile, tmp);
-  tmp.push_back('\n');
-  while (tmp.find("PATH") == std::string::npos) {
-    outfile << tmp;
-    std::getline(infile, tmp);
-    tmp.push_back('\n');
-  }
-  _template = tmp;
+  in.get(*(out.rdbuf()), '$');
+  in.ignore();
+  std::getline(in, _template);
+  _template.push_back('\n');
 
   struct dirent *dir;
   DIR* directory;
   directory = opendir(path.c_str());
   dir = readdir(directory);
   while (dir != NULL) {
+    tmp = _template;
     tmp.replace(tmp.find("PATH"), 4, req->path + "/" + dir->d_name);
     tmp.replace(tmp.find("LINK"), 4, dir->d_name);
-    outfile << tmp;
-    tmp = _template;
+    out << tmp;
     dir = readdir(directory);
   }
 
-  std::getline(infile, tmp);
-  while (tmp.size()) {
-    tmp.push_back('\n');
-    outfile << tmp;
-    std::getline(infile, tmp);
-  }
-
+  out << in.rdbuf();
   closedir(directory);
-  infile.close();
-  outfile.close();
+  in.close();
+  out.close();
   remove_tmp = true;
 }
 

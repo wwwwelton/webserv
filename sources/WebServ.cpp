@@ -90,8 +90,8 @@ void WebServ::_accept(int i) {
 
 void WebServ::_receive(int i) {
   int fd = pollfds[i].fd;
-
   RequestParser &parser = *clientlist[fd].request_parser;
+
   try {
     parser.parse();
     if (parser.finished)
@@ -106,8 +106,8 @@ void WebServ::_receive(int i) {
 
 void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
-
   RequestParser &parser = *clientlist[fd].request_parser;
+
   if (parser.finished) {
     Response req_handler;
     Request &ptr = parser.get_request();
