@@ -24,6 +24,18 @@ WebServ::~WebServ(void) {
   std::map<int, Server *>::iterator ite = serverlist.end();
   for (; it != ite; it++)
     delete it->second;
+{
+  std::vector<_pollfd>:: iterator it = pollfds.begin();
+  std::vector<_pollfd>:: iterator ite = pollfds.end();
+  for (; it != ite; it++) {
+    if (serverlist.count(it->fd))
+      continue;
+    delete clientlist[it->fd].request_parser;
+    clientlist[it->fd].request_parser = NULL;
+    clientlist[it->fd].server = NULL;
+    it->fd = -1;
+  }
+}
 }
 
 WebServ::WebServ(int argc, char **argv) {
