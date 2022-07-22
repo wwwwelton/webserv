@@ -124,10 +124,10 @@ std::string RequestParser::supported_version = "HTTP/1.1";
 
 RequestParser::RequestParser(int fd, size_t buff_max):
   finished(false),
+  valid(false),
   content_length(false),
   chunked(false),
   chunk_size(),
-  valid(false),
   fd(fd),
   buffer(new char[buff_max]),
   bytes_read(),
@@ -481,6 +481,3 @@ Request &RequestParser::get_request() {
   _request->valid = this->valid;
   return *_request;
 }
-
-RequestParser::Token::Token(const char *value, size_t size, TokenType type)
-  : value(value), size(size), type(type) { }
