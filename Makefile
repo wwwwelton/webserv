@@ -16,6 +16,7 @@ SRC     = main.cpp \
           Config.cpp \
           Logger.cpp \
           HttpResponse.cpp \
+          LoadException.cpp \
           signal.cpp \
 
 
@@ -30,6 +31,7 @@ INC     = defines.hpp \
           Config.hpp \
           Logger.hpp \
           HttpResponse.hpp \
+          LoadException.hpp \
 
 OBJDIR  = objects
 SRC_DIR =	sources
