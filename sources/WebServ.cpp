@@ -76,21 +76,28 @@ void WebServ::_accept(int i) {
   }
 }
 
-void WebServ::_respond(int i) {
+void WebServ::_receive(int i) {
   int fd = pollfds[i].fd;
-  Response req_handler;
 
   RequestParser &parser = *clientlist[fd].request_parser;
   try {
     parser.parse();
+    if (parser.finished)
+      pollfds[i].events = POLLIN | POLLOUT;
   } catch (std::exception &e) {
     WebServ::log.error()
         << "exception caught while tokenizing request: "
         << e.what() << std::endl;
     return;
   }
+}
 
+void WebServ::_respond(int i) {
+  int fd = pollfds[i].fd;
+
+  RequestParser &parser = *clientlist[fd].request_parser;
   if (parser.finished) {
+    Response req_handler;
     Request &ptr = parser.get_request();
     req_handler = Response(ptr, clientlist[fd].server);
     req_handler.process();

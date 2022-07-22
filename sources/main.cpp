@@ -15,12 +15,18 @@ void loop(int argc, char **argv) {
     if (webserv.conn <= 0)
       break;
     for (int i = 0, size = webserv.pollfds.size(); i < size; i++) {
-      if (webserv.pollfds[i].revents == 0)
+      int16_t revents = webserv.pollfds[i].revents;
+      if (revents == 0)
         continue;
       if (webserv.serverlist.count(webserv.pollfds[i].fd)) {
         webserv._accept(i);
       } else {
-        webserv._respond(i);
+        if (revents & POLLIN)
+          webserv._receive(i);
+        else if (revents & POLLOUT)
+          webserv._respond(i);
+        else
+          WebServ::log.warning() << "unexpected error returned on poll";
       }
     }
     if (webserv.compress)

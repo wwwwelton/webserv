@@ -55,6 +55,7 @@ class WebServ {
   ~WebServ();
   int _poll(void);
   void _accept(int fd);
+  void _receive(int fd);
   void _respond(int fd);
   void purge_conns(void);
   static Logger init_log(void);
