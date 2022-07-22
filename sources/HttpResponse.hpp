@@ -8,7 +8,6 @@
 #ifndef HTTPRESPONSE_HPP
 # define HTTPRESPONSE_HPP
 
-#define BUFFER_SIZE 100
 #define DFL_TMPFILE "./tmp.html"
 
 #include <unistd.h>
@@ -74,9 +73,11 @@ private:
   ServerLocation* location;
 
   bool        folder_request;
+  bool        response_finished;
   bool        valid;
   bool        remove_tmp;
 
+  std::string _itoa(size_t nbr);
   int validate_limit_except(void);
   int validate_http_version(void);
   int _get(void);

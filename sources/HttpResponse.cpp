@@ -72,6 +72,15 @@ void Response::dispatch(std::string const& body_path) {
     WebServ::log.warning() << extension << " support not yet implemented\n";
 }
 
+std::string Response::_itoa(size_t nbr) {
+  std::stringstream ss;
+  std::string       ret;
+
+  ss << nbr;
+  ss >> ret;
+  return ret;
+}
+
 void Response::assemble(std::string const& body_path) {
   std::ifstream in;
   std::string str = httpversion +
@@ -80,27 +89,20 @@ void Response::assemble(std::string const& body_path) {
                     contenttype +
                     DFL_CONTENTLEN;
   std::string body;
-  std::string size;
-  std::stringstream ss;
+  size_t      body_size;
 
-  char buf[BUFFER_SIZE + 1];
+  char buf[BUFFER_SIZE];
   in.open(body_path.c_str());
-  while (!in.eof()) {
-    in.get(buf, BUFFER_SIZE, 0);
-    body += buf;
-  }
-  // WebServ::log.debug() << "Response body: " << body << "\n";
+  in.read(buf, BUFFER_SIZE);
+  body_size = in.gcount();
+  if (body_size == 0 || in.eof())
+    response_finished = true;
 
-  // std::cout << "body:\n\n" << body;
-  str += body;
-  ss << body.size();
-  ss >> size;
-  str.replace(str.find("LENGTH"), 6, size);
+  str.replace(str.find("LENGTH"), 6, _itoa(body_size));
   std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
-  HttpBase::size = str.size();
-  // WebServ::log.debug() << str.size() << "\n";
+  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
+  HttpBase::size = str.size() + body_size;
   in.close();
-  // WebServ::log.debug() << "Host: " << req->host << "\n";
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
