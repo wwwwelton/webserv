@@ -168,6 +168,7 @@ void Response::create_error_page(void) {
   content.assign(std::istreambuf_iterator<char>(infile),
                  std::istreambuf_iterator<char>());
   content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
+  content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
   outfile << content;
   response_path = DFL_TMPFILE;
   remove_tmp = true;

@@ -83,7 +83,7 @@ public:
     RequestErrors get_error() const;
   };
 
-  RequestParser(int fd = -1, size_t buff_max = 2000);
+  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 2000);
   ~RequestParser();
 
   void parse();
@@ -93,6 +93,9 @@ private:
   bool valid;
 
   size_t content_length;
+  size_t max_content_length;
+  size_t bytes_consumed;
+  bool parsing_body;
 
   bool chunked;
   size_t chunk_size;
