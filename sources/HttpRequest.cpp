@@ -43,5 +43,5 @@ Request::Request() { }
 Request::~Request() { }
 
 bool Request::is_valid() const {
-  return this->valid;
+  return !this->error;
 }

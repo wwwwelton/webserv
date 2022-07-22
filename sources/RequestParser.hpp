@@ -3,6 +3,8 @@
 #define HTTP_REQUEST_PARSER_HPP
 
 #include "HttpRequest.hpp"
+#include "defines.hpp"
+
 #include <exception>
 #include <string>
 #include <vector>
@@ -57,6 +59,15 @@ enum ParsingResult {
   P_PARSING_INVALID
 };
 
+enum RequestErrors {
+  BadRequest = BAD_REQUEST,
+  MethodNotAllowed = METHOD_NOT_ALLOWED,
+  RequestTimeout = REQUEST_TIMEOUT,
+  LengthRequired = LENGTH_REQUIRED,
+  RequestEntityTooLarge = REQUEST_ENTITY_TOO_LARGE,
+  RequestUriTooLong = REQUEST_URI_TOO_LONG
+};
+
 class RequestParser
 {
   RequestParser(const RequestParser &);
@@ -65,8 +76,11 @@ public:
   bool finished;
 
   class InvalidHttpRequestException: public std::exception {
+    RequestErrors _error;
   public:
-    const char* what() const throw() { return "invalid http request"; }
+    InvalidHttpRequestException(RequestErrors error);
+    const char* what() const throw();
+    RequestErrors get_error() const;
   };
 
   RequestParser(int fd = -1, size_t buff_max = 2000);
