@@ -3,6 +3,8 @@
 #define HTTP_REQUEST_PARSER_HPP
 
 #include "HttpRequest.hpp"
+#include "defines.hpp"
+
 #include <exception>
 #include <string>
 #include <vector>
@@ -57,10 +59,13 @@ enum ParsingResult {
   P_PARSING_INVALID
 };
 
-enum TokenType {
-  TK_WORD,
-  TK_NEWLINE,
-  TK_COLON
+enum RequestErrors {
+  BadRequest = BAD_REQUEST,
+  MethodNotAllowed = METHOD_NOT_ALLOWED,
+  RequestTimeout = REQUEST_TIMEOUT,
+  LengthRequired = LENGTH_REQUIRED,
+  RequestEntityTooLarge = REQUEST_ENTITY_TOO_LARGE,
+  RequestUriTooLong = REQUEST_URI_TOO_LONG
 };
 
 class RequestParser
@@ -70,33 +75,46 @@ class RequestParser
 public:
   bool finished;
 
-  class InvalidHttpRequestException: public std::exception {
-  public:
-    const char* what() const throw() { return "invalid http request"; }
-  };
-
-  RequestParser(int fd = -1, size_t buff_max = 2000);
+  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 2000);
   ~RequestParser();
-
-  struct Token {
-    const char *value;
-    const size_t size;
-    const TokenType type;
-      
-    Token(const char *value, size_t size, TokenType type);
-  };
 
   void parse();
   Request &get_request();
 
+  class InvalidHttpRequestException: public std::exception {
+    RequestErrors _error;
+  public:
+    InvalidHttpRequestException(RequestErrors error);
+    const char* what() const throw();
+    RequestErrors get_error() const;
+  };
+
+  class RequestFinishedException: public std::exception {
+  public:
+    const char* what() const throw();
+  };
+
+  class ReadException: public std::exception {
+    std::string _message;
+  public:
+    ReadException(const std::string& message);
+    const char* what() const throw();
+    virtual ~ReadException() throw();
+  };
+
 private:
+  bool valid;
+
   size_t content_length;
+  size_t max_content_length;
+  size_t bytes_consumed;
+  bool parsing_body;
+
   bool chunked;
   size_t chunk_size;
   std::vector<char> chunk_data;
-  bool valid;
+
   Request *_request;
-  std::vector<Token> headers;
 
   int fd;
   char *buffer;
@@ -105,7 +123,6 @@ private:
 
   std::string _header_key;
   std::string _header_value;
-  std::vector<Token> tokens;
 
   RequestStates current_state;
 

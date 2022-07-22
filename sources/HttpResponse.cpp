@@ -72,6 +72,15 @@ void Response::dispatch(std::string const& body_path) {
     WebServ::log.warning() << extension << " support not yet implemented\n";
 }
 
+std::string Response::_itoa(size_t nbr) {
+  std::stringstream ss;
+  std::string       ret;
+
+  ss << nbr;
+  ss >> ret;
+  return ret;
+}
+
 void Response::assemble(std::string const& body_path) {
   std::ifstream in;
   std::string str = httpversion +
@@ -80,81 +89,60 @@ void Response::assemble(std::string const& body_path) {
                     contenttype +
                     DFL_CONTENTLEN;
   std::string body;
-  std::string size;
-  std::stringstream ss;
+  size_t      body_size;
 
-  char buf[BUFFER_SIZE + 1];
+  char buf[BUFFER_SIZE];
   in.open(body_path.c_str());
-  while (!in.eof()) {
-    in.get(buf, BUFFER_SIZE, 0);
-    body += buf;
-  }
-  // WebServ::log.debug() << "Response body: " << body << "\n";
+  in.read(buf, BUFFER_SIZE);
+  body_size = in.gcount();
+  if (body_size == 0 || in.eof())
+    response_finished = true;
 
-  // std::cout << "body:\n\n" << body;
-  str += body;
-  ss << body.size();
-  ss >> size;
-  str.replace(str.find("LENGTH"), 6, size);
+  str.replace(str.find("LENGTH"), 6, _itoa(body_size));
   std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
-  HttpBase::size = str.size();
-  // WebServ::log.debug() << str.size() << "\n";
+  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
+  HttpBase::size = str.size() + body_size;
   in.close();
-  // WebServ::log.debug() << "Host: " << req->host << "\n";
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
 void Response::create_directory_listing(void) {
-  std::string _template("<a href=\"PATH\">LINK</a>");
-  std::stringstream ss;
-  std::ifstream infile;
-  std::ofstream outfile;
-  std::string tmp;
+  std::string       _template;
+  std::ifstream     in;
+  std::ofstream     out;
+  std::string       tmp;
 
-  infile.open("./sources/templates/index.html");
-  outfile.open(DFL_TMPFILE, outfile.out | outfile.trunc);
+  in.open("./sources/templates/index.html");
+  out.open(DFL_TMPFILE, out.out | out.trunc | std::ios::binary);
 
-  std::getline(infile, tmp);
+  in.get(*(out.rdbuf()), '$');
+  in.ignore();
+  std::getline(in, tmp);
   tmp.push_back('\n');
-  while (tmp.find("<h1>") == std::string::npos) {
-    outfile << tmp;
-    std::getline(infile, tmp);
-    tmp.push_back('\n');
-  }
   tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
-  outfile << tmp;
+  out << tmp;
 
-  std::getline(infile, tmp);
-  tmp.push_back('\n');
-  while (tmp.find("PATH") == std::string::npos) {
-    outfile << tmp;
-    std::getline(infile, tmp);
-    tmp.push_back('\n');
-  }
-  _template = tmp;
+  in.get(*(out.rdbuf()), '$');
+  in.ignore();
+  std::getline(in, _template);
+  _template.push_back('\n');
 
   struct dirent *dir;
   DIR* directory;
   directory = opendir(path.c_str());
   dir = readdir(directory);
   while (dir != NULL) {
+    tmp = _template;
     tmp.replace(tmp.find("PATH"), 4, req->path + "/" + dir->d_name);
     tmp.replace(tmp.find("LINK"), 4, dir->d_name);
-    outfile << tmp;
-    tmp = _template;
+    out << tmp;
     dir = readdir(directory);
   }
 
-  std::getline(infile, tmp);
-  while (tmp.size()) {
-    tmp.push_back('\n');
-    outfile << tmp;
-    std::getline(infile, tmp);
-  }
-
+  out << in.rdbuf();
   closedir(directory);
-  infile.close();
-  outfile.close();
+  in.close();
+  out.close();
   remove_tmp = true;
 }
 
@@ -167,6 +155,7 @@ void Response::create_error_page(void) {
   outfile.open(DFL_TMPFILE, outfile.trunc);
   content.assign(std::istreambuf_iterator<char>(infile),
                  std::istreambuf_iterator<char>());
+  content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
   content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
   outfile << content;
   response_path = DFL_TMPFILE;

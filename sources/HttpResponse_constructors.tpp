@@ -8,7 +8,7 @@
 #include "HttpResponse.hpp"
 
 void Response::find_location(std::string path, Server *server) {
-  while (path.size()) {
+  while (path.find('/') != std::string::npos) {
     if (server->location.count(path)) {
       location = &server->location[path];
       return;
@@ -39,4 +39,6 @@ Response::Response(Request const& _req, Server *_server)
   root = "./" + location->root + "/";
   method = req->method;
   response_code = location->redirect.first;
+  if (req->error)
+    response_code = req->error;
 }

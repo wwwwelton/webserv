@@ -19,7 +19,7 @@ struct Request {
   std::string http_version;
   std::string host;
   std::string body;
-  bool valid;
+  unsigned int error;
   int body_size;
   int finished;
 

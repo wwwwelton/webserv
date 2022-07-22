@@ -24,6 +24,18 @@ WebServ::~WebServ(void) {
   std::map<int, Server *>::iterator ite = serverlist.end();
   for (; it != ite; it++)
     delete it->second;
+{
+  std::vector<_pollfd>:: iterator it = pollfds.begin();
+  std::vector<_pollfd>:: iterator ite = pollfds.end();
+  for (; it != ite; it++) {
+    if (serverlist.count(it->fd))
+      continue;
+    delete clientlist[it->fd].request_parser;
+    clientlist[it->fd].request_parser = NULL;
+    clientlist[it->fd].server = NULL;
+    it->fd = -1;
+  }
+}
 }
 
 WebServ::WebServ(int argc, char **argv) {
@@ -52,7 +64,7 @@ WebServ::WebServ(int argc, char **argv) {
 }
 
 int WebServ::_poll(void) {
-  conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), -1);
+  conn = poll((struct pollfd *)&(*pollfds.begin()), pollfds.size(), 5000);
   log.info() << "returned connections: " << conn << '\n';
   return conn;
 }
@@ -64,8 +76,9 @@ void WebServ::_accept(int i) {
   log.info() << "Events detected in socket " << pollfds[i].fd << "\n";
   new_sd = accept(host->sockfd, NULL, NULL);
   while (new_sd != -1) {
-    clientlist[new_sd].request_parser = new RequestParser(new_sd);
     clientlist[new_sd].server = host;
+    int max_body_size = host->client_max_body_size;
+    clientlist[new_sd].request_parser = new RequestParser(new_sd, max_body_size);
     pollfds.push_back(_pollfd(new_sd, POLLIN));
     log.info() << host->server_name[0]
                << " accepted connection of client "
@@ -74,32 +87,47 @@ void WebServ::_accept(int i) {
   }
 }
 
-void WebServ::_respond(int i) {
+void WebServ::end_connection(int i) {
   int fd = pollfds[i].fd;
-  Response req_handler;
 
+  delete clientlist[fd].request_parser;
+  clientlist[fd].request_parser = NULL;
+  clientlist[fd].server = NULL;
+  close(pollfds[i].fd);
+  log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
+  pollfds[i].fd = -1;
+  compress = true;
+}
+
+void WebServ::_receive(int i) {
+  int fd = pollfds[i].fd;
   RequestParser &parser = *clientlist[fd].request_parser;
+
   try {
     parser.parse();
+    if (parser.finished)
+      pollfds[i].events = POLLIN | POLLOUT;
   } catch (std::exception &e) {
     WebServ::log.error()
         << "exception caught while tokenizing request: "
         << e.what() << std::endl;
+    end_connection(i);
     return;
   }
+}
+
+void WebServ::_respond(int i) {
+  int fd = pollfds[i].fd;
+
+  RequestParser &parser = *clientlist[fd].request_parser;
 
   if (parser.finished) {
+    Response req_handler;
     Request &ptr = parser.get_request();
     req_handler = Response(ptr, clientlist[fd].server);
     req_handler.process();
     req_handler._send(fd);
-    delete clientlist[fd].request_parser;
-    clientlist[fd].request_parser = NULL;
-    clientlist[fd].server = NULL;
-    close(pollfds[i].fd);
-    log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
-    pollfds[i].fd = -1;
-    compress = true;
+    end_connection(i);
   }
 }
 
