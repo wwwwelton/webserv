@@ -13,7 +13,7 @@
 #include <string>
 
 class LoadException : std::exception {
- private:
+ protected:
   static std::string _message;
 
  public:

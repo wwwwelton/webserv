@@ -33,13 +33,12 @@ int main(int argc, char **argv) {
     try {
       loop(argc, argv);
       break;
+    } catch (LoadException& e) {
+      WebServ::log.error() << e.what() << std::endl;
+      return (1);
     } catch (std::exception& e) {
       WebServ::log.error() << e.what() << "\n";
       WebServ::log.error() << "EXCEPTION HANDLED REINITIALIZING...\n";
-    } catch (LoadException& e) {
-      WebServ::log.error() << "Failed to read config file: " << e.what()
-                           << std::endl;
-      return (1);
     }
   }
 }
