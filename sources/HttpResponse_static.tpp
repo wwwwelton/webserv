@@ -22,6 +22,7 @@ Response::status_map Response::init_status_map(void) {
   _map[403] = "FORBIDDEN\n";
   _map[404] = "NOT FOUND\n";
   _map[405] = "METHOD NOT ALLOWED\n";
+  _map[413] = "REQUEST ENTITY TOO LARGE\n";
   _map[415] = "UNSUPPORTED MEDIA TYPE\n";
   _map[500] = "INTERNAL SERVER ERROR\n";
   _map[502] = "BAD GATEWAY\n";
