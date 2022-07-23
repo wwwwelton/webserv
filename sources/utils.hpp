@@ -18,8 +18,14 @@
 
 namespace utils {
 
-void validate_input(int argc, char **argv);
+class ValidateInputException : public LoadException {
+ public:
+  explicit ValidateInputException(const std::string& str);
+  const char* what(void) const throw();
+};
 
-}
+void validate_input(int argc, char** argv);
+
+}  // namespace utils
 
 #endif  // UTILS_HPP
