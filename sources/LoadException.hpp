@@ -9,16 +9,20 @@
 #ifndef LOAD_EXCEPTION_HPP
 #define LOAD_EXCEPTION_HPP
 
-#include <algorithm>
 #include <string>
 
 class LoadException : std::exception {
  protected:
-  static std::string _message;
+  std::string _m;
 
  public:
+  LoadException(void);
   explicit LoadException(const std::string& str);
-  ~LoadException(void) throw();
+  LoadException(const LoadException& src);
+  virtual ~LoadException(void) throw();
+
+  LoadException& operator=(const LoadException& rhs);
+
   const char* what(void) const throw();
 };
 

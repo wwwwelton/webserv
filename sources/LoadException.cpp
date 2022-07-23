@@ -8,16 +8,17 @@
 
 #include "LoadException.hpp"
 
-std::string LoadException::_message = "";
+LoadException::LoadException(void) {}
 
-LoadException::LoadException(const std::string& str) {
-  _message = str;
+LoadException::LoadException(const std::string& str) : _m(str) {}
+
+LoadException::LoadException(const LoadException& src) { *this = src; }
+
+LoadException::~LoadException(void) throw() {}
+
+LoadException& LoadException::operator=(const LoadException& rhs) {
+  _m = rhs._m;
+  return (*this);
 }
 
-LoadException::~LoadException(void) throw() {
-  return;
-}
-
-const char* LoadException::what(void) const throw() {
-  return (_message.c_str());
-}
+const char* LoadException::what(void) const throw() { return (_m.c_str()); }
