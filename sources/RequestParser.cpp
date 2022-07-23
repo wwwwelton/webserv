@@ -7,35 +7,31 @@
 #include <sys/socket.h>
 #include <exception>
 
-inline bool is_space(char c) {
+static inline bool is_space(char c) {
   return (c == ' ');
 }
 
-inline bool is_lalpha(char c) {
+static inline bool is_lalpha(char c) {
   return (c >= 'a' && c <= 'z');
 }
 
-inline bool is_ualpha(char c) {
+static inline bool is_ualpha(char c) {
   return (c >= 'A' && c <= 'Z');
 }
 
-inline bool is_alpha(char c) {
+static inline bool is_alpha(char c) {
   return (is_ualpha(c) || is_lalpha(c));
 }
 
-inline bool is_ctl(char c) {
+static inline bool is_ctl(char c) {
   return ((c >= 0 && c < 32) || c == 127);
 }
 
-inline bool is_character(char c) {
+static inline bool is_character(char c) {
   return (std::isdigit(c) || is_alpha(c));
 }
 
-inline bool is_crlf(char c) {
-  return (c == '\r' && (c + 1) == '\n');
-}
-
-inline int get_hex(char c) {
+static inline int get_hex(char c) {
   switch (c) {
     case '0':
     case '1':
@@ -60,7 +56,7 @@ inline int get_hex(char c) {
   }
 }
 
-bool is_separator(char c) {
+static inline bool is_separator(char c) {
   switch (c) {
     case '(':
     case ')':
@@ -87,20 +83,11 @@ bool is_separator(char c) {
   }
 }
 
-// LWS = linear white space
-inline bool is_lws(char *c) {
-  int offset = 0;
-  if (is_crlf(*c))
-    offset = 1;
-  char target = *(c + offset);
-  return (target == ' ' || target == '\t');
-}
-
-inline bool is_ascii(char c) {
+static inline bool is_ascii(char c) {
   return (c >= 0);
 }
 
-inline bool is_token(char c) {
+static inline bool is_token(char c) {
   return (is_ascii(c) && !is_ctl(c) && !is_separator(c));
 }
 
