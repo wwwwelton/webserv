@@ -11,7 +11,7 @@ namespace utils {
 
 ValidateInputException::ValidateInputException(const std::string& str)
     : LoadException(str) {
-  _m = "Failed to read config file: " + str;
+  _m = "WebServ Failed to start: " + str;
 }
 
 const char* ValidateInputException::what(void) const throw() {
