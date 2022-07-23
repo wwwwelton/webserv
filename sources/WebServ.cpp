@@ -42,7 +42,7 @@ WebServ::WebServ(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
   size_t i;
 
-  _init_signals();
+  utils::init_signals(this);
   log.info() << "WebServ Signals Initialized\n";
 
   utils::validate_input(argc, argv);
@@ -142,12 +142,4 @@ void WebServ::purge_conns(void) {
         break;
     }
   }
-}
-
-void WebServ::_init_signals(void) {
-  void *func = NULL;
-  func = reinterpret_cast<void *>(sighandler);
-  std::signal(SIGINT, reinterpret_cast<__sighandler_t>(func));
-  std::signal(SIGQUIT, reinterpret_cast<__sighandler_t>(func));
-  sighandler(0, this);
 }

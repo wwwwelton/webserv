@@ -9,6 +9,14 @@
 
 namespace utils {
 
+void init_signals(WebServ* ptr) {
+  void* func = NULL;
+  func = reinterpret_cast<void*>(sighandler);
+  std::signal(SIGINT, reinterpret_cast<__sighandler_t>(func));
+  std::signal(SIGQUIT, reinterpret_cast<__sighandler_t>(func));
+  sighandler(0, ptr);
+}
+
 ValidateInputException::ValidateInputException(const std::string& str)
     : LoadException(str) {
   _m = "Failed to read config file: " + str;

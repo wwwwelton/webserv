@@ -14,7 +14,10 @@
 #include <string>
 
 #include "LoadException.hpp"
+#include "WebServ.hpp"
 #include "defines.hpp"
+
+class WebServ;
 
 namespace utils {
 
@@ -25,6 +28,7 @@ class ValidateInputException : public LoadException {
 };
 
 void validate_input(int argc, char** argv);
+void init_signals(WebServ* ptr);
 
 }  // namespace utils
 

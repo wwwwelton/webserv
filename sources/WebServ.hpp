@@ -71,9 +71,6 @@ class WebServ {
   static Logger log;
   int conn;
   int compress;
-
- private:
-  void _init_signals(void);
 };
 
 void sighandler(const int signal, void *ptr);
