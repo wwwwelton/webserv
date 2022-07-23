@@ -8,9 +8,11 @@
 
 #include "LoadException.hpp"
 
+std::string LoadException::_m = "";
+
 LoadException::LoadException(void) {}
 
-LoadException::LoadException(const std::string& str) : _m(str) {}
+LoadException::LoadException(const std::string& str) { _m = str; }
 
 LoadException::LoadException(const LoadException& src) { *this = src; }
 

@@ -13,7 +13,7 @@
 
 class LoadException : std::exception {
  protected:
-  std::string _m;
+  static std::string _m;
 
  public:
   LoadException(void);
