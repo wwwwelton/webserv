@@ -43,7 +43,7 @@ WebServ::WebServ(int argc, char **argv) {
   size_t i;
 
   utils::init_signals(this);
-  log.info() << "WebServ Signals Initialized\n";
+  log.info() << "WebServ Signals initialized\n";
 
   utils::validate_input(argc, argv);
   conf.parse(argv[1]);
