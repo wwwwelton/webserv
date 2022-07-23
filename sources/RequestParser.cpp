@@ -91,7 +91,7 @@ static inline bool is_token(char c) {
   return (is_ascii(c) && !is_ctl(c) && !is_separator(c));
 }
 
-bool str_iequals(const std::string& str1, const std::string& str2) {
+static inline bool str_iequals(const std::string& str1, const std::string& str2) {
   size_t size1 = str1.size();
 
   if (size1 != str2.size())
