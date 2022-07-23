@@ -5,11 +5,12 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "WebServ.hpp"
+#include "signal.hpp"
+
+namespace utils {
 
 void sighandler(const int signal, void *ptr) {
   static WebServ *webserv = NULL;
-
   if (webserv == NULL)
     webserv = reinterpret_cast<WebServ *>(ptr);
   if (signal == SIGINT || signal == SIGQUIT) {
@@ -17,3 +18,13 @@ void sighandler(const int signal, void *ptr) {
     exit(128 + signal);
   }
 }
+
+void init_signals(WebServ *ptr) {
+  void *func = NULL;
+  func = reinterpret_cast<void *>(sighandler);
+  std::signal(SIGINT, reinterpret_cast<__sighandler_t>(func));
+  std::signal(SIGQUIT, reinterpret_cast<__sighandler_t>(func));
+  sighandler(0, ptr);
+}
+
+}  // namespace utils

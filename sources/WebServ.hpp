@@ -39,6 +39,7 @@
 #include "Server.hpp"
 #include "ServerLocation.hpp"
 #include "defines.hpp"
+#include "signal.hpp"
 #include "utils.hpp"
 
 class Request;
@@ -72,7 +73,5 @@ class WebServ {
   int conn;
   int compress;
 };
-
-void sighandler(const int signal, void *ptr);
 
 #endif  // WEBSERV_HPP

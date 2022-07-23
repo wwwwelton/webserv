@@ -34,6 +34,7 @@ INC     = defines.hpp \
           HttpResponse.hpp \
           LoadException.hpp \
           utils.hpp \
+          signal.hpp \
 
 OBJDIR  = objects
 SRC_DIR =	sources

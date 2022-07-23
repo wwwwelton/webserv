@@ -6,29 +6,18 @@
 //##############################################################################
 
 #pragma once
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef SIGNAL_HPP
+#define SIGNAL_HPP
 
-#include <cstring>
-#include <fstream>
-#include <string>
-
-#include "LoadException.hpp"
 #include "WebServ.hpp"
-#include "defines.hpp"
 
 class WebServ;
 
 namespace utils {
 
-class ValidateInputException : public LoadException {
- public:
-  explicit ValidateInputException(const std::string& str);
-  const char* what(void) const throw();
-};
-
-void validate_input(int argc, char** argv);
+void sighandler(const int signal, void* ptr);
+void init_signals(WebServ* ptr);
 
 }  // namespace utils
 
-#endif  // UTILS_HPP
+#endif  // SIGNAL_HPP
