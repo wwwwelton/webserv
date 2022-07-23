@@ -41,6 +41,7 @@
 #include "defines.hpp"
 
 class Request;
+class Response;
 typedef struct addrinfo s_addrinfo;
 
 typedef struct s_request {
@@ -48,6 +49,7 @@ typedef struct s_request {
   s_request(Server *_server, int fd);
   Server *server;
   RequestParser *request_parser;
+  Response *response;
 } req;
 
 class WebServ {

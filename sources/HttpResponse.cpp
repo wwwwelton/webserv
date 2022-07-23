@@ -25,6 +25,21 @@ int Response::validate_limit_except(void) {
   return CONTINUE;
 }
 
+void Response::set_request(Request const*_req) {
+  req = _req;
+  if (_req->body.size()) {
+    WebServ::log.debug() << "Request body:\n" << _req->body << "\n";
+    req_body = req->body;
+  }
+  find_location(_req->path, server);
+  path = "./" + location->root + _req->path;
+  root = "./" + location->root + "/";
+  method = _req->method;
+  response_code = location->redirect.first;
+  if (_req->error)
+    response_code = _req->error;
+}
+
 int Response::validate_http_version(void) {
   if (req->http_version != "HTTP/1.1")
     return HTTP_VERSION_UNSUPPORTED;

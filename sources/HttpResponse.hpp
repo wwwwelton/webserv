@@ -96,8 +96,9 @@ private:
   void create_directory_listing(void);
 
 public:
-  Response(Request const& req, Server *_server);
+  Response(Request *req, Server *_server);
   Response(void);
+  void set_request(Request const* req);
   void process(void);
   void _send(int fd);
 };
