@@ -22,8 +22,9 @@ WebServ::~WebServ(void) {
   log.debug() << "WebServ destructor called\n";
   std::map<int, Server *>::iterator it = serverlist.begin();
   std::map<int, Server *>::iterator ite = serverlist.end();
-  for (; it != ite; it++)
+  for (; it != ite; it++) {
     delete it->second;
+  }
   {
     std::vector<_pollfd>::iterator it = pollfds.begin();
     std::vector<_pollfd>::iterator ite = pollfds.end();
@@ -31,6 +32,7 @@ WebServ::~WebServ(void) {
       if (serverlist.count(it->fd))
         continue;
       delete clientlist[it->fd].request_parser;
+      delete clientlist[it->fd].response;
       clientlist[it->fd].request_parser = NULL;
       clientlist[it->fd].server = NULL;
       it->fd = -1;
@@ -71,19 +73,20 @@ int WebServ::_poll(void) {
 
 void WebServ::_accept(int i) {
   Server *host = serverlist[pollfds[i].fd];
-  int new_sd;
+  int _fd;
 
   log.info() << "Events detected in socket " << pollfds[i].fd << "\n";
-  new_sd = accept(host->sockfd, NULL, NULL);
-  while (new_sd != -1) {
-    clientlist[new_sd].server = host;
+  _fd = accept(host->sockfd, NULL, NULL);
+  while (_fd != -1) {
+    clientlist[_fd].server = host;
     int max_body_size = host->client_max_body_size;
-    clientlist[new_sd].request_parser = new RequestParser(new_sd, max_body_size);
-    pollfds.push_back(_pollfd(new_sd, POLLIN));
+    clientlist[_fd].request_parser = new RequestParser(_fd, max_body_size);
+    clientlist[_fd].response = new Response(NULL, host);
+    pollfds.push_back(_pollfd(_fd, POLLIN));
     log.info() << host->server_name[0]
                << " accepted connection of client "
-               << new_sd << "\n";
-    new_sd = accept(host->sockfd, NULL, NULL);
+               << _fd << "\n";
+    _fd = accept(host->sockfd, NULL, NULL);
   }
 }
 
@@ -91,6 +94,7 @@ void WebServ::end_connection(int i) {
   int fd = pollfds[i].fd;
 
   delete clientlist[fd].request_parser;
+  delete clientlist[fd].response;
   clientlist[fd].request_parser = NULL;
   clientlist[fd].server = NULL;
   close(pollfds[i].fd);
@@ -120,13 +124,12 @@ void WebServ::_respond(int i) {
   int fd = pollfds[i].fd;
 
   RequestParser &parser = *clientlist[fd].request_parser;
+  Response &response = *clientlist[fd].response;
 
   if (parser.finished) {
-    Response req_handler;
-    Request &ptr = parser.get_request();
-    req_handler = Response(ptr, clientlist[fd].server);
-    req_handler.process();
-    req_handler._send(fd);
+    response.set_request(&parser.get_request());
+    response.process();
+    response._send(fd);
     end_connection(i);
   }
 }
