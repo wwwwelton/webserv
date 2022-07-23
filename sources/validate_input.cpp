@@ -16,27 +16,51 @@ const char* ValidateInputException::what(void) const throw() {
   return (_m.c_str());
 }
 
+static bool empty_file_name(char* file) {
+  std::string _file(file);
+  return (_file.empty());
+}
+
+static bool invalid_file_extension(char* file) {
+  std::string _file(file);
+  std::string::size_type pos = _file.find_last_of(".");
+  if (pos == std::string::npos)
+    return (true);
+  std::string ext = _file.substr(pos);
+  if (ext != CFG_FILE_EXT)
+    return (true);
+  return (false);
+}
+
+static bool cannot_open_file(char* file) {
+  std::ifstream ifs(file);
+  if (ifs.fail()) {
+    ifs.close();
+    return (true);
+  }
+  return (false);
+}
+
+static bool file_too_large(char* file) {
+  std::ifstream ifs(file, std::ios::binary | std::ios::ate);
+  if (ifs.tellg() > (CFG_FILE_MAX_SIZE * 1000)) {
+    ifs.close();
+    return (true);
+  }
+  return (false);
+}
+
 void validate_input(int argc, char** argv) {
   if (argc < 2)
     throw ValidateInputException("no file provided");
   if (argc > 2)
     throw ValidateInputException("too many arguments");
-  if (argv[1][0] == '\0')
+  if (empty_file_name(argv[1]))
     throw ValidateInputException("no file provided");
-  std::string file(argv[1]);
-  std::string::size_type pos = file.find_last_of(".");
-  if (pos == std::string::npos)
+  if (invalid_file_extension(argv[1]))
     throw ValidateInputException("invalid file extension");
-  std::string ext = file.substr(pos);
-  if (ext != CFG_FILE_EXT)
-    throw ValidateInputException("invalid file extension");
-  std::ifstream ifs(argv[1], std::ios::binary | std::ios::ate);
-  if (ifs.fail()) {
-    ifs.close();
+  if (cannot_open_file(argv[1]))
     throw ValidateInputException(strerror(errno));
-  }
-  if (ifs.tellg() > (CFG_FILE_MAX_SIZE * 1000)) {
-    ifs.close();
+  if (file_too_large(argv[1]))
     throw ValidateInputException("file too large");
-  }
 }
