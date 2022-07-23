@@ -17,7 +17,7 @@ SRC     = main.cpp \
           Logger.cpp \
           HttpResponse.cpp \
           LoadException.cpp \
-          utils.cpp \
+          validate_input.cpp \
           signal.cpp \
 
 
@@ -33,7 +33,7 @@ INC     = defines.hpp \
           Logger.hpp \
           HttpResponse.hpp \
           LoadException.hpp \
-          utils.hpp \
+          validate_input.hpp \
           signal.hpp \
 
 OBJDIR  = objects

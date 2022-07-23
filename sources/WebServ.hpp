@@ -40,7 +40,7 @@
 #include "ServerLocation.hpp"
 #include "defines.hpp"
 #include "signal.hpp"
-#include "utils.hpp"
+#include "validate_input.hpp"
 
 class Request;
 typedef struct addrinfo s_addrinfo;
