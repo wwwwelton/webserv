@@ -101,7 +101,7 @@ static inline bool str_iequals(const std::string& str1, const std::string& str2)
   const char *cstr2 = str2.c_str();
 
   for (size_t i = 0; i < size1; i++) {
-    if (std::toupper(cstr1[i]) != std::toupper(cstr2[i]))
+    if (std::tolower(cstr1[i]) != std::tolower(cstr2[i]))
       return false;
   }
   return true;
