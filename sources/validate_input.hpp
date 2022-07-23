@@ -16,8 +16,6 @@
 #include "LoadException.hpp"
 #include "defines.hpp"
 
-namespace utils {
-
 class ValidateInputException : public LoadException {
  public:
   explicit ValidateInputException(const std::string& str);
@@ -25,7 +23,5 @@ class ValidateInputException : public LoadException {
 };
 
 void validate_input(int argc, char** argv);
-
-}  // namespace utils
 
 #endif  // UTILS_HPP

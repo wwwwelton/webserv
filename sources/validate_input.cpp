@@ -7,8 +7,6 @@
 
 #include "validate_input.hpp"
 
-namespace utils {
-
 ValidateInputException::ValidateInputException(const std::string& str)
     : LoadException(str) {
   _m = "WebServ Failed to start: " + str;
@@ -42,5 +40,3 @@ void validate_input(int argc, char** argv) {
     throw ValidateInputException("file too large");
   }
 }
-
-}  // namespace utils

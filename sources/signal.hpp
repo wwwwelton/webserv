@@ -13,11 +13,7 @@
 
 class WebServ;
 
-namespace utils {
-
 void sighandler(const int signal, void* ptr);
 void init_signals(WebServ* ptr);
-
-}  // namespace utils
 
 #endif  // SIGNAL_HPP
