@@ -39,6 +39,7 @@
 #include "Server.hpp"
 #include "ServerLocation.hpp"
 #include "defines.hpp"
+#include "utils.hpp"
 
 class Request;
 typedef struct addrinfo s_addrinfo;
@@ -72,7 +73,6 @@ class WebServ {
   int compress;
 
  private:
-  void _validate_input(int argc, char **argv);
   void _init_signals(void);
 };
 
