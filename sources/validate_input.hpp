@@ -11,6 +11,7 @@
 
 #include <cstring>
 #include <fstream>
+#include <string>
 
 #include "LoadException.hpp"
 #include "defines.hpp"
