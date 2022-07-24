@@ -321,8 +321,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         break;
 
       case S_BODY_START:
-        WebServ::log.debug() << "Current request: " << *_request << std::endl;
-        WebServ::log.debug() << "Initializing body parsing" << std::endl;
+        WebServ::log.debug() << "Request before body parsing: " << *_request << std::endl;
         content_length--;
         _request->body.push_back(c);
         current_state = S_BODY;
