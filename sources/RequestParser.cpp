@@ -280,7 +280,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
             if (content_length > max_content_length)
               throw InvalidHttpRequestException(RequestEntityTooLarge);
           } else if (str_iequals(_header_key, "transfer-encoding")) {
-            if (_header_value == "chunked")
+            if (_header_value != "identity")
               chunked = true;
           }
         }
