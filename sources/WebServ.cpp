@@ -126,12 +126,16 @@ void WebServ::_respond(int i) {
   RequestParser &parser = *clientlist[fd].request_parser;
   Response &response = *clientlist[fd].response;
 
-  if (parser.finished) {
+  if (response.inprogress) {
+
+  }
+  else if (parser.finished) {
     response.set_request(&parser.get_request());
     response.process();
     response._send(fd);
-    end_connection(i);
   }
+  if (response.finished)
+    end_connection(i);
 }
 
 void WebServ::purge_conns(void) {

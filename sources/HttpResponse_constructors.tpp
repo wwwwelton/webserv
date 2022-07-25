@@ -24,5 +24,11 @@ Response::Response(Request *_req, Server *_server)
 {
   folder_request = false;
   remove_tmp = false;
+  finished = false;
+  inprogress = false;
   server = _server;
+}
+
+Response::~Response(void) {
+  file.close();
 }

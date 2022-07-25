@@ -97,27 +97,28 @@ std::string Response::_itoa(size_t nbr) {
 }
 
 void Response::assemble(std::string const& body_path) {
-  std::ifstream in;
   std::string str = httpversion +
                     statuscode +
                     statusmsg +
                     contenttype +
                     DFL_CONTENTLEN;
-  std::string body;
-  size_t      body_size;
+  std::string       body;
+  size_t            body_size;
 
+  if (!file.is_open())
+    file.open(body_path.c_str());
   char buf[BUFFER_SIZE];
-  in.open(body_path.c_str());
-  in.read(buf, BUFFER_SIZE);
-  body_size = in.gcount();
-  if (body_size == 0 || in.eof())
-    response_finished = true;
+  file.read(buf, BUFFER_SIZE);
+  body_size = file.gcount();
+  if (body_size == 0 || file.eof())
+    finished = true;
+  else
+    inprogress = true;
 
   str.replace(str.find("LENGTH"), 6, _itoa(body_size));
   std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
   std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
   HttpBase::size = str.size() + body_size;
-  in.close();
   WebServ::log.debug() << "File requested: " << path << "\n";
 }
 
@@ -127,18 +128,18 @@ void Response::create_directory_listing(void) {
   std::ofstream     out;
   std::string       tmp;
 
-  in.open("./sources/templates/index.html");
+  file.open("./sources/templates/index.html");
   out.open(DFL_TMPFILE, out.out | out.trunc | std::ios::binary);
 
-  in.get(*(out.rdbuf()), '$');
-  in.ignore();
+  file.get(*(out.rdbuf()), '$');
+  file.ignore();
   std::getline(in, tmp);
   tmp.push_back('\n');
   tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
   out << tmp;
 
-  in.get(*(out.rdbuf()), '$');
-  in.ignore();
+  file.get(*(out.rdbuf()), '$');
+  file.ignore();
   std::getline(in, _template);
   _template.push_back('\n');
 
@@ -154,9 +155,9 @@ void Response::create_directory_listing(void) {
     dir = readdir(directory);
   }
 
-  out << in.rdbuf();
+  out << file.rdbuf();
   closedir(directory);
-  in.close();
+  file.close();
   out.close();
   remove_tmp = true;
 }

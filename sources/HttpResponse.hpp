@@ -55,8 +55,9 @@ private:
   static status_map      init_status_map();
   static mimetypes_map   init_mimetypes();
 
-  std::string response_path;
-  int         response_code;
+  std::string   response_path;
+  int           response_code;
+  std::ifstream file;
 
   std::string httpversion;
   std::string statuscode;
@@ -73,7 +74,6 @@ private:
   ServerLocation* location;
 
   bool        folder_request;
-  bool        response_finished;
   bool        valid;
   bool        remove_tmp;
 
@@ -96,6 +96,10 @@ private:
   void create_directory_listing(void);
 
 public:
+  bool        finished;
+  bool        inprogress;
+
+  ~Response(void);
   Response(Request *req, Server *_server);
   Response(void);
   void set_request(Request const* req);
