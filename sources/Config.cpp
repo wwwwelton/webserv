@@ -32,8 +32,6 @@ void Config::parse(char* file) {
   std::string host;
   std::vector<std::string> vhost;
 
-  backlog = DFL_BACKLOG;
-
   ifs.open(file);
   ss << ifs.rdbuf();
 
