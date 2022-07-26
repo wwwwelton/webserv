@@ -55,7 +55,6 @@ private:
   static status_map      init_status_map();
   static mimetypes_map   init_mimetypes();
 
-  std::string   response_path;
   int           response_code;
   std::ifstream file;
 
@@ -85,7 +84,6 @@ private:
   int validate_path(void);
   int validate_folder(void);
   void set_statuscode(int code);
-  void assemble(std::string const& body_path);
   void php_cgi(std::string const& body_path);
   void dispatch(std::string const& body_path);
   int _post(void);
@@ -96,12 +94,14 @@ private:
   void create_directory_listing(void);
 
 public:
-  bool        finished;
-  bool        inprogress;
+  bool          finished;
+  bool          inprogress;
+  std::string   response_path;
 
   ~Response(void);
   Response(Request *req, Server *_server);
   Response(void);
+  void assemble(std::string const& body_path);
   void set_request(Request const* req);
   void process(void);
   void _send(int fd);
