@@ -7,32 +7,23 @@
 
 #include "Config.hpp"
 
-Config::Config(void) {
-  backlog = DFL_BACKLOG;
-}
+Config::Config(void) { backlog = DFL_BACKLOG; }
 
-Config::Config(const Config& src) {
-  *this = src;
-}
+Config::Config(const Config& src) { *this = src; }
 
-Config::~Config(void) {
-  return;
-}
+Config::~Config(void) {}
 
 Config& Config::operator=(const Config& rhs) {
   if (this != &rhs) {
-    this->_servers = rhs._servers;
+    backlog = rhs.backlog;
+    _servers = rhs._servers;
   }
   return (*this);
 }
 
-const Server& Config::operator[](size_t n) {
-  return (_servers[n]);
-}
+const Server& Config::operator[](size_t n) { return (_servers[n]); }
 
-size_t Config::size(void) {
-  return (_servers.size());
-}
+size_t Config::size(void) { return (_servers.size()); }
 
 void Config::parse(char* file) {
   std::ifstream ifs;
