@@ -101,6 +101,7 @@ public:
   ~Response(void);
   Response(Request *req, Server *_server);
   Response(void);
+  void assemble_followup(void);
   void assemble(std::string const& body_path);
   void set_request(Request const* req);
   void process(void);

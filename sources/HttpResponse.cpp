@@ -8,7 +8,13 @@
 #include "HttpResponse.hpp"
 
 void Response::_send(int fd) {
-  send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
+  ssize_t bytes;
+  bytes = send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
+  if (bytes == 0 || bytes == -1) {
+    WebServ::log.error() << "unable to send response: "
+                         << strerror(errno) << "\n";
+    finished = true;
+  }
   WebServ::log.info() << "Response sent to client " << fd << "\n";
 }
 
@@ -96,35 +102,8 @@ std::string Response::_itoa(size_t nbr) {
   return ret;
 }
 
-void Response::assemble(std::string const& body_path) {
-  std::string str = httpversion +
-                    statuscode +
-                    statusmsg +
-                    contenttype +
-                    DFL_CONTENTLEN;
-  std::string       body;
-  size_t            body_size;
-
-  if (!file.is_open())
-    file.open(body_path.c_str());
-  char buf[BUFFER_SIZE];
-  file.read(buf, BUFFER_SIZE);
-  body_size = file.gcount();
-  if (body_size == 0 || file.eof())
-    finished = true;
-  else
-    inprogress = true;
-
-  str.replace(str.find("LENGTH"), 6, _itoa(body_size));
-  std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
-  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
-  HttpBase::size = str.size() + body_size;
-  WebServ::log.debug() << "File requested: " << path << "\n";
-}
-
 void Response::create_directory_listing(void) {
   std::string       _template;
-  std::ifstream     in;
   std::ofstream     out;
   std::string       tmp;
 
@@ -133,14 +112,16 @@ void Response::create_directory_listing(void) {
 
   file.get(*(out.rdbuf()), '$');
   file.ignore();
-  std::getline(in, tmp);
+  std::getline(file, tmp);
   tmp.push_back('\n');
+  std::cout << path << "\n";
+  std::cout << tmp << "\n";
   tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
   out << tmp;
 
   file.get(*(out.rdbuf()), '$');
   file.ignore();
-  std::getline(in, _template);
+  std::getline(file, _template);
   _template.push_back('\n');
 
   struct dirent *dir;
@@ -229,6 +210,37 @@ void Response::set_statuscode(int code) {
       create_redir_page();
   }
 }
+
+void Response::assemble_followup(void) {
+  return;
+}
+
+void Response::assemble(std::string const& body_path) {
+  std::string str = httpversion +
+                    statuscode +
+                    statusmsg +
+                    contenttype +
+                    DFL_CONTENTLEN;
+  std::string       body;
+  size_t            body_size;
+
+  if (!file.is_open())
+    file.open(body_path.c_str());
+  char buf[BUFFER_SIZE];
+  file.read(buf, BUFFER_SIZE);
+  body_size = file.gcount();
+  if (body_size == 0 || file.eof())
+    finished = true;
+  else
+    inprogress = true;
+
+  str.replace(str.find("LENGTH"), 6, _itoa(body_size));
+  std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
+  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
+  HttpBase::size = str.size() + body_size;
+  WebServ::log.debug() << "File requested: " << path << "\n";
+}
+
 
 void Response::process(void) {
   for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)
