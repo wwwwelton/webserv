@@ -58,18 +58,18 @@ void Config::parse(char* file) {
 std::string Config::_sanitize(const std::string& file_content) {
   std::string tmp(file_content);
 
-  _replace_all(&tmp, "\n", " ");
-  _replace_all(&tmp, "\t", " ");
+  String::replace_all(&tmp, "\n", " ");
+  String::replace_all(&tmp, "\t", " ");
 
-  _replace_all(&tmp, "server{", "server {");
+  String::replace_all(&tmp, "server{", "server {");
 
-  _replace_all(&tmp, ";", ";\n");
-  _replace_all(&tmp, "{", "{\n");
-  _replace_all(&tmp, "}", "}\n");
+  String::replace_all(&tmp, ";", ";\n");
+  String::replace_all(&tmp, "{", "{\n");
+  String::replace_all(&tmp, "}", "}\n");
 
-  _replace_unique(&tmp, ' ');
+  String::replace_unique(&tmp, ' ');
 
-  _trim_lines(&tmp, " ");
+  String::trim_lines(&tmp, " ");
 
   return (tmp);
 }
@@ -113,11 +113,11 @@ void Config::_parse_host(const std::string& host) {
   std::vector<std::string> tokens;
 
   while (std::getline(is, line)) {
-    line = _trim(line, "; ");
-    tokens = _split(line, " ");
+    line = String::trim(line, "; ");
+    tokens = String::split(line, " ");
 
     if (tokens[0] == "workers") {
-      backlog = _stoi(tokens[1]);
+      backlog = String::stoi(tokens[1]);
     }
   }
 }
@@ -131,17 +131,17 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
     Server srv;
 
     while (std::getline(is, line)) {
-      line = _trim(line, "; ");
-      tokens = _split(line, " ");
+      line = String::trim(line, "; ");
+      tokens = String::split(line, " ");
 
       if (tokens[0] == "listen") {
         if (tokens[1].find(":") != std::string::npos) {
-          tokens = _split(tokens[1], ":");
+          tokens = String::split(tokens[1], ":");
           srv.ip = inet_addr(tokens[0].c_str());
-          srv.port = htons(_stoi(tokens[1]));
+          srv.port = htons(String::stoi(tokens[1]));
         } else {
           srv.ip = inet_addr(DFL_ADDRESS);
-          srv.port = htons(_stoi(tokens[1]));
+          srv.port = htons(String::stoi(tokens[1]));
         }
       }
 
@@ -156,7 +156,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "root") {
-        srv.root = _trim(std::string(tokens[1]), "/");
+        srv.root = String::trim(std::string(tokens[1]), "/");
       }
 
       if (tokens[0] == "index") {
@@ -170,15 +170,15 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "error_page") {
-        srv.error_page[_stoi(tokens[1])] = _trim(std::string(tokens[2]), "/");
+        srv.error_page[String::stoi(tokens[1])] = String::trim(std::string(tokens[2]), "/");
       }
 
       if (tokens[0] == "timeout") {
-        srv.timeout = _stoi(tokens[1]);
+        srv.timeout = String::stoi(tokens[1]);
       }
 
       if (tokens[0] == "client_max_body_size") {
-        srv.client_max_body_size = _stoi(tokens[1]);
+        srv.client_max_body_size = String::stoi(tokens[1]);
       }
 
       if (tokens[0] == "access_log") {
@@ -198,7 +198,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "return") {
-        srv.redirect.first = _stoi(tokens[1]);
+        srv.redirect.first = String::stoi(tokens[1]);
         srv.redirect.second = tokens[2];
       }
 
@@ -215,11 +215,11 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
         }
 
         while (std::getline(is, line)) {
-          line = _trim(line, "; ");
-          tokens = _split(line, " ");
+          line = String::trim(line, "; ");
+          tokens = String::split(line, " ");
 
           if (tokens[0] == "root") {
-            srv.location[index].root = _trim(std::string(tokens[1]), "/");
+            srv.location[index].root = String::trim(std::string(tokens[1]), "/");
           }
 
           if (tokens[0] == "index") {
@@ -242,7 +242,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           }
 
           if (tokens[0] == "client_max_body_size") {
-            srv.location[index].client_max_body_size = _stoi(tokens[1]);
+            srv.location[index].client_max_body_size = String::stoi(tokens[1]);
           }
 
           if (tokens[0] == "autoindex") {
@@ -256,7 +256,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           if (tokens[0] == "return") {
             if (srv.location[index].redirect.first == 0 &&
                 srv.location[index].redirect.second.empty()) {
-              srv.location[index].redirect.first = _stoi(tokens[1]);
+              srv.location[index].redirect.first = String::stoi(tokens[1]);
               srv.location[index].redirect.second = tokens[2];
             }
           }
@@ -272,70 +272,4 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
 
     _servers.push_back(srv);
   }
-}
-
-void Config::_replace_all(std::string* str,
-                          const std::string& old_word,
-                          const std::string& new_word) {
-  size_t pos;
-
-  pos = str->find(old_word);
-  while (pos != std::string::npos) {
-    str->replace(pos, old_word.length(), new_word);
-    pos = str->find(old_word, pos + new_word.length());
-  }
-}
-
-void Config::_replace_unique(std::string* str, char pattern) {
-  std::string tmp("");
-
-  for (std::string::size_type i = 0; i < str->size() - 1; i++) {
-    if (str->at(i) == pattern && str->at(i + 1) == pattern) {
-      continue;
-    }
-    tmp += str->at(i);
-  }
-  *str = tmp;
-}
-
-std::string Config::_trim(const std::string& str, const std::string& set) {
-  std::string tmp(str);
-
-  tmp.erase(tmp.find_last_not_of(set) + 1);
-  tmp.erase(0, tmp.find_first_not_of(set));
-
-  return (tmp);
-}
-
-void Config::_trim_lines(std::string* str, const std::string& set) {
-  std::istringstream is(*str);
-  std::string line;
-
-  str->erase();
-  while (std::getline(is, line)) {
-    str->append(_trim(line, set));
-    str->append("\n");
-  }
-}
-
-std::vector<std::string> Config::_split(const std::string& str,
-                                        const std::string& del) {
-  std::vector<std::string> list;
-  std::string s(str);
-  size_t pos = 0;
-
-  std::string token;
-  while ((pos = s.find(del)) != std::string::npos) {
-    token = s.substr(0, pos);
-    list.push_back(token);
-    s.erase(0, pos + del.length());
-  }
-  list.push_back(s);
-  return (list);
-}
-
-size_t Config::_stoi(const std::string& str) {
-  size_t n;
-  std::istringstream(str) >> n;
-  return (n);
 }

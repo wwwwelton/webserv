@@ -38,6 +38,7 @@
 #include "RequestParser.hpp"
 #include "Server.hpp"
 #include "ServerLocation.hpp"
+#include "String.hpp"
 #include "defines.hpp"
 #include "signal.hpp"
 #include "validate_input.hpp"

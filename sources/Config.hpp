@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "Server.hpp"
+#include "String.hpp"
 
 class Server;
 
@@ -42,20 +43,6 @@ class Config {
 
   void _parse_host(const std::string& host);
   void _parse_vhost(const std::vector<std::string>& vhost);
-
-  void _replace_all(std::string* str,
-                    const std::string& old_word,
-                    const std::string& new_word);
-
-  void _replace_unique(std::string* str, char pattern);
-
-  std::string _trim(const std::string& str, const std::string& set);
-  void _trim_lines(std::string* str, const std::string& set);
-
-  std::vector<std::string> _split(const std::string& str,
-                                  const std::string& del);
-
-  size_t _stoi(const std::string& str);
 
  public:
   int backlog;
