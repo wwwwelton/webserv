@@ -35,8 +35,6 @@ class Config {
 
   void parse(char* file);
 
-  const std::string& get_error(void);
-
  private:
   std::string _sanitize(const std::string& file_content);
   std::string _sub_host(const std::string& file_content);
@@ -63,8 +61,6 @@ class Config {
 
  private:
   std::vector<Server> _servers;
-  int _error;
-  std::string _str_error;
 };
 
 #endif  // CONFIG_HPP_

@@ -9,9 +9,6 @@
 
 Config::Config(void) {
   backlog = DFL_BACKLOG;
-
-  _error = 0;
-  _str_error = "";
 }
 
 Config::Config(const Config& src) {
@@ -46,9 +43,6 @@ void Config::parse(char* file) {
 
   backlog = DFL_BACKLOG;
 
-  _error = 0;
-  _str_error = "";
-
   ifs.open(file);
   ss << ifs.rdbuf();
 
@@ -59,10 +53,6 @@ void Config::parse(char* file) {
 
   _parse_host(host);
   _parse_vhost(vhost);
-}
-
-const std::string& Config::get_error(void) {
-  return (_str_error);
 }
 
 std::string Config::_sanitize(const std::string& file_content) {
