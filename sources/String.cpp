@@ -78,7 +78,7 @@ std::vector<std::string> String::split(const std::string& str,
   return (list);
 }
 
-size_t String::stoi(const std::string& str) {
+int String::to_int(const std::string& str) {
   size_t n;
   std::istringstream(str) >> n;
   return (n);

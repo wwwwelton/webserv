@@ -117,7 +117,7 @@ void Config::_parse_host(const std::string& host) {
     tokens = String::split(line, " ");
 
     if (tokens[0] == "workers") {
-      backlog = String::stoi(tokens[1]);
+      backlog = String::to_int(tokens[1]);
     }
   }
 }
@@ -138,10 +138,10 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
         if (tokens[1].find(":") != std::string::npos) {
           tokens = String::split(tokens[1], ":");
           srv.ip = inet_addr(tokens[0].c_str());
-          srv.port = htons(String::stoi(tokens[1]));
+          srv.port = htons(String::to_int(tokens[1]));
         } else {
           srv.ip = inet_addr(DFL_ADDRESS);
-          srv.port = htons(String::stoi(tokens[1]));
+          srv.port = htons(String::to_int(tokens[1]));
         }
       }
 
@@ -170,15 +170,15 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "error_page") {
-        srv.error_page[String::stoi(tokens[1])] = String::trim(std::string(tokens[2]), "/");
+        srv.error_page[String::to_int(tokens[1])] = String::trim(std::string(tokens[2]), "/");
       }
 
       if (tokens[0] == "timeout") {
-        srv.timeout = String::stoi(tokens[1]);
+        srv.timeout = String::to_int(tokens[1]);
       }
 
       if (tokens[0] == "client_max_body_size") {
-        srv.client_max_body_size = String::stoi(tokens[1]);
+        srv.client_max_body_size = String::to_int(tokens[1]);
       }
 
       if (tokens[0] == "access_log") {
@@ -198,7 +198,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
       }
 
       if (tokens[0] == "return") {
-        srv.redirect.first = String::stoi(tokens[1]);
+        srv.redirect.first = String::to_int(tokens[1]);
         srv.redirect.second = tokens[2];
       }
 
@@ -242,7 +242,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           }
 
           if (tokens[0] == "client_max_body_size") {
-            srv.location[index].client_max_body_size = String::stoi(tokens[1]);
+            srv.location[index].client_max_body_size = String::to_int(tokens[1]);
           }
 
           if (tokens[0] == "autoindex") {
@@ -256,7 +256,7 @@ void Config::_parse_vhost(const std::vector<std::string>& vhost) {
           if (tokens[0] == "return") {
             if (srv.location[index].redirect.first == 0 &&
                 srv.location[index].redirect.second.empty()) {
-              srv.location[index].redirect.first = String::stoi(tokens[1]);
+              srv.location[index].redirect.first = String::to_int(tokens[1]);
               srv.location[index].redirect.second = tokens[2];
             }
           }

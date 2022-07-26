@@ -33,7 +33,7 @@ class String {
   static std::vector<std::string> split(const std::string& str,
                                         const std::string& del);
 
-  static size_t stoi(const std::string& str);
+  static int to_int(const std::string& str);
 };
 
 #endif  // STRING_HPP_
