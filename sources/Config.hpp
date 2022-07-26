@@ -39,6 +39,7 @@ class Config {
   std::string _sanitize(const std::string& file_content);
   std::string _sub_host(const std::string& file_content);
   std::vector<std::string> _sub_vhost(const std::string& file_content);
+
   void _parse_host(const std::string& host);
   void _parse_vhost(const std::vector<std::string>& vhost);
 
@@ -49,7 +50,7 @@ class Config {
   void _replace_unique(std::string* str, char pattern);
 
   std::string _trim(const std::string& str, const std::string& set);
-  void _trim_line(std::string* str, const std::string& set);
+  void _trim_lines(std::string* str, const std::string& set);
 
   std::vector<std::string> _split(const std::string& str,
                                   const std::string& del);

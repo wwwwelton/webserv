@@ -69,7 +69,7 @@ std::string Config::_sanitize(const std::string& file_content) {
 
   _replace_unique(&tmp, ' ');
 
-  _trim_line(&tmp, " ");
+  _trim_lines(&tmp, " ");
 
   return (tmp);
 }
@@ -307,7 +307,7 @@ std::string Config::_trim(const std::string& str, const std::string& set) {
   return (tmp);
 }
 
-void Config::_trim_line(std::string* str, const std::string& set) {
+void Config::_trim_lines(std::string* str, const std::string& set) {
   std::istringstream is(*str);
   std::string line;
 
