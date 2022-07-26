@@ -25,7 +25,7 @@ const Server& Config::operator[](size_t n) { return (_servers[n]); }
 
 size_t Config::size(void) { return (_servers.size()); }
 
-void Config::parse(char* file) {
+void Config::read(char* file) {
   std::ifstream ifs;
   std::stringstream ss;
   std::string str;

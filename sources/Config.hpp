@@ -34,7 +34,7 @@ class Config {
 
   size_t size(void);
 
-  void parse(char* file);
+  void read(char* file);
 
  private:
   std::string _sanitize(const std::string& file_content);
