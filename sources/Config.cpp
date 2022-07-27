@@ -180,16 +180,17 @@ Server Config::_parse_server(std::istringstream* is) {
 
 void Config::_parse(const std::string& file_content) {
   std::istringstream is(file_content);
-  std::string line;
+  std::string line, directive;
   std::vector<std::string> tokens;
 
   while (std::getline(is, line)) {
     line = String::trim(line, "; ");
     tokens = String::split(line, " ");
+    directive = tokens[0];
 
-    if (tokens[0] == "workers")
+    if (directive == "workers")
       backlog = ConfigHelper::get_backlog(tokens);
-    else if (tokens[0] == "server")
+    else if (directive == "server")
       _servers.push_back(_parse_server(&is));
     else
       throw ConfigHelper::DirectiveUnknown(tokens[0]);
