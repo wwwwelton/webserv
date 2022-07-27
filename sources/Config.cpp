@@ -26,22 +26,26 @@ const Server& Config::operator[](size_t n) { return (_servers[n]); }
 size_t Config::size(void) { return (_servers.size()); }
 
 void Config::load(char* file) {
-  std::ifstream ifs;
-  std::stringstream ss;
   std::string str;
   std::string host;
   std::vector<std::string> vhost;
 
-  ifs.open(file);
-  ss << ifs.rdbuf();
-
-  str = _sanitize(ss.str());
+  str = _sanitize(_open(file));
 
   host = _sub_host(str);
   vhost = _sub_vhost(str);
 
   _parse_host(host);
   _parse_vhost(vhost);
+}
+
+std::string Config::_open(char* file) {
+  std::ifstream ifs;
+  std::stringstream ss;
+
+  ifs.open(file);
+  ss << ifs.rdbuf();
+  return (ss.str());
 }
 
 std::string Config::_sanitize(const std::string& file_content) {

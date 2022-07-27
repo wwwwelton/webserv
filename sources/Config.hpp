@@ -37,6 +37,8 @@ class Config {
   void load(char* file);
 
  private:
+  std::string _open(char* file);
+
   std::string _sanitize(const std::string& file_content);
   std::string _sub_host(const std::string& file_content);
   std::vector<std::string> _sub_vhost(const std::string& file_content);
