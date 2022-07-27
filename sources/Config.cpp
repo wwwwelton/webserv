@@ -110,7 +110,7 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
 }
 
 Server Config::_parse_server(std::istringstream* is) {
-  std::string line;
+  std::string line, directive;
   std::vector<std::string> tokens;
 
   Server srv;
@@ -118,16 +118,11 @@ Server Config::_parse_server(std::istringstream* is) {
   while (std::getline(*is, line)) {
     line = String::trim(line, "; ");
     tokens = String::split(line, " ");
+    directive = tokens[0];
 
-    if (tokens[0] == "listen") {
-      if (tokens[1].find(":") != std::string::npos) {
-        tokens = String::split(tokens[1], ":");
-        srv.ip = inet_addr(tokens[0].c_str());
-        srv.port = htons(String::to_int(tokens[1]));
-      } else {
-        srv.ip = inet_addr(DFL_ADDRESS);
-        srv.port = htons(String::to_int(tokens[1]));
-      }
+    if (directive == "listen") {
+      srv.ip = ConfigHelper::get_ip(tokens);
+      srv.port = ConfigHelper::get_port(tokens);
     } else if (tokens[0] == "server_name") {
       if (srv.server_name[0] == DFL_SERVER_NAME1 &&
           srv.server_name[1] == DFL_SERVER_NAME2) {
