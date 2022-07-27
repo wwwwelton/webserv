@@ -30,6 +30,12 @@ class ConfigHelper {
     const char* what(void) const throw();
   };
 
+  class DirectiveInvValue : public LoadException {
+   public:
+    explicit DirectiveInvValue(const std::string& str);
+    const char* what(void) const throw();
+  };
+
   static int get_backlog(const std::vector<std::string>& tokens);
 };
 
