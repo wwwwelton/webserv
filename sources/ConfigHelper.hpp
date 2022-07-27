@@ -37,6 +37,12 @@ class ConfigHelper {
     explicit DirectiveInvValue(const std::string& str);
     const char* what(void) const throw();
   };
+
+  class DirectiveUnknown : public LoadException {
+   public:
+    explicit DirectiveUnknown(const std::string& str);
+    const char* what(void) const throw();
+  };
 };
 
 #endif  // CONFIG_HELPER_HPP_

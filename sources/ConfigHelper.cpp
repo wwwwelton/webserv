@@ -47,3 +47,12 @@ ConfigHelper::DirectiveInvValue ::DirectiveInvValue(const std::string& str)
 const char* ConfigHelper::DirectiveInvValue::what(void) const throw() {
   return (_m.c_str());
 }
+
+ConfigHelper::DirectiveUnknown ::DirectiveUnknown(const std::string& str)
+    : LoadException(str) {
+  _m = PARSE_ERROR "unknown directive \"" + str + "\"";
+}
+
+const char* ConfigHelper::DirectiveUnknown::what(void) const throw() {
+  return (_m.c_str());
+}

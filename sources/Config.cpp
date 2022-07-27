@@ -102,7 +102,7 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
     } else if (tokens[0] == "}") {
       break;
     } else {
-      throw LoadException("Parse: invalid keyword " + tokens[0]);
+      throw ConfigHelper::DirectiveUnknown(tokens[0]);
     }
   }
 
@@ -171,7 +171,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (tokens[0] == "}") {
       break;
     } else {
-      throw LoadException("Parse: invalid keyword " + tokens[0]);
+      throw ConfigHelper::DirectiveUnknown(tokens[0]);
     }
   }
 
@@ -192,6 +192,6 @@ void Config::_parse(const std::string& file_content) {
     else if (tokens[0] == "server")
       _servers.push_back(_parse_server(&is));
     else
-      throw LoadException("Parse: invalid keyword " + tokens[0]);
+      throw ConfigHelper::DirectiveUnknown(tokens[0]);
   }
 }
