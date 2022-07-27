@@ -18,6 +18,8 @@
 
 class ConfigHelper {
  public:
+  static int get_backlog(const std::vector<std::string>& tokens);
+
   class InvalidNumberArgs : public LoadException {
    public:
     explicit InvalidNumberArgs(const std::string& str);
@@ -35,8 +37,6 @@ class ConfigHelper {
     explicit DirectiveInvValue(const std::string& str);
     const char* what(void) const throw();
   };
-
-  static int get_backlog(const std::vector<std::string>& tokens);
 };
 
 #endif  // CONFIG_HELPER_HPP_
