@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "LoadException.hpp"
 #include "Server.hpp"
 #include "String.hpp"
 
@@ -33,18 +34,14 @@ class Config {
   const Server& operator[](size_t n);
 
   size_t size(void);
-
   void load(char* file);
 
  private:
   std::string _open(char* file);
-
   std::string _sanitize(const std::string& file_content);
-  std::string _sub_host(const std::string& file_content);
-  std::vector<std::string> _sub_vhost(const std::string& file_content);
-
-  void _parse_host(const std::string& host);
-  void _parse_vhost(const std::vector<std::string>& vhost);
+  void _parse(const std::string& file_content);
+  Server _parse_server(std::istringstream* is);
+  ServerLocation _parse_location(std::istringstream* is);
 
  public:
   int backlog;
