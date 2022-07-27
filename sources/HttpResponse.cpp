@@ -74,11 +74,12 @@ void Response::php_cgi(std::string const& body_path) {
 
 void Response::dispatch(std::string const& body_path) {
   std::string extension;
+  std::string tmp(body_path.substr(1));
 
-  if (body_path.find_last_of('.') == std::string::npos)
+  if (tmp.find_last_of('.') == std::string::npos)
     extension = "text";
   else
-    extension = body_path.substr(body_path.find_last_of('.'));
+    extension = tmp.substr(tmp.find_last_of('.'));
 
   // TODO(VLN37) change to dynamic extension
   if (location->cgi.count(extension)) {
@@ -211,31 +212,20 @@ void Response::set_statuscode(int code) {
 
 void Response::assemble_followup(void) {
   char buf[BUFFER_SIZE];
-  size_t prev_range;
-  size_t curr_range;
   size_t body_size;
   std::string str;
 
-  prev_range = file.tellg();
   file.read(buf, BUFFER_SIZE);
   body_size = file.gcount();
-  if (file.eof())
-    curr_range = body_max_size;
-  else
-    curr_range = file.tellg();
   if (body_size < BUFFER_SIZE || file.eof())
     finished = true;
-  str = DFL_SEPARATOR + filetype +
-        "Content-Range: bytes " + _itoa(prev_range) +
-        "-" + _itoa(curr_range - 1) + "/" + _itoa(body_max_size) + "\n\n";
 
-  std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
   std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
-  HttpBase::size = str.size() + body_size;
+  HttpBase::size = body_size;
   HttpBase::buffer_resp[HttpBase::size] = '\0';
-  WebServ::log.warning() << "Multipart response only partially implemented\n"
-                         << "message: \n"
-                         << HttpBase::buffer_resp << "\n";
+  // WebServ::log.warning() << "Multipart response only partially implemented\n"
+  //                        << "message: \n"
+  //                        << HttpBase::buffer_resp << "\n";
 }
 
 void Response::assemble(std::string const& body_path) {
@@ -245,17 +235,17 @@ void Response::assemble(std::string const& body_path) {
   WebServ::log.debug() << "File requested: " << path << "\n";
   file.open(body_path.c_str(), file.ate);
   body_max_size = file.tellg();
+  if (file.bad() || file.fail())
+    WebServ::log.error() << "file opening in Response::assemble\n";
   file.seekg(std::ios::beg);
   char buf[BUFFER_SIZE];
+  file.read(buf, BUFFER_SIZE);
+  body_size = file.gcount();
   if (body_max_size < BUFFER_SIZE) {
-    file.read(buf, BUFFER_SIZE);
-    body_size = file.gcount();
     finished = true;
   }
   else {
-    statuscode = "206 ";
-    filetype = contenttype;
-    contenttype = MULTIPART;
+    // contenttype = "Content-Type: application/octet-stream\n";
     inprogress = true;
   }
   std::string str = httpversion +
@@ -267,9 +257,8 @@ void Response::assemble(std::string const& body_path) {
   std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
   std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
   HttpBase::size = str.size() + body_size;
-  HttpBase::size = str.size() + body_size;
   HttpBase::buffer_resp[HttpBase::size] = '\0';
-  WebServ::log.debug() << HttpBase::buffer_resp;
+  // WebServ::log.debug() << HttpBase::buffer_resp;
 }
 
 
