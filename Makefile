@@ -20,6 +20,7 @@ SRC     = main.cpp \
           validate_input.cpp \
           signal.cpp \
           String.cpp \
+          ConfigHelper.cpp \
 
 
 INC     = defines.hpp \
@@ -37,6 +38,7 @@ INC     = defines.hpp \
           validate_input.hpp \
           signal.hpp \
           String.hpp \
+          ConfigHelper.hpp \
 
 OBJDIR  = objects
 SRC_DIR =	sources

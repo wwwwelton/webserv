@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "ConfigHelper.hpp"
 #include "LoadException.hpp"
 #include "Server.hpp"
 #include "String.hpp"

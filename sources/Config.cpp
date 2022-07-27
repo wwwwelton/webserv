@@ -192,7 +192,7 @@ void Config::_parse(const std::string& file_content) {
     tokens = String::split(line, " ");
 
     if (tokens[0] == "workers")
-      backlog = String::to_int(tokens[1]);
+      backlog = ConfigHelper::get_backlog(tokens);
     else if (tokens[0] == "server")
       _servers.push_back(_parse_server(&is));
     else
