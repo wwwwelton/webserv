@@ -24,6 +24,12 @@ class ConfigHelper {
     const char* what(void) const throw();
   };
 
+  class DuplicatedValue : public LoadException {
+   public:
+    explicit DuplicatedValue(const std::string& str);
+    const char* what(void) const throw();
+  };
+
   static int get_backlog(const std::vector<std::string>& tokens);
 };
 
