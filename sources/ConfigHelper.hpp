@@ -24,9 +24,9 @@ class ConfigHelper {
     const char* what(void) const throw();
   };
 
-  class DuplicateDirective : public LoadException {
+  class DirectiveDuplicate : public LoadException {
    public:
-    explicit DuplicateDirective(const std::string& str);
+    explicit DirectiveDuplicate(const std::string& str);
     const char* what(void) const throw();
   };
 
