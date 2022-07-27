@@ -114,8 +114,6 @@ void Response::create_directory_listing(void) {
   file.ignore();
   std::getline(file, tmp);
   tmp.push_back('\n');
-  std::cout << path << "\n";
-  std::cout << tmp << "\n";
   tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
   out << tmp;
 
@@ -212,33 +210,66 @@ void Response::set_statuscode(int code) {
 }
 
 void Response::assemble_followup(void) {
-  return;
+  char buf[BUFFER_SIZE];
+  size_t prev_range;
+  size_t curr_range;
+  size_t body_size;
+  std::string str;
+
+  prev_range = file.tellg();
+  file.read(buf, BUFFER_SIZE);
+  body_size = file.gcount();
+  if (file.eof())
+    curr_range = body_max_size;
+  else
+    curr_range = file.tellg();
+  if (body_size < BUFFER_SIZE || file.eof())
+    finished = true;
+  str = DFL_SEPARATOR + filetype +
+        "Content-Range: bytes " + _itoa(prev_range) +
+        "-" + _itoa(curr_range - 1) + "/" + _itoa(body_max_size) + "\n\n";
+
+  std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
+  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
+  HttpBase::size = str.size() + body_size;
+  HttpBase::buffer_resp[HttpBase::size] = '\0';
+  WebServ::log.warning() << "Multipart response only partially implemented\n"
+                         << "message: \n"
+                         << HttpBase::buffer_resp << "\n";
 }
 
 void Response::assemble(std::string const& body_path) {
+  std::string       body;
+  size_t            body_size = 0;
+
+  WebServ::log.debug() << "File requested: " << path << "\n";
+  file.open(body_path.c_str(), file.ate);
+  body_max_size = file.tellg();
+  file.seekg(std::ios::beg);
+  char buf[BUFFER_SIZE];
+  if (body_max_size < BUFFER_SIZE) {
+    file.read(buf, BUFFER_SIZE);
+    body_size = file.gcount();
+    finished = true;
+  }
+  else {
+    statuscode = "206 ";
+    filetype = contenttype;
+    contenttype = MULTIPART;
+    inprogress = true;
+  }
   std::string str = httpversion +
                     statuscode +
                     statusmsg +
                     contenttype +
                     DFL_CONTENTLEN;
-  std::string       body;
-  size_t            body_size;
-
-  if (!file.is_open())
-    file.open(body_path.c_str());
-  char buf[BUFFER_SIZE];
-  file.read(buf, BUFFER_SIZE);
-  body_size = file.gcount();
-  if (body_size == 0 || file.eof())
-    finished = true;
-  else
-    inprogress = true;
-
-  str.replace(str.find("LENGTH"), 6, _itoa(body_size));
+  str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
   std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
   std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
   HttpBase::size = str.size() + body_size;
-  WebServ::log.debug() << "File requested: " << path << "\n";
+  HttpBase::size = str.size() + body_size;
+  HttpBase::buffer_resp[HttpBase::size] = '\0';
+  WebServ::log.debug() << HttpBase::buffer_resp;
 }
 
 

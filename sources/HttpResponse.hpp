@@ -62,7 +62,9 @@ private:
   std::string statuscode;
   std::string statusmsg;
   std::string contenttype;
+  std::string filetype;
   std::string method;
+  size_t      body_max_size;
 
   Request const* req;
   std::string req_body;
