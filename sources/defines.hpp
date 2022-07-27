@@ -67,6 +67,6 @@
 
 #define DFL_CONTENTTYPE "Content-Type: text/html; charset=utf-8\n"
 #define DFL_CONTENTLEN "Content-Length: LENGTH\n\n"
-#define DFL_SEPARATOR "--42__SEPARATOR__42\n"
-#define MULTIPART "Content-Type: multipart/bytesrange; boundary=" DFL_SEPARATOR
+#define DFL_SEPARATOR "42__SEPARATOR__42\n"
+#define MULTIPART "Content-Type: multipart/byteranges; boundary=" DFL_SEPARATOR
 #endif  // DEFINES_H
