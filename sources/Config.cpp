@@ -28,10 +28,6 @@ size_t Config::size(void) { return (_servers.size()); }
 void Config::load(char* file) {
   std::string str = _sanitize(_open(file));
   _parse(str);
-
-  for (size_t i = 0; i < _servers.size(); i++) {
-    _servers[i].print();
-  }
 }
 
 std::string Config::_open(char* file) {

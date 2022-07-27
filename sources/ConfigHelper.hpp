@@ -8,6 +8,8 @@
 #ifndef CONFIG_HELPER_HPP_
 #define CONFIG_HELPER_HPP_
 
+#define PARSE_ERROR "WebServ Failed to parse config: "
+
 #include <string>
 #include <vector>
 
@@ -16,6 +18,12 @@
 
 class ConfigHelper {
  public:
+  class InvalidNumberArgs : public LoadException {
+   public:
+    explicit InvalidNumberArgs(const std::string& str);
+    const char* what(void) const throw();
+  };
+
   static int get_backlog(const std::vector<std::string>& tokens);
 };
 

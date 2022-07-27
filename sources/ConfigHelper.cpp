@@ -7,16 +7,25 @@
 
 #include "ConfigHelper.hpp"
 
+ConfigHelper::InvalidNumberArgs::InvalidNumberArgs(const std::string& str)
+    : LoadException(str) {
+  _m = PARSE_ERROR "invalid number of arguments in \"" + str + "\"";
+}
+
+const char* ConfigHelper::InvalidNumberArgs::what(void) const throw() {
+  return (_m.c_str());
+}
+
 int ConfigHelper::get_backlog(const std::vector<std::string>& tokens) {
-  static int setted = 0;
+  static bool exists = false;
 
-  if (setted)
-    throw LoadException("Parse: workers already setted");
+  if (exists)
+    throw InvalidNumberArgs("workers already exists");
   if (tokens.size() != 2)
-    throw LoadException("Parse: workers invalid");
+    throw InvalidNumberArgs("workers");
   if (String::to_int(tokens[1]) <= 0 || String::to_int(tokens[1]) > 4096)
-    throw LoadException("Parse: workers invalid");
+    throw InvalidNumberArgs("workers");
 
-  setted++;
+  exists = true;
   return (String::to_int(tokens[1]));
 }
