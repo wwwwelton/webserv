@@ -21,64 +21,60 @@ int ConfigHelper::get_backlog(const std::vector<std::string>& tokens) {
   return (String::to_int(tokens[1]));
 }
 
-in_addr_t ConfigHelper::get_ip(const std::vector<std::string>& tokens) {
+std::pair<in_addr_t, int>
+ConfigHelper::get_listen(const std::vector<std::string>& tokens) {
   in_addr_t ip;
-
-  if (String::split(tokens[1], " ").size() != 1) {
-    throw InvalidNumberArgs(tokens[0]);
-  }
-
-  if (tokens[1].find(":") != std::string::npos) {
-    if (*tokens[1].begin() == ':')
-      throw InvFieldValue("host", tokens[1]);
-  }
-
-  if (tokens[1].find(":") != std::string::npos) {
-    std::vector<std::string> tmp = String::split(tokens[1], ":");
-    if (tmp[0].find_first_not_of("0123456789.") != std::string::npos)
-      throw InvFieldValue("host", tokens[1]);
-    if (tmp[0].find(".") == std::string::npos)
-      throw InvFieldValue("host", tokens[1]);
-    ip = inet_addr(tmp[0].c_str());
-  } else if (tokens[1].find(".") != std::string::npos) {
-    if (tokens[1].find_first_not_of("0123456789.") != std::string::npos)
-      throw InvFieldValue("host", tokens[1]);
-    ip = inet_addr(tokens[1].c_str());
-  } else {
-    ip = inet_addr(DFL_ADDRESS);
-  }
-  if (ip == 0)
-    throw InvFieldValue("host", tokens[1]);
-  return (ip);
-}
-
-int ConfigHelper::get_port(const std::vector<std::string>& tokens) {
   int port;
 
   if (String::split(tokens[1], " ").size() != 1) {
     throw InvalidNumberArgs(tokens[0]);
   }
-
-  if (tokens[1].find(":") != std::string::npos) {
-    if (*tokens[1].rbegin() == ':')
-      throw InvFieldValue("port", tokens[1]);
-  }
-
   if (tokens[1].find(":") != std::string::npos) {
     std::vector<std::string> tmp = String::split(tokens[1], ":");
-    if (tmp[1].find_first_not_of("0123456789") != std::string::npos)
+    if (tmp.size() != 2)
+      throw InvFieldValue("host/port", tokens[1]);
+    if (_valid_ip(tmp[0]) && _valid_port(tmp[1])) {
+      ip = inet_addr(tmp[0].c_str());
+      port = htons(String::to_int(tmp[1]));
+    } else if (!_valid_ip(tmp[0])) {
+      throw InvFieldValue("host", tokens[1]);
+    } else {
       throw InvFieldValue("port", tokens[1]);
-    port = htons(String::to_int(tmp[1]));
-  } else if (tokens[1].find(".") == std::string::npos) {
-    if (tokens[1].find_first_not_of("0123456789") != std::string::npos)
-      throw InvFieldValue("port", tokens[1]);
+    }
+    return (std::make_pair(ip, port));
+  }
+  if (_valid_ip(tokens[1]) && !_valid_port(tokens[1])) {
+    ip = inet_addr(tokens[1].c_str());
+    port = htons(DFL_PORT);
+  } else if (!_valid_ip(tokens[1]) && _valid_port(tokens[1])) {
+    ip = inet_addr(DFL_ADDRESS);
     port = htons(String::to_int(tokens[1]));
   } else {
-    port = htons(DFL_PORT);
+    throw InvFieldValue("host/port", tokens[1]);
   }
-  if (port == 0)
-    throw InvFieldValue("port", tokens[1]);
-  return (port);
+  return (std::make_pair(ip, port));
+}
+
+bool ConfigHelper::_valid_ip(const std::string& ip) {
+  std::vector<std::string> list = String::split(ip, ".");
+
+  if (list.size() != 4)
+    return (false);
+  for (size_t i = 0; i < list.size(); i++) {
+    if (list[i].find_first_not_of("0123456789") != std::string::npos ||
+        String::to_int(list[i]) > 255 || String::to_int(list[i]) < 0) {
+      return (false);
+    }
+  }
+  return (true);
+}
+
+bool ConfigHelper::_valid_port(const std::string& port) {
+  if (port.find_first_not_of("0123456789") != std::string::npos ||
+      String::to_int(port) > 65000 || String::to_int(port) < 80) {
+    return (false);
+  }
+  return (true);
 }
 
 ConfigHelper::InvalidNumberArgs::InvalidNumberArgs(const std::string& str)

@@ -121,8 +121,8 @@ Server Config::_parse_server(std::istringstream* is) {
     directive = tokens[0];
 
     if (directive == "listen") {
-      srv.ip = ConfigHelper::get_ip(tokens);
-      srv.port = ConfigHelper::get_port(tokens);
+      srv.ip = ConfigHelper::get_listen(tokens).first;
+      srv.port = ConfigHelper::get_listen(tokens).second;
     } else if (tokens[0] == "server_name") {
       if (srv.server_name[0] == DFL_SERVER_NAME1 &&
           srv.server_name[1] == DFL_SERVER_NAME2) {

@@ -24,9 +24,14 @@
 class ConfigHelper {
  public:
   static int get_backlog(const std::vector<std::string>& tokens);
-  static in_addr_t get_ip(const std::vector<std::string>& tokens);
-  static int get_port(const std::vector<std::string>& tokens);
+  static std::pair<in_addr_t, int> get_listen(const std::vector<std::string>&
+                                                  tokens);
 
+ private:
+  static bool _valid_ip(const std::string& ip);
+  static bool _valid_port(const std::string& port);
+
+ public:
   class InvalidNumberArgs : public LoadException {
    public:
     explicit InvalidNumberArgs(const std::string& str);
