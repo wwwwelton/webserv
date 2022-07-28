@@ -8,16 +8,10 @@
 #include "ConfigHelper.hpp"
 
 int ConfigHelper::get_backlog(const std::vector<std::string>& tokens) {
-  static bool exists = false;
-
-  if (exists)
-    throw DirectiveDuplicate(tokens[0]);
   if (tokens.size() != 2)
     throw InvalidNumberArgs(tokens[0]);
   if (String::to_int(tokens[1]) <= 0 || String::to_int(tokens[1]) > 4096)
     throw DirectiveInvValue(tokens[0]);
-
-  exists = true;
   return (String::to_int(tokens[1]));
 }
 
@@ -60,6 +54,12 @@ ConfigHelper::get_server_name(const std::vector<std::string>& tokens) {
   if (tokens.size() == 1)
     throw InvalidNumberArgs(tokens[0]);
   return (String::split(tokens[1], " "));
+}
+
+std::string ConfigHelper::get_root(const std::vector<std::string>& tokens) {
+  if (tokens.size() == 1)
+    throw InvalidNumberArgs(tokens[0]);
+  return (String::trim(std::string(tokens[1]), "/"));
 }
 
 bool ConfigHelper::_valid_ip(const std::string& ip) {

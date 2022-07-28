@@ -126,7 +126,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (directive == "server_name") {
       srv.server_name = ConfigHelper::get_server_name(tokens);
     } else if (tokens[0] == "root") {
-      srv.root = String::trim(std::string(tokens[1]), "/");
+      srv.root = ConfigHelper::get_root(tokens);
     } else if (tokens[0] == "index") {
       if (srv.index[0] == DFL_SERVER_INDEX_PAGE1 &&
           srv.index[1] == DFL_SERVER_INDEX_PAGE2) {
