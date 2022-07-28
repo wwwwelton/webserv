@@ -45,6 +45,9 @@ class ConfigHelper {
   static bool get_autoindex(const std::vector<std::string>& tokens);
   static std::string get_cgi(const std::vector<std::string>& tokens);
 
+  static std::pair<int, std::string>
+  get_redirect(const std::vector<std::string>& tokens);
+
  private:
   static bool _valid_ip(const std::string& ip);
   static bool _valid_port(const std::string& port);

@@ -145,8 +145,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (directive == "cgi") {
       srv.cgi["." + tokens[1]] = ConfigHelper::get_cgi(tokens);
     } else if (tokens[0] == "return") {
-      srv.redirect.first = String::to_int(tokens[1]);
-      srv.redirect.second = tokens[2];
+      srv.redirect = ConfigHelper::get_redirect(tokens);
     } else if (tokens[0] == "location") {
       srv.location[tokens[1]] = _parse_location(is);
     } else if (tokens[0][0] == '#') {
