@@ -129,7 +129,10 @@ void Response::create_directory_listing(void) {
   dir = readdir(directory);
   while (dir != NULL) {
     tmp = _template;
-    tmp.replace(tmp.find("PATH"), 4, req->path + "/" + dir->d_name);
+    if (req->path[req->path.size() - 1] == '/')
+      tmp.replace(tmp.find("PATH"), 4, req->path + dir->d_name);
+    else
+      tmp.replace(tmp.find("PATH"), 4, req->path + "/" + dir->d_name);
     tmp.replace(tmp.find("LINK"), 4, dir->d_name);
     out << tmp;
     dir = readdir(directory);
