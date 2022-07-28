@@ -33,6 +33,9 @@ class ConfigHelper {
 
   static std::string get_root(const std::vector<std::string>& tokens);
 
+  static std::vector<std::string>
+  get_index(const std::vector<std::string>& tokens);
+
  private:
   static bool _valid_ip(const std::string& ip);
   static bool _valid_port(const std::string& port);

@@ -128,13 +128,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (tokens[0] == "root") {
       srv.root = ConfigHelper::get_root(tokens);
     } else if (tokens[0] == "index") {
-      if (srv.index[0] == DFL_SERVER_INDEX_PAGE1 &&
-          srv.index[1] == DFL_SERVER_INDEX_PAGE2) {
-        srv.index.clear();
-      }
-      for (size_t i = 1; i < tokens.size(); i++) {
-        srv.index.push_back(tokens[i]);
-      }
+      srv.index = ConfigHelper::get_index(tokens);
     } else if (tokens[0] == "error_page") {
       srv.error_page[String::to_int(tokens[1])] =
           String::trim(std::string(tokens[2]), "/");
