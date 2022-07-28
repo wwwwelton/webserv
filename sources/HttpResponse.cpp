@@ -53,7 +53,7 @@ int Response::validate_http_version(void) {
 }
 
 void Response::php_cgi(std::string const& body_path) {
-  int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC);
+  int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC, 0644);
   if (fd == -1)
     throw(std::exception());
   int status;
@@ -64,7 +64,7 @@ void Response::php_cgi(std::string const& body_path) {
       exit(1);
     }
     // std::cout << body_path.c_str();
-    execlp("php-cgi", "-f", body_path.substr(2).c_str(), NULL);
+    execlp("php-cgi", "-f", "-q", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
   close(fd);
