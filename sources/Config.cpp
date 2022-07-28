@@ -120,32 +120,34 @@ Server Config::_parse_server(std::istringstream* is) {
     tokens = String::split(line, " ");
     directive = tokens[0];
 
+    ConfigHelper helper(tokens);
+
     if (directive == "listen") {
-      srv.ip = ConfigHelper::get_listen(tokens).first;
-      srv.port = ConfigHelper::get_listen(tokens).second;
+      srv.ip = helper.get_listen().first;
+      srv.port = helper.get_listen().second;
     } else if (directive == "server_name") {
-      srv.server_name = ConfigHelper::get_server_name(tokens);
+      srv.server_name = helper.get_server_name();
     } else if (directive == "root") {
-      srv.root = ConfigHelper::get_root(tokens);
+      srv.root = helper.get_root();
     } else if (directive == "index") {
-      srv.index = ConfigHelper::get_index(tokens);
+      srv.index = helper.get_index();
     } else if (directive == "error_page") {
       int code = String::to_int(tokens[1]);
-      srv.error_page[code] = ConfigHelper::get_error_page(tokens);
+      srv.error_page[code] = helper.get_error_page();
     } else if (directive == "timeout") {
-      srv.timeout = ConfigHelper::get_timeout(tokens);
+      srv.timeout = helper.get_timeout();
     } else if (directive == "client_max_body_size") {
-      srv.client_max_body_size = ConfigHelper::get_client_max_body_size(tokens);
+      srv.client_max_body_size = helper.get_client_max_body_size();
     } else if (directive == "access_log") {
-      srv.log["access_log"] = ConfigHelper::get_access_log(tokens);
+      srv.log["access_log"] = helper.get_access_log();
     } else if (directive == "error_log") {
-      srv.log["error_log"] = ConfigHelper::get_error_log(tokens);
+      srv.log["error_log"] = helper.get_error_log();
     } else if (directive == "autoindex") {
-      srv.autoindex = ConfigHelper::get_autoindex(tokens);
+      srv.autoindex = helper.get_autoindex();
     } else if (directive == "cgi") {
-      srv.cgi["." + tokens[1]] = ConfigHelper::get_cgi(tokens);
+      srv.cgi["." + tokens[1]] = helper.get_cgi();
     } else if (tokens[0] == "return") {
-      srv.redirect = ConfigHelper::get_redirect(tokens);
+      srv.redirect = helper.get_redirect();
     } else if (tokens[0] == "location") {
       srv.location[tokens[1]] = _parse_location(is);
     } else if (tokens[0][0] == '#') {
@@ -170,8 +172,10 @@ void Config::_parse(const std::string& file_content) {
     tokens = String::split(line, " ");
     directive = tokens[0];
 
+    ConfigHelper helper(tokens);
+
     if (directive == "workers")
-      backlog = ConfigHelper::get_backlog(tokens);
+      backlog = helper.get_backlog();
     else if (directive == "server")
       _servers.push_back(_parse_server(&is));
     else

@@ -23,134 +23,125 @@ ConfigHelper& ConfigHelper::operator=(const ConfigHelper& rhs) {
   return (*this);
 }
 
-int ConfigHelper::get_backlog(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 2)
-    throw InvalidNumberArgs(tokens[0]);
-  if (String::to_int(tokens[1]) <= 0 || String::to_int(tokens[1]) > 4096)
-    throw DirectiveInvValue(tokens[0]);
-  return (String::to_int(tokens[1]));
+int ConfigHelper::get_backlog(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (String::to_int(_tokens[1]) <= 0 || String::to_int(_tokens[1]) > 4096)
+    throw DirectiveInvValue(_tokens[0]);
+  return (String::to_int(_tokens[1]));
 }
 
-std::pair<in_addr_t, int>
-ConfigHelper::get_listen(const std::vector<std::string>& tokens) {
+std::pair<in_addr_t, int> ConfigHelper::get_listen(void) {
   in_addr_t ip;
   int port;
 
-  if (String::split(tokens[1], " ").size() != 1) {
-    throw InvalidNumberArgs(tokens[0]);
+  if (String::split(_tokens[1], " ").size() != 1) {
+    throw InvalidNumberArgs(_tokens[0]);
   }
-  if (tokens[1].find(":") != std::string::npos) {
-    std::vector<std::string> tmp = String::split(tokens[1], ":");
+  if (_tokens[1].find(":") != std::string::npos) {
+    std::vector<std::string> tmp = String::split(_tokens[1], ":");
     if (tmp.size() != 2)
-      throw InvFieldValue("host/port", tokens[1]);
+      throw InvFieldValue("host/port", _tokens[1]);
     if (_valid_ip(tmp[0]) && _valid_port(tmp[1])) {
       ip = inet_addr(tmp[0].c_str());
       port = htons(String::to_int(tmp[1]));
     } else if (!_valid_ip(tmp[0])) {
-      throw InvFieldValue("host", tokens[1]);
+      throw InvFieldValue("host", _tokens[1]);
     } else {
-      throw InvFieldValue("port", tokens[1]);
+      throw InvFieldValue("port", _tokens[1]);
     }
     return (std::make_pair(ip, port));
   }
-  if (_valid_ip(tokens[1]) && !_valid_port(tokens[1])) {
-    ip = inet_addr(tokens[1].c_str());
+  if (_valid_ip(_tokens[1]) && !_valid_port(_tokens[1])) {
+    ip = inet_addr(_tokens[1].c_str());
     port = htons(DFL_PORT);
-  } else if (!_valid_ip(tokens[1]) && _valid_port(tokens[1])) {
+  } else if (!_valid_ip(_tokens[1]) && _valid_port(_tokens[1])) {
     ip = inet_addr(DFL_ADDRESS);
-    port = htons(String::to_int(tokens[1]));
+    port = htons(String::to_int(_tokens[1]));
   } else {
-    throw InvFieldValue("host/port", tokens[1]);
+    throw InvFieldValue("host/port", _tokens[1]);
   }
   return (std::make_pair(ip, port));
 }
 
-std::vector<std::string>
-ConfigHelper::get_server_name(const std::vector<std::string>& tokens) {
-  if (tokens.size() == 1)
-    throw InvalidNumberArgs(tokens[0]);
-  return (String::split(tokens[1], " "));
+std::vector<std::string> ConfigHelper::get_server_name(void) {
+  if (_tokens.size() == 1)
+    throw InvalidNumberArgs(_tokens[0]);
+  return (String::split(_tokens[1], " "));
 }
 
-std::string ConfigHelper::get_root(const std::vector<std::string>& tokens) {
-  if (tokens.size() == 1)
-    throw InvalidNumberArgs(tokens[0]);
-  return (String::trim(std::string(tokens[1]), "/"));
+std::string ConfigHelper::get_root(void) {
+  if (_tokens.size() == 1)
+    throw InvalidNumberArgs(_tokens[0]);
+  return (String::trim(std::string(_tokens[1]), "/"));
 }
 
-std::vector<std::string>
-ConfigHelper::get_index(const std::vector<std::string>& tokens) {
-  if (tokens.size() == 1)
-    throw InvalidNumberArgs(tokens[0]);
-  return (String::split(tokens[1], " "));
+std::vector<std::string> ConfigHelper::get_index(void) {
+  if (_tokens.size() == 1)
+    throw InvalidNumberArgs(_tokens[0]);
+  return (String::split(_tokens[1], " "));
 }
 
-std::string
-ConfigHelper::get_error_page(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 3)
-    throw InvalidNumberArgs(tokens[0]);
-  if (tokens[1].find_first_not_of("0123456789") != std::string::npos ||
-      String::to_int(tokens[1]) > 499 || String::to_int(tokens[1]) < 400) {
-    throw InvFieldValue("error_page", tokens[1]);
+std::string ConfigHelper::get_error_page(void) {
+  if (_tokens.size() != 3)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (_tokens[1].find_first_not_of("0123456789") != std::string::npos ||
+      String::to_int(_tokens[1]) > 499 || String::to_int(_tokens[1]) < 400) {
+    throw InvFieldValue("error_page", _tokens[1]);
   }
-  return (String::trim(std::string(tokens[2]), "/"));
+  return (String::trim(std::string(_tokens[2]), "/"));
 }
 
-int ConfigHelper::get_timeout(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 2)
-    throw InvalidNumberArgs(tokens[0]);
-  if (String::to_int(tokens[1]) <= 0 || String::to_int(tokens[1]) > 4096)
-    throw DirectiveInvValue(tokens[0]);
-  return (String::to_int(tokens[1]));
+int ConfigHelper::get_timeout(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (String::to_int(_tokens[1]) <= 0 || String::to_int(_tokens[1]) > 4096)
+    throw DirectiveInvValue(_tokens[0]);
+  return (String::to_int(_tokens[1]));
 }
 
-int ConfigHelper::get_client_max_body_size(const std::vector<std::string>&
-                                               tokens) {
-  if (tokens.size() != 2)
-    throw InvalidNumberArgs(tokens[0]);
-  if (String::to_int(tokens[1]) <= 0 || String::to_int(tokens[1]) > 1000)
-    throw DirectiveInvValue(tokens[0]);
-  return (String::to_int(tokens[1]));
+int ConfigHelper::get_client_max_body_size(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (String::to_int(_tokens[1]) <= 0 || String::to_int(_tokens[1]) > 1000)
+    throw DirectiveInvValue(_tokens[0]);
+  return (String::to_int(_tokens[1]));
 }
 
-std::string
-ConfigHelper::get_access_log(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 2)
-    throw InvalidNumberArgs(tokens[0]);
-  return (tokens[1]);
+std::string ConfigHelper::get_access_log(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  return (_tokens[1]);
 }
 
-std::string
-ConfigHelper::get_error_log(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 2)
-    throw InvalidNumberArgs(tokens[0]);
-  return (tokens[1]);
+std::string ConfigHelper::get_error_log(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  return (_tokens[1]);
 }
 
-#include <iostream>
-bool ConfigHelper::get_autoindex(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 2)
-    throw InvalidNumberArgs(tokens[0]);
-  if (tokens[1] != "on" && tokens[1] != "off")
-    throw InvFieldValue("autoindex", tokens[1]);
-  return ((tokens[1] == "on") ? true : false);
+bool ConfigHelper::get_autoindex(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (_tokens[1] != "on" && _tokens[1] != "off")
+    throw InvFieldValue("autoindex", _tokens[1]);
+  return ((_tokens[1] == "on") ? true : false);
 }
 
-std::string ConfigHelper::get_cgi(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 3)
-    throw InvalidNumberArgs(tokens[0]);
-  return (tokens[2]);
+std::string ConfigHelper::get_cgi(void) {
+  if (_tokens.size() != 3)
+    throw InvalidNumberArgs(_tokens[0]);
+  return (_tokens[2]);
 }
 
-std::pair<int, std::string>
-ConfigHelper::get_redirect(const std::vector<std::string>& tokens) {
-  if (tokens.size() != 3)
-    throw InvalidNumberArgs(tokens[0]);
-  if (tokens[1].find_first_not_of("0123456789") != std::string::npos ||
-      String::to_int(tokens[1]) > 499 || String::to_int(tokens[1]) < 100) {
-    throw InvFieldValue("redirect", tokens[1]);
+std::pair<int, std::string> ConfigHelper::get_redirect(void) {
+  if (_tokens.size() != 3)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (_tokens[1].find_first_not_of("0123456789") != std::string::npos ||
+      String::to_int(_tokens[1]) > 499 || String::to_int(_tokens[1]) < 100) {
+    throw InvFieldValue("redirect", _tokens[1]);
   }
-  return (std::make_pair(String::to_int(tokens[1]), tokens[2]));
+  return (std::make_pair(String::to_int(_tokens[1]), _tokens[2]));
 }
 
 bool ConfigHelper::_valid_ip(const std::string& ip) {

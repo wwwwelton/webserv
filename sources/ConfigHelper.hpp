@@ -31,33 +31,23 @@ class ConfigHelper {
 
   ConfigHelper& operator=(const ConfigHelper& rhs);
 
-  static int get_backlog(const std::vector<std::string>& tokens);
-
-  static std::pair<in_addr_t, int>
-  get_listen(const std::vector<std::string>& tokens);
-
-  static std::vector<std::string>
-  get_server_name(const std::vector<std::string>& tokens);
-
-  static std::string get_root(const std::vector<std::string>& tokens);
-
-  static std::vector<std::string>
-  get_index(const std::vector<std::string>& tokens);
-
-  static std::string get_error_page(const std::vector<std::string>& tokens);
-  static int get_timeout(const std::vector<std::string>& tokens);
-  static int get_client_max_body_size(const std::vector<std::string>& tokens);
-  static std::string get_access_log(const std::vector<std::string>& tokens);
-  static std::string get_error_log(const std::vector<std::string>& tokens);
-  static bool get_autoindex(const std::vector<std::string>& tokens);
-  static std::string get_cgi(const std::vector<std::string>& tokens);
-
-  static std::pair<int, std::string>
-  get_redirect(const std::vector<std::string>& tokens);
+  int get_backlog(void);
+  std::pair<in_addr_t, int> get_listen(void);
+  std::vector<std::string> get_server_name(void);
+  std::string get_root(void);
+  std::vector<std::string> get_index(void);
+  std::string get_error_page(void);
+  int get_timeout(void);
+  int get_client_max_body_size(void);
+  std::string get_access_log(void);
+  std::string get_error_log(void);
+  bool get_autoindex(void);
+  std::string get_cgi(void);
+  std::pair<int, std::string> get_redirect(void);
 
  private:
-  static bool _valid_ip(const std::string& ip);
-  static bool _valid_port(const std::string& port);
+  bool _valid_ip(const std::string& ip);
+  bool _valid_port(const std::string& port);
 
   std::vector<std::string> _tokens;
 
