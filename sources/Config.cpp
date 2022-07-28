@@ -132,10 +132,10 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (directive == "error_page") {
       int code = String::to_int(tokens[1]);
       srv.error_page[code] = ConfigHelper::get_error_page(tokens);
-    } else if (tokens[0] == "timeout") {
+    } else if (directive == "timeout") {
       srv.timeout = ConfigHelper::get_timeout(tokens);
-    } else if (tokens[0] == "client_max_body_size") {
-      srv.client_max_body_size = String::to_int(tokens[1]);
+    } else if (directive == "client_max_body_size") {
+      srv.client_max_body_size = ConfigHelper::get_client_max_body_size(tokens);
     } else if (tokens[0] == "access_log") {
       srv.log["access_log"] = tokens[1];
     } else if (tokens[0] == "error_log") {

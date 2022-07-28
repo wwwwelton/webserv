@@ -39,6 +39,7 @@ class ConfigHelper {
 
   static std::string get_error_page(const std::vector<std::string>& tokens);
   static int get_timeout(const std::vector<std::string>& tokens);
+  static int get_client_max_body_size(const std::vector<std::string>& tokens);
 
  private:
   static bool _valid_ip(const std::string& ip);
