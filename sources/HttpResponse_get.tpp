@@ -48,7 +48,7 @@ int Response::validate_folder(void) {
 
 
 int Response::validate_index(void) {
-  if (path == root) {
+  if (path == root && location->index.size()) {
     for (size_t i = 0; i < server->index.size(); i++) {
       std::string indexpath = root + server->index[i];
       if (!access(indexpath.c_str(), R_OK)) {
@@ -56,8 +56,6 @@ int Response::validate_index(void) {
         return OK;
       }
     }
-    if (location->autoindex)
-      return CONTINUE;
     if (errno == ENOENT)
       return NOT_FOUND;
     if (errno == EACCES)

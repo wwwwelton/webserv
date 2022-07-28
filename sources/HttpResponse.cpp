@@ -115,7 +115,7 @@ void Response::create_directory_listing(void) {
   file.ignore();
   std::getline(file, tmp);
   tmp.push_back('\n');
-  tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
+  tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/')));
   out << tmp;
 
   file.get(*(out.rdbuf()), '$');
