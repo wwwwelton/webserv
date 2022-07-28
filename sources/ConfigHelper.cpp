@@ -80,6 +80,14 @@ ConfigHelper::get_error_page(const std::vector<std::string>& tokens) {
   return (String::trim(std::string(tokens[2]), "/"));
 }
 
+int ConfigHelper::get_timeout(const std::vector<std::string>& tokens) {
+  if (tokens.size() != 2)
+    throw InvalidNumberArgs(tokens[0]);
+  if (String::to_int(tokens[1]) <= 0 || String::to_int(tokens[1]) > 4096)
+    throw DirectiveInvValue(tokens[0]);
+  return (String::to_int(tokens[1]));
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 

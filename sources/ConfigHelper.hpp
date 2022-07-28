@@ -38,6 +38,7 @@ class ConfigHelper {
   get_index(const std::vector<std::string>& tokens);
 
   static std::string get_error_page(const std::vector<std::string>& tokens);
+  static int get_timeout(const std::vector<std::string>& tokens);
 
  private:
   static bool _valid_ip(const std::string& ip);
