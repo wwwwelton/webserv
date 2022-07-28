@@ -111,6 +111,15 @@ ConfigHelper::get_error_log(const std::vector<std::string>& tokens) {
   return (tokens[1]);
 }
 
+#include <iostream>
+bool ConfigHelper::get_autoindex(const std::vector<std::string>& tokens) {
+  if (tokens.size() != 2)
+    throw InvalidNumberArgs(tokens[0]);
+  if (tokens[1] != "on" && tokens[1] != "off")
+    throw InvFieldValue("autoindex", tokens[1]);
+  return ((tokens[1] == "on") ? true : false);
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 

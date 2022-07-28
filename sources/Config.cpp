@@ -136,12 +136,12 @@ Server Config::_parse_server(std::istringstream* is) {
       srv.timeout = ConfigHelper::get_timeout(tokens);
     } else if (directive == "client_max_body_size") {
       srv.client_max_body_size = ConfigHelper::get_client_max_body_size(tokens);
-    } else if (tokens[0] == "access_log") {
+    } else if (directive == "access_log") {
       srv.log["access_log"] = ConfigHelper::get_access_log(tokens);
-    } else if (tokens[0] == "error_log") {
+    } else if (directive == "error_log") {
       srv.log["error_log"] = ConfigHelper::get_error_log(tokens);
-    } else if (tokens[0] == "autoindex") {
-      srv.autoindex = (tokens[1] == "on") ? true : false;
+    } else if (directive == "autoindex") {
+      srv.autoindex = ConfigHelper::get_autoindex(tokens);
     } else if (tokens[0] == "cgi") {
       srv.cgi["." + tokens[1]] = tokens[2];
     } else if (tokens[0] == "return") {
