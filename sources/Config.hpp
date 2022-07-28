@@ -43,7 +43,7 @@ class Config {
   std::string _sanitize(const std::string& file_content);
   void _parse(const std::string& file_content);
   Server _parse_server(std::istringstream* is);
-  ServerLocation _parse_location(std::istringstream* is);
+  ServerLocation _parse_location(std::istringstream* is, const Server& srv);
 
  public:
   int backlog;
