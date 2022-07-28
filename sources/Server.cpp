@@ -8,23 +8,14 @@
 #include "Server.hpp"
 
 Server::Server(void) {
-  ip = inet_addr(DFL_ADDRESS);
-  port = htons(DFL_PORT);
-  server_name.push_back(DFL_SERVER_NAME1);
-  server_name.push_back(DFL_SERVER_NAME2);
-  root = DFL_SERVER_ROOT;
-  index.push_back(DFL_SERVER_INDEX_PAGE1);
-  index.push_back(DFL_SERVER_INDEX_PAGE2);
-  error_page[404] = DFL_404_PAGE;
-  error_page[405] = DFL_405_PAGE;
-  timeout = DFL_TIMEOUT;
-  client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
-  log = std::map<std::string, std::string>();
-  cgi = std::map<std::string, std::string>();
+  ip = -1;
+  port = -1;
+  root = "";
+  timeout = -1;
+  client_max_body_size = -1;
   redirect = std::make_pair(0, "");
-  location = std::map<std::string, ServerLocation>();
-  autoindex = DFL_AUTO_INDEX;
-  sockfd = DFL_SOCK_FD;
+  autoindex = -1;
+  sockfd = -1;
 }
 
 Server::Server(const Server& src) {
