@@ -142,8 +142,8 @@ Server Config::_parse_server(std::istringstream* is) {
       srv.log["error_log"] = ConfigHelper::get_error_log(tokens);
     } else if (directive == "autoindex") {
       srv.autoindex = ConfigHelper::get_autoindex(tokens);
-    } else if (tokens[0] == "cgi") {
-      srv.cgi["." + tokens[1]] = tokens[2];
+    } else if (directive == "cgi") {
+      srv.cgi["." + tokens[1]] = ConfigHelper::get_cgi(tokens);
     } else if (tokens[0] == "return") {
       srv.redirect.first = String::to_int(tokens[1]);
       srv.redirect.second = tokens[2];
