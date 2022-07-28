@@ -55,6 +55,13 @@ ConfigHelper::get_listen(const std::vector<std::string>& tokens) {
   return (std::make_pair(ip, port));
 }
 
+std::vector<std::string>
+ConfigHelper::get_server_name(const std::vector<std::string>& tokens) {
+  if (tokens.size() == 1)
+    throw InvalidNumberArgs(tokens[0]);
+  return (String::split(tokens[1], " "));
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 

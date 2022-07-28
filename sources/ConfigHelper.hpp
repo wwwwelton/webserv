@@ -24,8 +24,12 @@
 class ConfigHelper {
  public:
   static int get_backlog(const std::vector<std::string>& tokens);
-  static std::pair<in_addr_t, int> get_listen(const std::vector<std::string>&
-                                                  tokens);
+
+  static std::pair<in_addr_t, int>
+  get_listen(const std::vector<std::string>& tokens);
+
+  static std::vector<std::string>
+  get_server_name(const std::vector<std::string>& tokens);
 
  private:
   static bool _valid_ip(const std::string& ip);

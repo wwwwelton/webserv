@@ -123,14 +123,8 @@ Server Config::_parse_server(std::istringstream* is) {
     if (directive == "listen") {
       srv.ip = ConfigHelper::get_listen(tokens).first;
       srv.port = ConfigHelper::get_listen(tokens).second;
-    } else if (tokens[0] == "server_name") {
-      if (srv.server_name[0] == DFL_SERVER_NAME1 &&
-          srv.server_name[1] == DFL_SERVER_NAME2) {
-        srv.server_name.clear();
-      }
-      for (size_t i = 1; i < tokens.size(); i++) {
-        srv.server_name.push_back(tokens[i]);
-      }
+    } else if (directive == "server_name") {
+      srv.server_name = ConfigHelper::get_server_name(tokens);
     } else if (tokens[0] == "root") {
       srv.root = String::trim(std::string(tokens[1]), "/");
     } else if (tokens[0] == "index") {
