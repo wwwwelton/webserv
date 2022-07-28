@@ -50,3 +50,20 @@ ServerLocation& ServerLocation::operator=(const ServerLocation& rhs) {
   }
   return (*this);
 }
+
+void ServerLocation::fill(const Server& srv) {
+  if (root.empty())
+    root = srv.root;
+  if (index.size() == 0)
+    index = srv.index;
+  if (limit_except.size() == 0)
+    limit_except.push_back(DFL_LIM_EXCEPT);
+  if (client_max_body_size == -1)
+    client_max_body_size = srv.client_max_body_size;
+  if (cgi.size() == 0)
+    cgi = srv.cgi;
+  if (redirect.first == 0 && redirect.second == "")
+    redirect = srv.redirect;
+  if (autoindex == -1)
+    autoindex = srv.autoindex;
+}

@@ -14,8 +14,11 @@
 #include <utility>
 #include <vector>
 
+#include "Server.hpp"
 #include "String.hpp"
 #include "defines.hpp"
+
+class Server;
 
 class ServerLocation {
  public:
@@ -39,6 +42,8 @@ class ServerLocation {
   ~ServerLocation(void);
 
   ServerLocation& operator=(const ServerLocation& rhs);
+
+  void fill(const Server& srv);
 };
 
 #endif  // SERVERLOCATION_HPP

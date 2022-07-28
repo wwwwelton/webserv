@@ -29,6 +29,8 @@
 #include "String.hpp"
 #include "defines.hpp"
 
+class ServerLocation;
+
 class Server {
  public:
   in_addr_t ip;
