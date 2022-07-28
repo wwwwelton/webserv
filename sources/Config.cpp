@@ -137,7 +137,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (directive == "client_max_body_size") {
       srv.client_max_body_size = ConfigHelper::get_client_max_body_size(tokens);
     } else if (tokens[0] == "access_log") {
-      srv.log["access_log"] = tokens[1];
+      srv.log["access_log"] = ConfigHelper::get_access_log(tokens);
     } else if (tokens[0] == "error_log") {
       srv.log["error_log"] = tokens[1];
     } else if (tokens[0] == "autoindex") {

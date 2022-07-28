@@ -97,6 +97,13 @@ int ConfigHelper::get_client_max_body_size(const std::vector<std::string>&
   return (String::to_int(tokens[1]));
 }
 
+std::string
+ConfigHelper::get_access_log(const std::vector<std::string>& tokens) {
+  if (tokens.size() != 2)
+    throw InvalidNumberArgs(tokens[0]);
+  return (tokens[1]);
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 
