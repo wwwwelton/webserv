@@ -13,23 +13,6 @@ ServerLocation::ServerLocation(void) {
   autoindex = -1;
 }
 
-ServerLocation::ServerLocation(std::string root,
-                               std::vector<std::string> index,
-                               std::vector<std::string> limit_except,
-                               int client_max_body_size,
-                               std::map<std::string, std::string> cgi,
-                               std::pair<int, std::string> redirect,
-                               int autoindex)
-    : root(root),
-      index(index),
-      limit_except(limit_except),
-      client_max_body_size(client_max_body_size),
-      cgi(cgi),
-      redirect(redirect),
-      autoindex(autoindex) {
-  return;
-}
-
 ServerLocation::ServerLocation(const ServerLocation& src) {
   *this = src;
 }
