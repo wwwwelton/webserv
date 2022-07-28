@@ -67,7 +67,8 @@ std::pair<in_addr_t, int> ConfigHelper::get_listen(void) {
 std::vector<std::string> ConfigHelper::get_server_name(void) {
   if (_tokens.size() == 1)
     throw InvalidNumberArgs(_tokens[0]);
-  return (String::split(_tokens[1], " "));
+  std::vector<std::string> tmp(_tokens.begin() + 1, _tokens.end());
+  return (tmp);
 }
 
 std::string ConfigHelper::get_root(void) {
