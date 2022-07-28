@@ -24,6 +24,13 @@
 
 class ConfigHelper {
  public:
+  ConfigHelper(void);
+  ConfigHelper(const ConfigHelper& src);
+  explicit ConfigHelper(const std::vector<std::string>& tokens);
+  ~ConfigHelper(void);
+
+  ConfigHelper& operator=(const ConfigHelper& rhs);
+
   static int get_backlog(const std::vector<std::string>& tokens);
 
   static std::pair<in_addr_t, int>
@@ -51,6 +58,8 @@ class ConfigHelper {
  private:
   static bool _valid_ip(const std::string& ip);
   static bool _valid_port(const std::string& port);
+
+  std::vector<std::string> _tokens;
 
  public:
   class InvalidNumberArgs : public LoadException {

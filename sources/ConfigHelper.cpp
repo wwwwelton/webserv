@@ -7,6 +7,22 @@
 
 #include "ConfigHelper.hpp"
 
+ConfigHelper::ConfigHelper(void) {}
+
+ConfigHelper::ConfigHelper(const ConfigHelper& src) { *this = src; }
+
+ConfigHelper::ConfigHelper(const std::vector<std::string>& tokens)
+    : _tokens(tokens) {}
+
+ConfigHelper::~ConfigHelper(void) {}
+
+ConfigHelper& ConfigHelper::operator=(const ConfigHelper& rhs) {
+  if (this != &rhs) {
+    _tokens = rhs._tokens;
+  }
+  return (*this);
+}
+
 int ConfigHelper::get_backlog(const std::vector<std::string>& tokens) {
   if (tokens.size() != 2)
     throw InvalidNumberArgs(tokens[0]);
