@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "String.hpp"
 #include "defines.hpp"
 
 class ServerLocation {
@@ -24,8 +25,7 @@ class ServerLocation {
   int client_max_body_size;
   std::map<std::string, std::string> cgi;
   std::pair<int, std::string> redirect;
-  bool autoindex;
-  bool filled;
+  int autoindex;
 
   ServerLocation(void);
   ServerLocation(std::string root,
@@ -34,7 +34,7 @@ class ServerLocation {
                  int client_max_body_size,
                  std::map<std::string, std::string> cgi,
                  std::pair<int, std::string> redirect,
-                 bool autoindex);
+                 int autoindex);
   ServerLocation(const ServerLocation& src);
   ~ServerLocation(void);
 

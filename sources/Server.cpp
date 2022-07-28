@@ -8,14 +8,14 @@
 #include "Server.hpp"
 
 Server::Server(void) {
-  ip = -1;
+  ip = INT_MAX;
   port = -1;
   root = "";
   timeout = -1;
   client_max_body_size = -1;
   redirect = std::make_pair(0, "");
-  autoindex = -1;
-  sockfd = -1;
+  autoindex = DFL_AUTO_INDEX;
+  sockfd = DFL_SOCK_FD;
 }
 
 Server::Server(const Server& src) {
@@ -45,6 +45,25 @@ Server& Server::operator=(const Server& rhs) {
     sockfd = rhs.sockfd;
   }
   return (*this);
+}
+
+void Server::fill(void) {
+  if (ip == INT_MAX)
+    ip = inet_addr(DFL_ADDRESS);
+  if (port == -1)
+    port = htons(DFL_PORT);
+  if (root.empty())
+    root = DFL_SERVER_ROOT;
+  if (index.size() == 0)
+    index = String::split(DFL_SERVER_INDEX, " ");
+  if (error_page.count(404) > 0)
+    error_page[404] = DFL_404_PAGE;
+  if (error_page.count(405) > 0)
+    error_page[405] = DFL_405_PAGE;
+  if (timeout == -1)
+    timeout = DFL_TIMEOUT;
+  if (client_max_body_size == -1)
+    client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
 }
 
 void Server::_socket(void) {

@@ -16,8 +16,7 @@
 #define DFL_SERVER_NAME1 "localhost"
 #define DFL_SERVER_NAME2 "www.localhost"
 #define DFL_SERVER_ROOT "server_root"
-#define DFL_SERVER_INDEX_PAGE1 "index.html"
-#define DFL_SERVER_INDEX_PAGE2 "index.php"
+#define DFL_SERVER_INDEX "index.html index.php"
 #define DFL_404_PAGE "custom_404.html"
 #define DFL_405_PAGE "custom_405.html"
 #define DFL_TIMEOUT 300
