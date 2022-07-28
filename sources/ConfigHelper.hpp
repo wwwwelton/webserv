@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <utility>
@@ -44,6 +45,7 @@ class ConfigHelper {
   bool get_autoindex(void);
   std::string get_cgi(void);
   std::pair<int, std::string> get_redirect(void);
+  std::vector<std::string> get_limit_except(void);
 
  private:
   bool _valid_ip(const std::string& ip);

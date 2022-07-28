@@ -79,18 +79,7 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
     } else if (directive == "index") {
       location.index = helper.get_index();
     } else if (directive == "limit_except") {
-      //
-      if (location.limit_except[0] == DFL_LIM_EXCEPT) {
-        location.limit_except.pop_back();
-      }
-      for (size_t i = 1; i < tokens.size(); i++) {
-        std::transform(tokens[i].begin(),
-                       tokens[i].end(),
-                       tokens[i].begin(),
-                       ::toupper);
-        location.limit_except.push_back(tokens[i]);
-      }
-      //
+      location.limit_except = helper.get_limit_except();
     } else if (directive == "client_max_body_size") {
       location.client_max_body_size = helper.get_client_max_body_size();
     } else if (directive == "autoindex") {

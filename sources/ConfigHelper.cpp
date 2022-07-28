@@ -146,6 +146,16 @@ std::pair<int, std::string> ConfigHelper::get_redirect(void) {
   return (std::make_pair(String::to_int(_tokens[1]), _tokens[2]));
 }
 
+std::vector<std::string> ConfigHelper::get_limit_except(void) {
+  if (_tokens.size() == 1)
+    throw InvalidNumberArgs(_tokens[0]);
+  std::vector<std::string> tmp(_tokens.begin() + 1, _tokens.end());
+  for (size_t i = 1; i < tmp.size(); i++) {
+    std::transform(tmp[i].begin(), tmp[i].end(), tmp[i].begin(), ::toupper);
+  }
+  return (tmp);
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 
