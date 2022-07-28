@@ -66,6 +66,11 @@ void Server::fill(void) {
     client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
   if (autoindex == -1)
     autoindex = DFL_AUTO_INDEX;
+  for (std::map<std::string, ServerLocation>::iterator it = location.begin();
+       it != location.end();
+       it++) {
+    it->second.fill(*this);
+  }
 }
 
 bool Server::is_invalid(void) {

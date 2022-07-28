@@ -61,8 +61,7 @@ std::string Config::_sanitize(const std::string& file_content) {
   return (tmp);
 }
 
-ServerLocation Config::_parse_location(std::istringstream* is,
-                                       const Server& srv) {
+ServerLocation Config::_parse_location(std::istringstream* is) {
   std::string line, directive;
   std::vector<std::string> tokens;
 
@@ -97,8 +96,6 @@ ServerLocation Config::_parse_location(std::istringstream* is,
       throw ConfigHelper::DirectiveUnknown(directive);
     }
   }
-
-  location.fill(srv);
 
   return (location);
 }
@@ -143,7 +140,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (directive == "return") {
       srv.redirect = helper.get_redirect();
     } else if (directive == "location") {
-      srv.location[tokens[1]] = _parse_location(is, srv);
+      srv.location[tokens[1]] = _parse_location(is);
     } else if (directive[0] == '#') {
       continue;
     } else if (directive == "}") {
