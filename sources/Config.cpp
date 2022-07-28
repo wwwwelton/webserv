@@ -62,7 +62,7 @@ std::string Config::_sanitize(const std::string& file_content) {
 }
 
 ServerLocation Config::_parse_location(std::istringstream* is) {
-  std::string line;
+  std::string line, directive;
   std::vector<std::string> tokens;
 
   ServerLocation location;
@@ -70,14 +70,16 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
   while (std::getline(*is, line)) {
     line = String::trim(line, "; ");
     tokens = String::split(line, " ");
+    directive = tokens[0];
 
-    if (tokens[0] == "root") {
-      location.root = String::trim(std::string(tokens[1]), "/");
-    } else if (tokens[0] == "index") {
-      for (size_t i = 1; i < tokens.size(); i++) {
-        location.index.push_back(tokens[i]);
-      }
-    } else if (tokens[0] == "limit_except") {
+    ConfigHelper helper(tokens);
+
+    if (directive == "root") {
+      location.root = helper.get_root();
+    } else if (directive == "index") {
+      location.index = helper.get_index();
+    } else if (directive == "limit_except") {
+      //
       if (location.limit_except[0] == DFL_LIM_EXCEPT) {
         location.limit_except.pop_back();
       }
@@ -88,24 +90,21 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
                        ::toupper);
         location.limit_except.push_back(tokens[i]);
       }
-    } else if (tokens[0] == "client_max_body_size") {
-      location.client_max_body_size = String::to_int(tokens[1]);
-    } else if (tokens[0] == "autoindex") {
-      location.autoindex = (tokens[1] == "on") ? true : false;
-    } else if (tokens[0] == "cgi") {
-      location.cgi["." + tokens[1]] = tokens[2];
-    } else if (tokens[0] == "return") {
-      if (location.redirect.first == 0 &&
-          location.redirect.second.empty()) {
-        location.redirect.first = String::to_int(tokens[1]);
-        location.redirect.second = tokens[2];
-      }
-    } else if (tokens[0][0] == '#') {
+      //
+    } else if (directive == "client_max_body_size") {
+      location.client_max_body_size = helper.get_client_max_body_size();
+    } else if (directive == "autoindex") {
+      location.autoindex = helper.get_autoindex();
+    } else if (directive == "cgi") {
+      location.cgi["." + tokens[1]] = helper.get_cgi();
+    } else if (directive == "return") {
+      location.redirect = helper.get_redirect();
+    } else if (directive[0] == '#') {
       continue;
-    } else if (tokens[0] == "}") {
+    } else if (directive == "}") {
       break;
     } else {
-      throw ConfigHelper::DirectiveUnknown(tokens[0]);
+      throw ConfigHelper::DirectiveUnknown(directive);
     }
   }
 
@@ -149,16 +148,16 @@ Server Config::_parse_server(std::istringstream* is) {
       srv.autoindex = helper.get_autoindex();
     } else if (directive == "cgi") {
       srv.cgi["." + tokens[1]] = helper.get_cgi();
-    } else if (tokens[0] == "return") {
+    } else if (directive == "return") {
       srv.redirect = helper.get_redirect();
-    } else if (tokens[0] == "location") {
+    } else if (directive == "location") {
       srv.location[tokens[1]] = _parse_location(is);
-    } else if (tokens[0][0] == '#') {
+    } else if (directive[0] == '#') {
       continue;
-    } else if (tokens[0] == "}") {
+    } else if (directive == "}") {
       break;
     } else {
-      throw ConfigHelper::DirectiveUnknown(tokens[0]);
+      throw ConfigHelper::DirectiveUnknown(directive);
     }
   }
 
