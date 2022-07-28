@@ -14,7 +14,7 @@ Server::Server(void) {
   timeout = -1;
   client_max_body_size = -1;
   redirect = std::make_pair(0, "");
-  autoindex = DFL_AUTO_INDEX;
+  autoindex = -1;
   sockfd = DFL_SOCK_FD;
 }
 
@@ -64,6 +64,14 @@ void Server::fill(void) {
     timeout = DFL_TIMEOUT;
   if (client_max_body_size == -1)
     client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
+  if (autoindex == -1)
+    autoindex = DFL_AUTO_INDEX;
+}
+
+bool Server::is_invalid(void) {
+  if (server_name.size() == 0 || location.size() == 0)
+    return (true);
+  return (false);
 }
 
 void Server::_socket(void) {
