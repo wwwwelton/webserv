@@ -150,6 +150,10 @@ Server Config::_parse_server(std::istringstream* is) {
     }
   }
 
+  srv.fill();
+  if (srv.is_invalid())
+    throw LoadException("Invalid Server");
+
   return (srv);
 }
 
