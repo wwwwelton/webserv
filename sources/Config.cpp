@@ -139,7 +139,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (tokens[0] == "access_log") {
       srv.log["access_log"] = ConfigHelper::get_access_log(tokens);
     } else if (tokens[0] == "error_log") {
-      srv.log["error_log"] = tokens[1];
+      srv.log["error_log"] = ConfigHelper::get_error_log(tokens);
     } else if (tokens[0] == "autoindex") {
       srv.autoindex = (tokens[1] == "on") ? true : false;
     } else if (tokens[0] == "cgi") {
