@@ -8,13 +8,9 @@
 #include "ServerLocation.hpp"
 
 ServerLocation::ServerLocation(void) {
-  root = DFL_SERVER_ROOT;
-  index = String::split(DFL_SERVER_INDEX, " ");
-  limit_except.push_back(DFL_LIM_EXCEPT);
-  client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
-  cgi = std::map<std::string, std::string>();
-  redirect = std::make_pair(0, "");
-  autoindex = DFL_AUTO_INDEX;
+  root = "";
+  client_max_body_size = -1;
+  autoindex = -1;
 }
 
 ServerLocation::ServerLocation(std::string root,
