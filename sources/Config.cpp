@@ -130,8 +130,8 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (tokens[0] == "index") {
       srv.index = ConfigHelper::get_index(tokens);
     } else if (tokens[0] == "error_page") {
-      srv.error_page[String::to_int(tokens[1])] =
-          String::trim(std::string(tokens[2]), "/");
+      int code = String::to_int(tokens[1]);
+      srv.error_page[code] = ConfigHelper::get_error_page(tokens);
     } else if (tokens[0] == "timeout") {
       srv.timeout = String::to_int(tokens[1]);
     } else if (tokens[0] == "client_max_body_size") {

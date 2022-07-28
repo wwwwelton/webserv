@@ -69,6 +69,17 @@ ConfigHelper::get_index(const std::vector<std::string>& tokens) {
   return (String::split(tokens[1], " "));
 }
 
+std::string
+ConfigHelper::get_error_page(const std::vector<std::string>& tokens) {
+  if (tokens.size() != 3)
+    throw InvalidNumberArgs(tokens[0]);
+  if (tokens[1].find_first_not_of("0123456789") != std::string::npos ||
+      String::to_int(tokens[1]) > 499 || String::to_int(tokens[1]) < 400) {
+    throw InvFieldValue("error_page", tokens[1]);
+  }
+  return (String::trim(std::string(tokens[2]), "/"));
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 

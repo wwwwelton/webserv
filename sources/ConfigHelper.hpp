@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,6 +36,8 @@ class ConfigHelper {
 
   static std::vector<std::string>
   get_index(const std::vector<std::string>& tokens);
+
+  static std::string get_error_page(const std::vector<std::string>& tokens);
 
  private:
   static bool _valid_ip(const std::string& ip);
