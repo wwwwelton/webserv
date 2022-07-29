@@ -41,6 +41,7 @@ class Config {
  private:
   std::string _open(char* file);
   std::string _sanitize(const std::string& file_content);
+  std::vector<std::string> _split_line(std::string line);
   void _parse(std::istringstream* is);
   Server _parse_server(std::istringstream* is);
   ServerLocation _parse_location(std::istringstream* is);

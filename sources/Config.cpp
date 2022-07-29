@@ -69,6 +69,12 @@ std::string Config::_sanitize(const std::string& file_content) {
   return (tmp);
 }
 
+std::vector<std::string> Config::_split_line(std::string line) {
+  line = String::trim(line, " ");
+  line = String::trim_last_if(line, ';');
+  return (String::split(line, " "));
+}
+
 ServerLocation Config::_parse_location(std::istringstream* is) {
   std::string line, directive;
   std::vector<std::string> tokens;
@@ -76,9 +82,7 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
   ConfigHelper helper;
 
   while (std::getline(*is, line)) {
-    line = String::trim(line, " ");
-    line = String::trim_last_if(line, ';');
-    tokens = String::split(line, " ");
+    tokens = _split_line(line);
     directive = tokens[0];
 
     helper.set_tokens(tokens);
@@ -118,9 +122,7 @@ Server Config::_parse_server(std::istringstream* is) {
   ConfigHelper helper;
 
   while (std::getline(*is, line)) {
-    line = String::trim(line, " ");
-    line = String::trim_last_if(line, ';');
-    tokens = String::split(line, " ");
+    tokens = _split_line(line);
     directive = tokens[0];
 
     helper.set_tokens(tokens);
@@ -177,9 +179,7 @@ void Config::_parse(std::istringstream* is) {
   ConfigHelper helper;
 
   while (std::getline(*is, line)) {
-    line = String::trim(line, " ");
-    line = String::trim_last_if(line, ';');
-    tokens = String::split(line, " ");
+    tokens = _split_line(line);
     directive = tokens[0];
 
     helper.set_tokens(tokens);
