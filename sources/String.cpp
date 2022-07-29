@@ -7,20 +7,9 @@
 
 #include "String.hpp"
 
-String::String(void) {}
+namespace String {
 
-String::String(const String& src) { *this = src; }
-
-String::~String(void) {}
-
-String& String::operator=(const String& rhs) {
-  (void)rhs;
-  return (*this);
-}
-
-void String::replace_all(std::string* str,
-                         const std::string& old_word,
-                         const std::string& new_word) {
+void replace_all(std::string* str, std::string old_word, std::string new_word) {
   size_t pos;
 
   pos = str->find(old_word);
@@ -30,7 +19,7 @@ void String::replace_all(std::string* str,
   }
 }
 
-void String::replace_unique(std::string* str, char pattern) {
+void replace_unique(std::string* str, char pattern) {
   std::string tmp("");
 
   for (std::string::size_type i = 0; i < str->size() - 1; i++) {
@@ -42,7 +31,7 @@ void String::replace_unique(std::string* str, char pattern) {
   *str = tmp;
 }
 
-std::string String::trim(const std::string& str, const std::string& set) {
+std::string trim(const std::string& str, const std::string& set) {
   std::string tmp(str);
 
   tmp.erase(tmp.find_last_not_of(set) + 1);
@@ -51,7 +40,7 @@ std::string String::trim(const std::string& str, const std::string& set) {
   return (tmp);
 }
 
-std::string String::trim_last_if(const std::string& str, char c) {
+std::string trim_last_if(const std::string& str, char c) {
   std::string tmp(str);
 
   if (str.size() > 1)
@@ -61,7 +50,7 @@ std::string String::trim_last_if(const std::string& str, char c) {
   return (tmp);
 }
 
-void String::trim_lines(std::string* str, const std::string& set) {
+void trim_lines(std::string* str, const std::string& set) {
   std::istringstream is(*str);
   std::string line;
 
@@ -72,8 +61,8 @@ void String::trim_lines(std::string* str, const std::string& set) {
   }
 }
 
-std::vector<std::string> String::split(const std::string& str,
-                                       const std::string& del) {
+std::vector<std::string> split(const std::string& str,
+                               const std::string& del) {
   std::vector<std::string> list;
   std::string s(str);
   size_t pos = 0;
@@ -88,8 +77,10 @@ std::vector<std::string> String::split(const std::string& str,
   return (list);
 }
 
-int String::to_int(const std::string& str) {
+int to_int(const std::string& str) {
   size_t n;
   std::istringstream(str) >> n;
   return (n);
 }
+
+}  // namespace String
