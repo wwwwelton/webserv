@@ -147,7 +147,8 @@ std::string ConfigHelper::get_error_page(void) {
 int ConfigHelper::get_timeout(void) {
   if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
-  if (String::to_int(_tokens[1]) <= 0 || String::to_int(_tokens[1]) > 4096)
+  if (String::to_int(_tokens[1]) <= CFG_MIN_TIMEOUT ||
+      String::to_int(_tokens[1]) > CFG_MAX_TIMEOUT)
     throw DirectiveInvValue(_tokens[0]);
   return (String::to_int(_tokens[1]));
 }
