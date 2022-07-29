@@ -51,6 +51,16 @@ std::string String::trim(const std::string& str, const std::string& set) {
   return (tmp);
 }
 
+std::string String::trim_last_if(const std::string& str, char c) {
+  std::string tmp(str);
+
+  if (str.size() > 1)
+    if (str[str.size() - 1] == c)
+      tmp = str.substr(0, str.size() - 1);
+
+  return (tmp);
+}
+
 void String::trim_lines(std::string* str, const std::string& set) {
   std::istringstream is(*str);
   std::string line;

@@ -28,6 +28,7 @@ class String {
   static void replace_unique(std::string* str, char pattern);
 
   static std::string trim(const std::string& str, const std::string& set);
+  static std::string trim_last_if(const std::string& str, char c);
   static void trim_lines(std::string* str, const std::string& set);
 
   static std::vector<std::string> split(const std::string& str,

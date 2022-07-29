@@ -76,7 +76,8 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
   ConfigHelper helper;
 
   while (std::getline(*is, line)) {
-    line = String::trim(line, "; ");
+    line = String::trim(line, " ");
+    line = String::trim_last_if(line, ';');
     tokens = String::split(line, " ");
     directive = tokens[0];
 
@@ -117,7 +118,8 @@ Server Config::_parse_server(std::istringstream* is) {
   ConfigHelper helper;
 
   while (std::getline(*is, line)) {
-    line = String::trim(line, "; ");
+    line = String::trim(line, " ");
+    line = String::trim_last_if(line, ';');
     tokens = String::split(line, " ");
     directive = tokens[0];
 
@@ -175,7 +177,8 @@ void Config::_parse(std::istringstream* is) {
   ConfigHelper helper;
 
   while (std::getline(*is, line)) {
-    line = String::trim(line, "; ");
+    line = String::trim(line, " ");
+    line = String::trim_last_if(line, ';');
     tokens = String::split(line, " ");
     directive = tokens[0];
 
