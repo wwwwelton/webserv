@@ -28,6 +28,30 @@ ConfigHelper& ConfigHelper::operator=(const ConfigHelper& rhs) {
 
 void ConfigHelper::set_tokens(const std::vector<std::string>& tokens) {
   _tokens = tokens;
+  if (tokens[0] == "server" || tokens.size() <= 1 || tokens[0][0] == '#')
+    return;
+  if (tokens[0] == "error_page" ||
+      tokens[0] == "cgi" ||
+      tokens[0] == "return" ||
+      tokens[0] == "location")
+    _list.insert(tokens[0] + tokens[1]);
+  else
+    _list.insert(tokens[0]);
+}
+
+bool ConfigHelper::already_exists(void) {
+  std::string elem;
+
+  if (_tokens[0] == "error_page" ||
+      _tokens[0] == "cgi" ||
+      _tokens[0] == "return" ||
+      _tokens[0] == "location")
+    elem = _tokens[0] + _tokens[1];
+  else
+    elem = _tokens[0];
+  if (_list.count(elem) > 1)
+    return (true);
+  return (false);
 }
 
 int ConfigHelper::get_backlog(void) {

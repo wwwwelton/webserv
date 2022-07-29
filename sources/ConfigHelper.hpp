@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -32,6 +33,7 @@ class ConfigHelper {
   ConfigHelper& operator=(const ConfigHelper& rhs);
 
   void set_tokens(const std::vector<std::string>& tokens);
+  bool already_exists(void);
 
   int get_backlog(void);
   std::pair<in_addr_t, int> get_listen(void);
@@ -53,6 +55,7 @@ class ConfigHelper {
   bool _valid_port(const std::string& port);
 
   std::vector<std::string> _tokens;
+  std::multiset<std::string> _list;
 
  public:
   class InvalidNumberArgs : public LoadException {

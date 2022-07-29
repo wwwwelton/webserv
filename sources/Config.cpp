@@ -82,6 +82,8 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
 
     helper.set_tokens(tokens);
 
+    if (helper.already_exists())
+      throw ConfigHelper::DirectiveDuplicate(tokens[0]);
     if (directive == "root") {
       location.root = helper.get_root();
     } else if (directive == "index") {
@@ -121,6 +123,8 @@ Server Config::_parse_server(std::istringstream* is) {
 
     helper.set_tokens(tokens);
 
+    if (helper.already_exists())
+      throw ConfigHelper::DirectiveDuplicate(tokens[0]);
     if (directive == "listen") {
       srv.ip = helper.get_listen().first;
       srv.port = helper.get_listen().second;
@@ -177,6 +181,8 @@ void Config::_parse(std::istringstream* is) {
 
     helper.set_tokens(tokens);
 
+    if (helper.already_exists())
+      throw ConfigHelper::DirectiveDuplicate(tokens[0]);
     if (directive == "workers")
       backlog = helper.get_backlog();
     else if (directive == "server")
