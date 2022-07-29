@@ -57,6 +57,7 @@ class ConfigHelper {
   bool _valid_server_name(const std::string& server_name);
   bool _valid_index(const std::string& index);
   bool _valid_error_page(const std::string& error_page);
+  bool _valid_log(const std::string& log);
 
   std::vector<std::string> _tokens;
   std::multiset<std::string> _list;

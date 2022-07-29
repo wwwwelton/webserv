@@ -165,12 +165,16 @@ int ConfigHelper::get_client_max_body_size(void) {
 std::string ConfigHelper::get_access_log(void) {
   if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
+  if (!_valid_log(_tokens[1]))
+    throw InvFieldValue("access_log", _tokens[1]);
   return (_tokens[1]);
 }
 
 std::string ConfigHelper::get_error_log(void) {
   if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
+  if (!_valid_log(_tokens[1]))
+    throw InvFieldValue("error_log", _tokens[1]);
   return (_tokens[1]);
 }
 
@@ -273,6 +277,20 @@ bool ConfigHelper::_valid_error_page(const std::string& error_page) {
   }
   if (error_page.find(".") == std::string::npos)
     return (false);
+  return (true);
+}
+
+bool ConfigHelper::_valid_log(const std::string& log) {
+  char start = log[0];
+  char end = log[log.size() - 1];
+  if ((!::isalnum(start) && start != '/') || !::isalnum(end))
+    return (false);
+  for (std::string::const_iterator it = log.begin();
+       it != log.end();
+       it++) {
+    if (!::isalnum(*it) && *it != '.' && *it != '-' && *it != '_' && *it != '/')
+      return (false);
+  }
   return (true);
 }
 
