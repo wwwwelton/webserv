@@ -101,6 +101,9 @@ std::vector<std::string> ConfigHelper::get_server_name(void) {
   if (_tokens.size() == 1)
     throw InvalidNumberArgs(_tokens[0]);
   std::vector<std::string> tmp(_tokens.begin() + 1, _tokens.end());
+  for (size_t i = 0; i < tmp.size(); i++) {
+    std::transform(tmp[i].begin(), tmp[i].end(), tmp[i].begin(), ::tolower);
+  }
   return (tmp);
 }
 
