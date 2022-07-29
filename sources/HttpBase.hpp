@@ -8,12 +8,13 @@
 #ifndef HTTPBASE_HPP
 #define HTTPBASE_HPP
 
-#define BUFFER_SIZE 125000
+#define BUFFER_SIZE 2000
+#define HEADER_SIZE 2000
 
 class HttpBase {
  public:
   static char buffer_req[BUFFER_SIZE];
-  static char buffer_resp[BUFFER_SIZE];
+  static char buffer_resp[HEADER_SIZE + BUFFER_SIZE];
   static int size;
 };
 

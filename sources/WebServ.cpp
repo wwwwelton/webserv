@@ -127,7 +127,8 @@ void WebServ::_respond(int i) {
   Response &response = *clientlist[fd].response;
 
   if (response.inprogress) {
-    response.assemble(response.response_path);
+    response.assemble_followup();
+    response._send(fd);
   }
   else if (parser.finished) {
     response.set_request(&parser.get_request());

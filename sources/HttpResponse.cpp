@@ -8,7 +8,13 @@
 #include "HttpResponse.hpp"
 
 void Response::_send(int fd) {
-  send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
+  ssize_t bytes;
+  bytes = send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
+  if (bytes == 0 || bytes == -1) {
+    WebServ::log.error() << "unable to send response: "
+                         << strerror(errno) << "\n";
+    finished = true;
+  }
   WebServ::log.info() << "Response sent to client " << fd << "\n";
 }
 
@@ -47,7 +53,7 @@ int Response::validate_http_version(void) {
 }
 
 void Response::php_cgi(std::string const& body_path) {
-  int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC);
+  int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC, 0644);
   if (fd == -1)
     throw(std::exception());
   int status;
@@ -58,7 +64,7 @@ void Response::php_cgi(std::string const& body_path) {
       exit(1);
     }
     // std::cout << body_path.c_str();
-    execlp("php-cgi", "-f", body_path.substr(2).c_str(), NULL);
+    execlp("php-cgi", "-f", "-q", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
   close(fd);
@@ -68,11 +74,12 @@ void Response::php_cgi(std::string const& body_path) {
 
 void Response::dispatch(std::string const& body_path) {
   std::string extension;
+  std::string tmp(body_path.substr(1));
 
-  if (body_path.find_last_of('.') == std::string::npos)
+  if (tmp.find_last_of('.') == std::string::npos)
     extension = "text";
   else
-    extension = body_path.substr(body_path.find_last_of('.'));
+    extension = tmp.substr(tmp.find_last_of('.'));
 
   // TODO(VLN37) change to dynamic extension
   if (location->cgi.count(extension)) {
@@ -96,35 +103,8 @@ std::string Response::_itoa(size_t nbr) {
   return ret;
 }
 
-void Response::assemble(std::string const& body_path) {
-  std::string str = httpversion +
-                    statuscode +
-                    statusmsg +
-                    contenttype +
-                    DFL_CONTENTLEN;
-  std::string       body;
-  size_t            body_size;
-
-  if (!file.is_open())
-    file.open(body_path.c_str());
-  char buf[BUFFER_SIZE];
-  file.read(buf, BUFFER_SIZE);
-  body_size = file.gcount();
-  if (body_size == 0 || file.eof())
-    finished = true;
-  else
-    inprogress = true;
-
-  str.replace(str.find("LENGTH"), 6, _itoa(body_size));
-  std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
-  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
-  HttpBase::size = str.size() + body_size;
-  WebServ::log.debug() << "File requested: " << path << "\n";
-}
-
 void Response::create_directory_listing(void) {
   std::string       _template;
-  std::ifstream     in;
   std::ofstream     out;
   std::string       tmp;
 
@@ -133,14 +113,14 @@ void Response::create_directory_listing(void) {
 
   file.get(*(out.rdbuf()), '$');
   file.ignore();
-  std::getline(in, tmp);
+  std::getline(file, tmp);
   tmp.push_back('\n');
-  tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/') + 1));
+  tmp.replace(tmp.find("DIRNAME"), 7, path.substr(path.find_last_of('/')));
   out << tmp;
 
   file.get(*(out.rdbuf()), '$');
   file.ignore();
-  std::getline(in, _template);
+  std::getline(file, _template);
   _template.push_back('\n');
 
   struct dirent *dir;
@@ -149,7 +129,10 @@ void Response::create_directory_listing(void) {
   dir = readdir(directory);
   while (dir != NULL) {
     tmp = _template;
-    tmp.replace(tmp.find("PATH"), 4, req->path + "/" + dir->d_name);
+    if (req->path[req->path.size() - 1] == '/')
+      tmp.replace(tmp.find("PATH"), 4, req->path + dir->d_name);
+    else
+      tmp.replace(tmp.find("PATH"), 4, req->path + "/" + dir->d_name);
     tmp.replace(tmp.find("LINK"), 4, dir->d_name);
     out << tmp;
     dir = readdir(directory);
@@ -229,6 +212,58 @@ void Response::set_statuscode(int code) {
       create_redir_page();
   }
 }
+
+void Response::assemble_followup(void) {
+  char buf[BUFFER_SIZE];
+  size_t body_size;
+  std::string str;
+
+  file.read(buf, BUFFER_SIZE);
+  body_size = file.gcount();
+  if (body_size < BUFFER_SIZE || file.eof())
+    finished = true;
+
+  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
+  HttpBase::size = body_size;
+  HttpBase::buffer_resp[HttpBase::size] = '\0';
+  // WebServ::log.warning() << "Multipart response only partially implemented\n"
+  //                        << "message: \n"
+  //                        << HttpBase::buffer_resp << "\n";
+}
+
+void Response::assemble(std::string const& body_path) {
+  std::string       body;
+  size_t            body_size = 0;
+
+  WebServ::log.debug() << "File requested: " << path << "\n";
+  file.open(body_path.c_str(), file.ate);
+  body_max_size = file.tellg();
+  if (file.bad() || file.fail())
+    WebServ::log.error() << "file opening in Response::assemble\n";
+  file.seekg(std::ios::beg);
+  char buf[BUFFER_SIZE];
+  file.read(buf, BUFFER_SIZE);
+  body_size = file.gcount();
+  if (body_max_size < BUFFER_SIZE) {
+    finished = true;
+  }
+  else {
+    // contenttype = "Content-Type: application/octet-stream\n";
+    inprogress = true;
+  }
+  std::string str = httpversion +
+                    statuscode +
+                    statusmsg +
+                    contenttype +
+                    DFL_CONTENTLEN;
+  str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
+  std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
+  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
+  HttpBase::size = str.size() + body_size;
+  HttpBase::buffer_resp[HttpBase::size] = '\0';
+  // WebServ::log.debug() << HttpBase::buffer_resp;
+}
+
 
 void Response::process(void) {
   for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)

@@ -62,7 +62,9 @@ private:
   std::string statuscode;
   std::string statusmsg;
   std::string contenttype;
+  std::string filetype;
   std::string method;
+  size_t      body_max_size;
 
   Request const* req;
   std::string req_body;
@@ -101,6 +103,7 @@ public:
   ~Response(void);
   Response(Request *req, Server *_server);
   Response(void);
+  void assemble_followup(void);
   void assemble(std::string const& body_path);
   void set_request(Request const* req);
   void process(void);

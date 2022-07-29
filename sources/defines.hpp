@@ -50,6 +50,7 @@
 #define OK 200
 #define CREATED 201
 #define ACCEPTED 202
+#define PARTIAL_CONTENT 206
 #define MULTIPLE_CHOICE 300
 #define MOVED_PERMANENTLY 301
 #define FOUND 302
@@ -79,4 +80,6 @@
 
 #define DFL_CONTENTTYPE "Content-Type: text/html; charset=utf-8\n"
 #define DFL_CONTENTLEN "Content-Length: LENGTH\n\n"
+#define DFL_SEPARATOR "42__SEPARATOR__42\n"
+#define MULTIPART "Content-Type: multipart/byteranges; boundary=" DFL_SEPARATOR
 #endif  // DEFINES_H
