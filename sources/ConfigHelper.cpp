@@ -123,6 +123,10 @@ std::string ConfigHelper::get_root(void) {
 std::vector<std::string> ConfigHelper::get_index(void) {
   if (_tokens.size() == 1)
     throw InvalidNumberArgs(_tokens[0]);
+  for (size_t i = 1; i < _tokens.size(); i++) {
+    if (!_valid_index(_tokens[i]))
+      throw InvFieldValue("index", _tokens[i]);
+  }
   std::vector<std::string> tmp(_tokens.begin() + 1, _tokens.end());
   return (tmp);
 }
@@ -222,16 +226,32 @@ bool ConfigHelper::_valid_port(const std::string& port) {
 }
 
 bool ConfigHelper::_valid_server_name(const std::string& server_name) {
-  char start = *server_name.begin();
-  char end = *server_name.end() - 1;
-  if (!::isalnum(start) && !::isalnum(end))
+  char start = server_name[0];
+  char end = server_name[server_name.size() - 1];
+  if (!::isalnum(start) || !::isalnum(end))
     return (false);
   for (std::string::const_iterator it = server_name.begin();
        it != server_name.end();
        it++) {
-    if (!::isalnum(*it) && *it != '.')
+    if (!::isalnum(*it) && *it != '.' && *it != '-' && *it != '_')
       return (false);
   }
+  return (true);
+}
+
+bool ConfigHelper::_valid_index(const std::string& index) {
+  char start = index[0];
+  char end = index[index.size() - 1];
+  if (!::isalnum(start) || !::isalnum(end))
+    return (false);
+  for (std::string::const_iterator it = index.begin();
+       it != index.end();
+       it++) {
+    if (!::isalnum(*it) && *it != '.' && *it != '-' && *it != '_')
+      return (false);
+  }
+  if (index.find(".") == std::string::npos)
+    return (false);
   return (true);
 }
 
