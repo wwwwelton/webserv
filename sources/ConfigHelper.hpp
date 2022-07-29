@@ -99,6 +99,12 @@ class ConfigHelper {
     explicit DirectiveGlobal(const std::string& str);
     const char* what(void) const throw();
   };
+
+  class UnclosedBrackets : public LoadException {
+   public:
+    explicit UnclosedBrackets(const std::string& str);
+    const char* what(void) const throw();
+  };
 };
 
 #endif  // CONFIG_HELPER_HPP_

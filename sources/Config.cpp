@@ -36,8 +36,10 @@ size_t Config::size(void) {
 }
 
 void Config::load(char* file) {
-  std::istringstream is(_sanitize(_open(file)));
-  _parse(&is);
+  std::string tmp = _sanitize(_open(file));
+  std::istringstream is(tmp);
+  if (_is_valid(tmp))
+    _parse(&is);
 }
 
 std::string Config::_open(char* file) {
@@ -67,6 +69,24 @@ std::string Config::_sanitize(const std::string& file_content) {
   String::trim_lines(&tmp, " ");
 
   return (tmp);
+}
+
+bool Config::_is_valid(const std::string& file_content) {
+  int bl = 0;
+  int br = 0;
+  for (std::string::const_iterator it = file_content.begin();
+       it != file_content.end();
+       it++) {
+    if (*it == '{')
+      bl++;
+    if (*it == '}')
+      br++;
+  }
+  if (bl > br)
+    throw ConfigHelper::UnclosedBrackets("{");
+  if (br > bl)
+    throw ConfigHelper::UnclosedBrackets("}");
+  return (true);
 }
 
 std::vector<std::string> Config::_split_line(std::string line) {

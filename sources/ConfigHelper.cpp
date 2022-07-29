@@ -272,3 +272,12 @@ ConfigHelper::DirectiveGlobal ::DirectiveGlobal(const std::string& str)
 const char* ConfigHelper::DirectiveGlobal::what(void) const throw() {
   return (_m.c_str());
 }
+
+ConfigHelper::UnclosedBrackets ::UnclosedBrackets(const std::string& str)
+    : LoadException(str) {
+  _m = PARSE_ERROR "unclosed brackets \"" + str + "\"";
+}
+
+const char* ConfigHelper::UnclosedBrackets::what(void) const throw() {
+  return (_m.c_str());
+}
