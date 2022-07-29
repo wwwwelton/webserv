@@ -196,7 +196,8 @@ std::pair<int, std::string> ConfigHelper::get_redirect(void) {
   if (_tokens.size() != 3)
     throw InvalidNumberArgs(_tokens[0]);
   if (_tokens[1].find_first_not_of("0123456789") != std::string::npos ||
-      String::to_int(_tokens[1]) > 499 || String::to_int(_tokens[1]) < 100) {
+      String::to_int(_tokens[1]) > CFG_MAX_RED_CODE ||
+      String::to_int(_tokens[1]) < CFG_MIN_RED_CODE) {
     throw InvFieldValue("redirect", _tokens[1]);
   }
   return (std::make_pair(String::to_int(_tokens[1]), _tokens[2]));
