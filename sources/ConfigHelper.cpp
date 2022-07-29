@@ -248,7 +248,7 @@ const char* ConfigHelper::DirectiveUnknown::what(void) const throw() {
 ConfigHelper::InvFieldValue::InvFieldValue(const std::string& field,
                                            const std::string& value)
     : LoadException("") {
-  _m = PARSE_ERROR "invalid " + field + " in " + "\"" + value + "\"";
+  _m = PARSE_ERROR "invalid \"" + value + "\" in " + field;
 }
 
 const char* ConfigHelper::InvFieldValue::what(void) const throw() {
