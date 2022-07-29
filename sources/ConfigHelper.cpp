@@ -59,10 +59,10 @@ bool ConfigHelper::directive_already_exists(void) {
 int ConfigHelper::get_backlog(void) {
   if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
-  if (String::to_int(_tokens[1]) <= CFG_MIN_BACKLOG ||
-      String::to_int(_tokens[1]) > CFG_MAX_BACKLOG)
+  int backlog = String::to_int(_tokens[1]);
+  if (backlog <= CFG_MIN_BACKLOG || backlog > CFG_MAX_BACKLOG)
     throw DirectiveInvValue(_tokens[0]);
-  return (String::to_int(_tokens[1]));
+  return (backlog);
 }
 
 std::pair<in_addr_t, int> ConfigHelper::get_listen(void) {
