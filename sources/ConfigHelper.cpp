@@ -100,6 +100,10 @@ std::pair<in_addr_t, int> ConfigHelper::get_listen(void) {
 std::vector<std::string> ConfigHelper::get_server_name(void) {
   if (_tokens.size() == 1)
     throw InvalidNumberArgs(_tokens[0]);
+  for (size_t i = 1; i < _tokens.size(); i++) {
+    if (!_valid_server_name(_tokens[i]))
+      throw InvFieldValue("server_name", _tokens[i]);
+  }
   std::vector<std::string> tmp(_tokens.begin() + 1, _tokens.end());
   for (size_t i = 0; i < tmp.size(); i++) {
     std::transform(tmp[i].begin(), tmp[i].end(), tmp[i].begin(), ::tolower);
@@ -210,6 +214,20 @@ bool ConfigHelper::_valid_port(const std::string& port) {
   if (port.find_first_not_of("0123456789") != std::string::npos ||
       String::to_int(port) > 65000 || String::to_int(port) < 80) {
     return (false);
+  }
+  return (true);
+}
+
+bool ConfigHelper::_valid_server_name(const std::string& server_name) {
+  char start = *server_name.begin();
+  char end = *server_name.end() - 1;
+  if (!::isalnum(start) && !::isalnum(end))
+    return (false);
+  for (std::string::const_iterator it = server_name.begin();
+       it != server_name.end();
+       it++) {
+    if (!::isalnum(*it) && *it != '.')
+      return (false);
   }
   return (true);
 }

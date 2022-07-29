@@ -53,6 +53,7 @@ class ConfigHelper {
  private:
   bool _valid_ip(const std::string& ip);
   bool _valid_port(const std::string& port);
+  bool _valid_server_name(const std::string& server_name);
 
   std::vector<std::string> _tokens;
   std::multiset<std::string> _list;
