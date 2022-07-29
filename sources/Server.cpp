@@ -74,8 +74,14 @@ void Server::fill(void) {
 }
 
 bool Server::is_invalid(void) {
-  if (server_name.size() == 0 || location.size() == 0)
+  if (server_name.size() == 0) {
+    error = "server_name";
     return (true);
+  }
+  if (location.size() == 0) {
+    error = "location";
+    return (true);
+  }
   return (false);
 }
 

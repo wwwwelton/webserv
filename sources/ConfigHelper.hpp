@@ -83,6 +83,12 @@ class ConfigHelper {
     explicit InvFieldValue(const std::string& field, const std::string& value);
     const char* what(void) const throw();
   };
+
+  class NotSpecified : public LoadException {
+   public:
+    explicit NotSpecified(const std::string& field);
+    const char* what(void) const throw();
+  };
 };
 
 #endif  // CONFIG_HELPER_HPP_

@@ -61,6 +61,8 @@ class Server {
   void _listen(int backlog);
   int _connect(int backlog);
   void print(void);
+
+  std::string error;
 };
 
 #endif  // SERVER_HPP

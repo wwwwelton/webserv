@@ -230,3 +230,12 @@ ConfigHelper::InvFieldValue::InvFieldValue(const std::string& field,
 const char* ConfigHelper::InvFieldValue::what(void) const throw() {
   return (_m.c_str());
 }
+
+ConfigHelper::NotSpecified ::NotSpecified(const std::string& str)
+    : LoadException(str) {
+  _m = PARSE_ERROR "\"" + str + "\" not specified";
+}
+
+const char* ConfigHelper::NotSpecified::what(void) const throw() {
+  return (_m.c_str());
+}
