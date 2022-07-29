@@ -69,9 +69,8 @@ std::pair<in_addr_t, int> ConfigHelper::get_listen(void) {
   in_addr_t ip;
   int port;
 
-  if (String::split(_tokens[1], " ").size() != 1) {
+  if (String::split(_tokens[1], " ").size() != 1)
     throw InvalidNumberArgs(_tokens[0]);
-  }
   if (_tokens[1].find(":") != std::string::npos) {
     std::vector<std::string> tmp = String::split(_tokens[1], ":");
     if (tmp.size() != 2)
