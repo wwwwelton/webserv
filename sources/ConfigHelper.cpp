@@ -135,9 +135,12 @@ std::string ConfigHelper::get_error_page(void) {
   if (_tokens.size() != 3)
     throw InvalidNumberArgs(_tokens[0]);
   if (_tokens[1].find_first_not_of("0123456789") != std::string::npos ||
-      String::to_int(_tokens[1]) > 499 || String::to_int(_tokens[1]) < 400) {
+      String::to_int(_tokens[1]) > CFG_MAX_ERR_CODE ||
+      String::to_int(_tokens[1]) < CFG_MIN_ERR_CODE) {
     throw InvFieldValue("error_page", _tokens[1]);
   }
+  if (!_valid_error_page(_tokens[2]))
+    throw InvFieldValue("error_page", _tokens[2]);
   return (String::trim(std::string(_tokens[2]), "/"));
 }
 
@@ -251,6 +254,22 @@ bool ConfigHelper::_valid_index(const std::string& index) {
       return (false);
   }
   if (index.find(".") == std::string::npos)
+    return (false);
+  return (true);
+}
+
+bool ConfigHelper::_valid_error_page(const std::string& error_page) {
+  char start = error_page[0];
+  char end = error_page[error_page.size() - 1];
+  if ((!::isalnum(start) && start != '/') || !::isalnum(end))
+    return (false);
+  for (std::string::const_iterator it = error_page.begin();
+       it != error_page.end();
+       it++) {
+    if (!::isalnum(*it) && *it != '.' && *it != '-' && *it != '_' && *it != '/')
+      return (false);
+  }
+  if (error_page.find(".") == std::string::npos)
     return (false);
   return (true);
 }

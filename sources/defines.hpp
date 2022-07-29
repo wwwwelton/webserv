@@ -30,6 +30,8 @@
 #define CFG_FIELD_DOUBLE "error_page cgi return location"
 #define CFG_MIN_BACKLOG 1
 #define CFG_MAX_BACKLOG 4096
+#define CFG_MIN_ERR_CODE 400
+#define CFG_MAX_ERR_CODE 499
 
 #define LOG_LEVEL LVL_DEBUG
 
