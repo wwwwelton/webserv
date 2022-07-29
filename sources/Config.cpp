@@ -7,11 +7,17 @@
 
 #include "Config.hpp"
 
-Config::Config(void) { backlog = DFL_BACKLOG; }
+Config::Config(void) {
+  backlog = DFL_BACKLOG;
+}
 
-Config::Config(const Config& src) { *this = src; }
+Config::Config(const Config& src) {
+  *this = src;
+}
 
-Config::~Config(void) {}
+Config::~Config(void) {
+  return;
+}
 
 Config& Config::operator=(const Config& rhs) {
   if (this != &rhs) {
@@ -21,9 +27,13 @@ Config& Config::operator=(const Config& rhs) {
   return (*this);
 }
 
-const Server& Config::operator[](size_t n) { return (_servers[n]); }
+const Server& Config::operator[](size_t n) {
+  return (_servers[n]);
+}
 
-size_t Config::size(void) { return (_servers.size()); }
+size_t Config::size(void) {
+  return (_servers.size());
+}
 
 void Config::load(char* file) {
   std::istringstream is(_sanitize(_open(file)));
