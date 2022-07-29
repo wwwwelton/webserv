@@ -9,7 +9,7 @@
 #define DEFINES_H
 
 // Server host default
-#define DFL_BACKLOG 500;
+#define DFL_BACKLOG 500
 // Server vhost default
 #define DFL_ADDRESS "127.0.0.1"
 #define DFL_PORT 8080
@@ -25,6 +25,9 @@
 #define DFL_SOCK_FD -1
 // Server vhost location default
 #define DFL_LIM_EXCEPT "ALL"
+
+#define CFG_FIELD_UNIQUE "server"
+#define CFG_FIELD_DOUBLE "error_page cgi return location"
 
 #define LOG_LEVEL LVL_DEBUG
 

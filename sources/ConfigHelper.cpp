@@ -27,25 +27,27 @@ ConfigHelper& ConfigHelper::operator=(const ConfigHelper& rhs) {
 }
 
 void ConfigHelper::set_tokens(const std::vector<std::string>& tokens) {
+  std::string tmp;
+
   _tokens = tokens;
-  if (tokens[0] == "server" || tokens.size() <= 1 || tokens[0][0] == '#')
+
+  tmp = CFG_FIELD_UNIQUE;
+  if (tmp.find(tokens[0]) != std::string::npos ||
+      tokens.size() <= 1 || tokens[0][0] == '#')
     return;
-  if (tokens[0] == "error_page" ||
-      tokens[0] == "cgi" ||
-      tokens[0] == "return" ||
-      tokens[0] == "location")
+  tmp = CFG_FIELD_DOUBLE;
+  if (tmp.find(tokens[0]) != std::string::npos)
     _list.insert(tokens[0] + tokens[1]);
   else
     _list.insert(tokens[0]);
 }
 
 bool ConfigHelper::directive_already_exists(void) {
+  std::string tmp;
   std::string elem;
 
-  if (_tokens[0] == "error_page" ||
-      _tokens[0] == "cgi" ||
-      _tokens[0] == "return" ||
-      _tokens[0] == "location")
+  tmp = CFG_FIELD_DOUBLE;
+  if (tmp.find(_tokens[0]) != std::string::npos)
     elem = _tokens[0] + _tokens[1];
   else
     elem = _tokens[0];
