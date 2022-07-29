@@ -59,7 +59,8 @@ bool ConfigHelper::directive_already_exists(void) {
 int ConfigHelper::get_backlog(void) {
   if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
-  if (String::to_int(_tokens[1]) <= 0 || String::to_int(_tokens[1]) > 4096)
+  if (String::to_int(_tokens[1]) <= CFG_MIN_BACKLOG ||
+      String::to_int(_tokens[1]) > CFG_MAX_BACKLOG)
     throw DirectiveInvValue(_tokens[0]);
   return (String::to_int(_tokens[1]));
 }

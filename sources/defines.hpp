@@ -28,6 +28,8 @@
 
 #define CFG_FIELD_UNIQUE "server"
 #define CFG_FIELD_DOUBLE "error_page cgi return location"
+#define CFG_MIN_BACKLOG 1
+#define CFG_MAX_BACKLOG 4096
 
 #define LOG_LEVEL LVL_DEBUG
 
