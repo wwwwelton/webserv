@@ -210,6 +210,11 @@ std::vector<std::string> ConfigHelper::get_limit_except(void) {
   for (size_t i = 0; i < tmp.size(); i++) {
     std::transform(tmp[i].begin(), tmp[i].end(), tmp[i].begin(), ::toupper);
   }
+  std::vector<std::string> cmp = String::split(CFG_FIELD_LIM_EXCEPT, " ");
+  for (size_t i = 0; i < tmp.size(); i++) {
+    if (std::find(cmp.begin(), cmp.end(), tmp[i]) == cmp.end())
+      throw InvFieldValue("get_limit_except", tmp[i]);
+  }
   return (tmp);
 }
 
