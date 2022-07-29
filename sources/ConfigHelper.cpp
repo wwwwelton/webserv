@@ -156,7 +156,8 @@ int ConfigHelper::get_timeout(void) {
 int ConfigHelper::get_client_max_body_size(void) {
   if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
-  if (String::to_int(_tokens[1]) <= 0 || String::to_int(_tokens[1]) > 1000)
+  if (String::to_int(_tokens[1]) <= CFG_MIN_CLI_MAX_BODY_SIZE ||
+      String::to_int(_tokens[1]) > CFG_MAX_CLI_MAX_BODY_SIZE)
     throw DirectiveInvValue(_tokens[0]);
   return (String::to_int(_tokens[1]));
 }
