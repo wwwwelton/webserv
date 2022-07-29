@@ -36,6 +36,7 @@ std::string Config::_open(char* file) {
 
   ifs.open(file);
   ss << ifs.rdbuf();
+  ifs.close();
   return (ss.str());
 }
 
