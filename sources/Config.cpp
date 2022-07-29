@@ -72,15 +72,15 @@ std::string Config::_sanitize(const std::string& file_content) {
 ServerLocation Config::_parse_location(std::istringstream* is) {
   std::string line, directive;
   std::vector<std::string> tokens;
-
   ServerLocation location;
+  ConfigHelper helper;
 
   while (std::getline(*is, line)) {
     line = String::trim(line, "; ");
     tokens = String::split(line, " ");
     directive = tokens[0];
 
-    ConfigHelper helper(tokens);
+    helper.set_tokens(tokens);
 
     if (directive == "root") {
       location.root = helper.get_root();
@@ -111,15 +111,15 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
 Server Config::_parse_server(std::istringstream* is) {
   std::string line, directive;
   std::vector<std::string> tokens;
-
   Server srv;
+  ConfigHelper helper;
 
   while (std::getline(*is, line)) {
     line = String::trim(line, "; ");
     tokens = String::split(line, " ");
     directive = tokens[0];
 
-    ConfigHelper helper(tokens);
+    helper.set_tokens(tokens);
 
     if (directive == "listen") {
       srv.ip = helper.get_listen().first;
@@ -168,13 +168,14 @@ Server Config::_parse_server(std::istringstream* is) {
 void Config::_parse(std::istringstream* is) {
   std::string line, directive;
   std::vector<std::string> tokens;
+  ConfigHelper helper;
 
   while (std::getline(*is, line)) {
     line = String::trim(line, "; ");
     tokens = String::split(line, " ");
     directive = tokens[0];
 
-    ConfigHelper helper(tokens);
+    helper.set_tokens(tokens);
 
     if (directive == "workers")
       backlog = helper.get_backlog();

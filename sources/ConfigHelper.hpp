@@ -27,10 +27,11 @@ class ConfigHelper {
  public:
   ConfigHelper(void);
   ConfigHelper(const ConfigHelper& src);
-  explicit ConfigHelper(const std::vector<std::string>& tokens);
   ~ConfigHelper(void);
 
   ConfigHelper& operator=(const ConfigHelper& rhs);
+
+  void set_tokens(const std::vector<std::string>& tokens);
 
   int get_backlog(void);
   std::pair<in_addr_t, int> get_listen(void);

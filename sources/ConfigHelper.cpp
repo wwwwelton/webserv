@@ -15,10 +15,6 @@ ConfigHelper::ConfigHelper(const ConfigHelper& src) {
   *this = src;
 }
 
-ConfigHelper::ConfigHelper(const std::vector<std::string>& tokens) {
-  _tokens = tokens;
-}
-
 ConfigHelper::~ConfigHelper(void) {
   return;
 }
@@ -28,6 +24,10 @@ ConfigHelper& ConfigHelper::operator=(const ConfigHelper& rhs) {
     _tokens = rhs._tokens;
   }
   return (*this);
+}
+
+void ConfigHelper::set_tokens(const std::vector<std::string>& tokens) {
+  _tokens = tokens;
 }
 
 int ConfigHelper::get_backlog(void) {
