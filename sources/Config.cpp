@@ -26,11 +26,8 @@ const Server& Config::operator[](size_t n) { return (_servers[n]); }
 size_t Config::size(void) { return (_servers.size()); }
 
 void Config::load(char* file) {
-  std::string str = _sanitize(_open(file));
-  _parse(str);
-  for (size_t i = 0; i < _servers.size(); i++) {
-    _servers[i].print();
-  }
+  std::istringstream is(_sanitize(_open(file)));
+  _parse(&is);
 }
 
 std::string Config::_open(char* file) {
@@ -157,12 +154,11 @@ Server Config::_parse_server(std::istringstream* is) {
   return (srv);
 }
 
-void Config::_parse(const std::string& file_content) {
-  std::istringstream is(file_content);
+void Config::_parse(std::istringstream* is) {
   std::string line, directive;
   std::vector<std::string> tokens;
 
-  while (std::getline(is, line)) {
+  while (std::getline(*is, line)) {
     line = String::trim(line, "; ");
     tokens = String::split(line, " ");
     directive = tokens[0];
@@ -172,7 +168,7 @@ void Config::_parse(const std::string& file_content) {
     if (directive == "workers")
       backlog = helper.get_backlog();
     else if (directive == "server")
-      _servers.push_back(_parse_server(&is));
+      _servers.push_back(_parse_server(is));
     else
       throw ConfigHelper::DirectiveUnknown(tokens[0]);
   }
