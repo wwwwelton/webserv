@@ -263,3 +263,12 @@ ConfigHelper::NotSpecified ::NotSpecified(const std::string& str)
 const char* ConfigHelper::NotSpecified::what(void) const throw() {
   return (_m.c_str());
 }
+
+ConfigHelper::DirectiveGlobal ::DirectiveGlobal(const std::string& str)
+    : LoadException(str) {
+  _m = PARSE_ERROR "\"" + str + "\" must be specified before server blocks";
+}
+
+const char* ConfigHelper::DirectiveGlobal::what(void) const throw() {
+  return (_m.c_str());
+}

@@ -186,6 +186,8 @@ void Config::_parse(std::istringstream* is) {
 
     if (helper.already_exists())
       throw ConfigHelper::DirectiveDuplicate(tokens[0]);
+    if (directive == "workers" && _servers.size())
+      throw ConfigHelper::DirectiveGlobal(tokens[0]);
     if (directive == "workers")
       backlog = helper.get_backlog();
     else if (directive == "server")

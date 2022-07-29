@@ -90,7 +90,13 @@ class ConfigHelper {
 
   class NotSpecified : public LoadException {
    public:
-    explicit NotSpecified(const std::string& field);
+    explicit NotSpecified(const std::string& str);
+    const char* what(void) const throw();
+  };
+
+  class DirectiveGlobal : public LoadException {
+   public:
+    explicit DirectiveGlobal(const std::string& str);
     const char* what(void) const throw();
   };
 };
