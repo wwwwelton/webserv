@@ -87,7 +87,7 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
 
     helper.set_tokens(tokens);
 
-    if (helper.already_exists())
+    if (helper.directive_already_exists())
       throw ConfigHelper::DirectiveDuplicate(tokens[0]);
     if (directive == "root") {
       location.root = helper.get_root();
@@ -127,7 +127,7 @@ Server Config::_parse_server(std::istringstream* is) {
 
     helper.set_tokens(tokens);
 
-    if (helper.already_exists())
+    if (helper.directive_already_exists())
       throw ConfigHelper::DirectiveDuplicate(tokens[0]);
     if (directive == "listen") {
       srv.ip = helper.get_listen().first;
@@ -184,7 +184,7 @@ void Config::_parse(std::istringstream* is) {
 
     helper.set_tokens(tokens);
 
-    if (helper.already_exists())
+    if (helper.directive_already_exists())
       throw ConfigHelper::DirectiveDuplicate(tokens[0]);
     if (directive == "workers" && _servers.size())
       throw ConfigHelper::DirectiveGlobal(tokens[0]);

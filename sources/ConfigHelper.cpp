@@ -39,7 +39,7 @@ void ConfigHelper::set_tokens(const std::vector<std::string>& tokens) {
     _list.insert(tokens[0]);
 }
 
-bool ConfigHelper::already_exists(void) {
+bool ConfigHelper::directive_already_exists(void) {
   std::string elem;
 
   if (_tokens[0] == "error_page" ||
