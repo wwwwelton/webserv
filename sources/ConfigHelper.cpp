@@ -7,14 +7,21 @@
 
 #include "ConfigHelper.hpp"
 
-ConfigHelper::ConfigHelper(void) {}
+ConfigHelper::ConfigHelper(void) {
+  return;
+}
 
-ConfigHelper::ConfigHelper(const ConfigHelper& src) { *this = src; }
+ConfigHelper::ConfigHelper(const ConfigHelper& src) {
+  *this = src;
+}
 
-ConfigHelper::ConfigHelper(const std::vector<std::string>& tokens)
-    : _tokens(tokens) {}
+ConfigHelper::ConfigHelper(const std::vector<std::string>& tokens) {
+  _tokens = tokens;
+}
 
-ConfigHelper::~ConfigHelper(void) {}
+ConfigHelper::~ConfigHelper(void) {
+  return;
+}
 
 ConfigHelper& ConfigHelper::operator=(const ConfigHelper& rhs) {
   if (this != &rhs) {
