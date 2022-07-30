@@ -18,6 +18,8 @@ void Response::set_request(Request const*_req) {
   originalroot = server->location["/"].root;
   root = "./" + location->root;
   path = "./" + server->root + _req->path;
+
+  path = String::trim_last_if(path, '/');
   // std::cout << "location: " << location->root << "\n";
   // std::cout << "req path: " << _req->path << "\n";
   // std::cout << "root: " << root << "\n";

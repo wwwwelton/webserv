@@ -52,7 +52,7 @@ int Response::validate_folder(void) {
 int Response::validate_index(void) {
   if (path == root && location->index.size()) {
     for (size_t i = 0; i < server->index.size(); i++) {
-      std::string indexpath = root + server->index[i];
+      std::string indexpath = root + "/" + server->index[i];
       if (!access(indexpath.c_str(), R_OK)) {
         response_path = indexpath;
         return OK;
