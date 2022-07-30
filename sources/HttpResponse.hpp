@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <stdlib.h>
 
 #include <iostream>
 #include <fstream>

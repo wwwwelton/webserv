@@ -28,5 +28,31 @@ int Response::_post(void) {
   // ofile << req_body;
   // return CREATED;
 
-  return 404;
+  int pid;
+  int io[2];
+
+  pipe(io);
+  WebServ::log.error() << req->body;
+  WebServ::log.warning() << "test\n";
+  write(io[1], req->body.c_str(), req->body.size());
+  pid = fork();
+  if (pid == 0) {
+    close(io[1]);
+    dup2(io[0], STDIN_FILENO);
+    setenv("SCRIPT_FILENAME", "server_root/post/upload_handler.php", 1);
+    setenv("SCRIPT_NAME", "upload_handler.php", 1);
+    // setenv("REQUEST_URI", "/post/")
+    setenv("CONTENT_LENGTH", _itoa(req->body.size() - 1).c_str(), 1);
+    setenv("CONTENT_TYPE", "multipart/form-data", 1);
+    setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
+    setenv("REQUEST_METHOD", "POST", 1);
+    setenv("REDIRECT_STATUS", "true", 1);
+    setenv("PATH_INFO", "server_root/post/register.html", 1);
+    execlp("php-cgi", "php-cgi", (char *)NULL);
+  }
+  close(io[1]);
+  waitpid(pid, NULL, 0);
+  close(io[0]);
+  std::cout << "here\n";
+  return 401;
 }

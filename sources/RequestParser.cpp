@@ -226,14 +226,14 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           current_state = S_REQUEST_LINE_LF;
         } else if (c == '\n') {
           current_state = S_HEADER_LINE_START;
-        } else 
+        } else
             throw InvalidHttpRequestException(BadRequest);
         break;
 
       case S_REQUEST_LINE_LF:
         if (c == '\n') {
           current_state = S_HEADER_LINE_START;
-        } else 
+        } else
             throw InvalidHttpRequestException(BadRequest);
         break;
 
@@ -510,7 +510,7 @@ const char* RequestParser::RequestFinishedException::what() const throw()  {
 
 RequestParser::ReadException::ReadException(const std::string& mes)
   : _message(std::string("Read returned an error: ") + mes) {
-  
+
 }
 
 const char* RequestParser::ReadException::what() const throw()  {
