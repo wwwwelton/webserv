@@ -31,19 +31,15 @@ int Response::validate_limit_except(void) {
   return CONTINUE;
 }
 
-void Response::set_request(Request const*_req) {
-  req = _req;
-  if (_req->body.size()) {
-    WebServ::log.debug() << "Request body:\n" << _req->body << "\n";
-    req_body = req->body;
+void Response::find_location(std::string path, Server *server) {
+  while (path.find('/') != std::string::npos) {
+    if (server->location.count(path)) {
+      location = &server->location[path];
+      return;
+    }
+    path = path.erase(path.find_last_of('/'));
   }
-  find_location(_req->path, server);
-  path = "./" + location->root + _req->path;
-  root = "./" + location->root + "/";
-  method = _req->method;
-  response_code = location->redirect.first;
-  if (_req->error)
-    response_code = _req->error;
+  location = &server->location["/"];
 }
 
 int Response::validate_http_version(void) {
@@ -200,14 +196,15 @@ void Response::set_statuscode(int code) {
     response_path = DFL_TMPFILE;
   }
   else if (response_code >= BAD_REQUEST) {
-    if (server->error_page.count(response_code))
-      response_path = root + server->error_page[response_code];
+    if (server->error_page.count(response_code)) {
+      response_path = server->root + "/" + server->error_page[response_code];
+    }
     else
       create_error_page();
   }
   else if (response_code >= MOVED_PERMANENTLY) {
     if (server->error_page.count(response_code))
-      response_path = root + server->error_page[response_code];
+      response_path = server->root + "/" + server->error_page[response_code];
     else
       create_redir_page();
   }

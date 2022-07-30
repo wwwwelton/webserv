@@ -7,15 +7,25 @@
 
 #include "HttpResponse.hpp"
 
-void Response::find_location(std::string path, Server *server) {
-  while (path.find('/') != std::string::npos) {
-    if (server->location.count(path)) {
-      location = &server->location[path];
-      return;
-    }
-    path = path.erase(path.find_last_of('/'));
+void Response::set_request(Request const*_req) {
+  req = _req;
+  if (_req->body.size()) {
+    WebServ::log.debug() << "Request body:\n" << _req->body << "\n";
+    req_body = req->body;
   }
-  location = &server->location["/"];
+
+  find_location(_req->path, server);
+  originalroot = server->location["/"].root;
+  root = "./" + location->root;
+  path = "./" + server->root + _req->path;
+  // std::cout << "location: " << location->root << "\n";
+  // std::cout << "req path: " << _req->path << "\n";
+  // std::cout << "root: " << root << "\n";
+  // std::cout << "path: " << path << "\n";
+  method = _req->method;
+  response_code = location->redirect.first;
+  if (_req->error)
+    response_code = _req->error;
 }
 
 Response::Response(void): req(NULL) { }
