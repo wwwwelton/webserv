@@ -159,7 +159,7 @@ int ConfigHelper::get_client_max_body_size(void) {
   if (String::to_int(_tokens[1]) <= CFG_MIN_CLI_MAX_BODY_SIZE ||
       String::to_int(_tokens[1]) > CFG_MAX_CLI_MAX_BODY_SIZE)
     throw DirectiveInvValue(_tokens[0]);
-  return (String::to_int(_tokens[1]));
+  return (String::to_int(_tokens[1]) * 1000);
 }
 
 std::string ConfigHelper::get_access_log(void) {
