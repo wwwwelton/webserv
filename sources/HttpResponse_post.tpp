@@ -75,14 +75,15 @@ int Response::_post(void) {
 
     setenv("REQUEST_URI", "/post/upload_handler.php", 1);
     setenv("PATH_INFO", "/", 1);
-    setenv("PATH_TRANSLATED", "/home/vln37/workspace/42cursus/lvl15_webserv/server_root/post/upload_handler.php", 1);
+    setenv("PATH_TRANSLATED", "/home/paulo/docs/42/projects/webserv/server_root/post/upload_handler.php", 1);
     // setenv("SCRIPT_NAME", "/upload_handler.php", 1);
     setenv("SCRIPT_NAME", "/usr/bin/php-cgi", 1);
     // setenv("SCRIPT_FILENAME", "/home/vln37/workspace/42cursus/lvl15_webserv/server_root/post/upload_handler.php", 1);
-    setenv("SCRIPT_FILENAME", "/home/vln37/workspace/42cursus/lvl15_webserv/server_root/post/upload_handler.php", 1);
+    setenv("SCRIPT_FILENAME", "/home/paulo/docs/42/projects/webserv/server_root/post/upload_handler.php", 1);
     // setenv("REQUEST_URI", "/post/")
     setenv("CONTENT_LENGTH", _itoa(req->body.size()).c_str(), 1);
-    setenv("CONTENT_TYPE", "multipart/form-data; boundary=------WebKitFormBoundaryoPWer5AwvkzlAciI", 1);
+    // setenv("CONTENT_TYPE", "multipart/form-data; boundary=------WebKitFormBoundaryoPWer5AwvkzlAciI", 1);
+    setenv("CONTENT_TYPE", req->headers.at("Content-Type").c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
     execlp("php-cgi", "-R", (char *)NULL);
   }

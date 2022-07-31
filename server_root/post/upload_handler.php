@@ -6,7 +6,8 @@
     <body>
         <pre>
         <?php
-            echo "raw: "; var_dump($HTTP_RAW_POST_DATA);
+            // echo "raw: "; var_dump($HTTP_RAW_POST_DATA);
+            
             echo "files: "; var_dump($_FILES);
             echo "post: "; var_dump($_POST);
             echo "server: "; var_dump($_SERVER);
