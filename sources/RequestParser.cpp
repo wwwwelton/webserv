@@ -162,9 +162,9 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
   size_t i = 0;
 
   // buff[bytes_read] = '\0';
-  WebServ::log.debug() << "Incoming request data: [";
-  print_chunk(buff, 0, bytes_read);
-  std::cout << "]" << std::endl;
+  // WebServ::log.debug() << "Incoming request data: [";
+  // print_chunk(buff, 0, bytes_read);
+  // std::cout << "]" << std::endl;
   while (i < bytes_read) {
     char c = buff[i++];
     // WebServ::log.info() << "current request: " << *_request << std::endl;
@@ -277,8 +277,14 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           if (str_iequals(_header_key, "content-length")) {
             std::stringstream ss(_header_value);
             ss >> content_length;
-            if (content_length > max_content_length)
+            if (content_length > max_content_length) {
+              WebServ::log.warning() << "Request content-length is "
+                << content_length
+                << " but the serve max content-length acceptable is "
+                << max_content_length
+                << std::endl;
               throw InvalidHttpRequestException(RequestEntityTooLarge);
+            }
           } else if (str_iequals(_header_key, "transfer-encoding")) {
             if (_header_value != "identity")
               chunked = true;

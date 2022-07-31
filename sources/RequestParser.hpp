@@ -75,7 +75,7 @@ class RequestParser
 public:
   bool finished;
 
-  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 2000);
+  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 200000);
   ~RequestParser();
 
   void parse();

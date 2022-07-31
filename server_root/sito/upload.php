@@ -4,9 +4,11 @@
 //print_r($_SERVER);
 //var_dump($HTTP_RAW_POST_DATA);
 
-foreach($_SERVER as $key => $value){
-      echo "<tr><td>" . $key . ":</td><td>" . $value . "</td><tr><br/>";
-   }
+var_dump($_FILES);
+
+// foreach($_SERVER as $key => $value){
+//       echo "<tr><td>" . $key . ":</td><td>" . $value . "</td><tr><br/>";
+//    }
 
 if(file_exists($target_file)) {
     chmod($target_file,0755); //Change the file permissions if allowed
