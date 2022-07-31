@@ -114,8 +114,9 @@ std::vector<std::string> ConfigHelper::get_server_name(void) {
 std::string ConfigHelper::get_root(void) {
   if (_tokens.size() == 1)
     throw InvalidNumberArgs(_tokens[0]);
-  struct stat buffer;
-  if (stat(_tokens[1].c_str(), &buffer) != 0)
+  struct stat statbuf;
+  stat(_tokens[1].c_str(), &statbuf);
+  if (!S_ISDIR(statbuf.st_mode | S_IRUSR))
     throw InvFieldValue("root", _tokens[1]);
   return (String::trim(std::string(_tokens[1]), "/"));
 }
