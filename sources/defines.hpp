@@ -20,7 +20,7 @@
 #define DFL_404_PAGE "custom_404.html"
 #define DFL_405_PAGE "custom_405.html"
 #define DFL_TIMEOUT 300
-#define DFL_CLI_MAX_BODY_SIZE 1024000
+#define DFL_CLI_MAX_BODY_SIZE 1
 #define DFL_AUTO_INDEX 0
 #define DFL_SOCK_FD -1
 // Server vhost location default
@@ -35,7 +35,7 @@
 #define CFG_MIN_TIMEOUT 0
 #define CFG_MAX_TIMEOUT 4096
 #define CFG_MIN_CLI_MAX_BODY_SIZE 0
-#define CFG_MAX_CLI_MAX_BODY_SIZE 1024000
+#define CFG_MAX_CLI_MAX_BODY_SIZE 1024
 #define CFG_MIN_RED_CODE 100
 #define CFG_MAX_RED_CODE 499
 #define CFG_FIELD_LIM_EXCEPT "ALL GET POST PUT DELETE"
