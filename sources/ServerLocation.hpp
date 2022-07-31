@@ -14,7 +14,11 @@
 #include <utility>
 #include <vector>
 
+#include "Server.hpp"
+#include "String.hpp"
 #include "defines.hpp"
+
+class Server;
 
 class ServerLocation {
  public:
@@ -24,21 +28,15 @@ class ServerLocation {
   int client_max_body_size;
   std::map<std::string, std::string> cgi;
   std::pair<int, std::string> redirect;
-  bool autoindex;
-  bool filled;
+  int autoindex;
 
   ServerLocation(void);
-  ServerLocation(std::string root,
-                 std::vector<std::string> index,
-                 std::vector<std::string> limit_except,
-                 int client_max_body_size,
-                 std::map<std::string, std::string> cgi,
-                 std::pair<int, std::string> redirect,
-                 bool autoindex);
   ServerLocation(const ServerLocation& src);
   ~ServerLocation(void);
 
   ServerLocation& operator=(const ServerLocation& rhs);
+
+  void fill(const Server& srv);
 };
 
 #endif  // SERVERLOCATION_HPP

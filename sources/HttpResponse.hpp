@@ -69,6 +69,7 @@ private:
 
   Request const* req;
   std::string req_body;
+  std::string originalroot;
   std::string path;
   std::string root;
 

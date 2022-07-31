@@ -9,9 +9,6 @@
 
 Config::Config(void) {
   backlog = DFL_BACKLOG;
-
-  _error = 0;
-  _str_error = "";
 }
 
 Config::Config(const Config& src) {
@@ -24,7 +21,8 @@ Config::~Config(void) {
 
 Config& Config::operator=(const Config& rhs) {
   if (this != &rhs) {
-    this->_servers = rhs._servers;
+    backlog = rhs.backlog;
+    _servers = rhs._servers;
   }
   return (*this);
 }
@@ -37,315 +35,184 @@ size_t Config::size(void) {
   return (_servers.size());
 }
 
-void Config::parse(char* file) {
+void Config::load(char* file) {
+  std::string tmp = _sanitize(_open(file));
+  std::istringstream is(tmp);
+  if (_is_valid(tmp))
+    _parse(&is);
+}
+
+std::string Config::_open(char* file) {
   std::ifstream ifs;
   std::stringstream ss;
-  std::string str;
-  std::string host;
-  std::vector<std::string> vhost;
-
-  backlog = DFL_BACKLOG;
-
-  _error = 0;
-  _str_error = "";
 
   ifs.open(file);
   ss << ifs.rdbuf();
-
-  str = _sanitize(ss.str());
-
-  host = _sub_host(str);
-  vhost = _sub_vhost(str);
-
-  _parse_host(host);
-  _parse_vhost(vhost);
-}
-
-const std::string& Config::get_error(void) {
-  return (_str_error);
+  ifs.close();
+  return (ss.str());
 }
 
 std::string Config::_sanitize(const std::string& file_content) {
   std::string tmp(file_content);
 
-  _replace_all(&tmp, "\n", " ");
-  _replace_all(&tmp, "\t", " ");
+  String::replace_all(&tmp, "\n", " ");
+  String::replace_all(&tmp, "\t", " ");
 
-  _replace_all(&tmp, "server{", "server {");
+  String::replace_all(&tmp, "server{", "server {");
 
-  _replace_all(&tmp, ";", ";\n");
-  _replace_all(&tmp, "{", "{\n");
-  _replace_all(&tmp, "}", "}\n");
+  String::replace_all(&tmp, ";", ";\n");
+  String::replace_all(&tmp, "{", "{\n");
+  String::replace_all(&tmp, "}", "}\n");
 
-  _replace_unique(&tmp, ' ');
+  String::replace_unique(&tmp, ' ');
 
-  _trim_line(&tmp, " ");
+  String::trim_lines(&tmp, " ");
 
   return (tmp);
 }
 
-std::string Config::_sub_host(const std::string& file_content) {
-  size_t pos;
-  std::string host;
-
-  pos = file_content.find("server {");
-  host = file_content.substr(0, pos);
-
-  return (host);
+bool Config::_is_valid(const std::string& file_content) {
+  int bl = 0;
+  int br = 0;
+  for (std::string::const_iterator it = file_content.begin();
+       it != file_content.end();
+       it++) {
+    if (*it == '{')
+      bl++;
+    if (*it == '}')
+      br++;
+  }
+  if (bl > br)
+    throw ConfigHelper::UnclosedBrackets("{");
+  if (br > bl)
+    throw ConfigHelper::UnclosedBrackets("}");
+  return (true);
 }
 
-std::vector<std::string> Config::_sub_vhost(const std::string& file_content) {
-  size_t start, end;
-  std::vector<std::string> vhost;
-
-  start = file_content.find("server {");
-  end = file_content.find("server {", start + 8);
-  if (end == std::string::npos) {
-    end = file_content.length();
-  }
-
-  while (start != std::string::npos) {
-    vhost.push_back(file_content.substr(start, end - start));
-    start += 8;
-    start = file_content.find("server {", start);
-    end = file_content.find("server {", start + 8);
-    if (end == std::string::npos) {
-      end = file_content.length();
-    }
-  }
-
-  return (vhost);
+std::vector<std::string> Config::_split_line(std::string line) {
+  line = String::trim(line, " ");
+  line = String::trim_last_if(line, ';');
+  return (String::split(line, " "));
 }
 
-void Config::_parse_host(const std::string& host) {
-  std::istringstream is(host);
-  std::string line;
+ServerLocation Config::_parse_location(std::istringstream* is) {
+  std::string line, directive;
   std::vector<std::string> tokens;
+  ServerLocation location;
+  ConfigHelper helper;
 
-  while (std::getline(is, line)) {
-    line = _trim(line, "; ");
-    tokens = _split(line, " ");
+  while (std::getline(*is, line)) {
+    tokens = _split_line(line);
+    directive = tokens[0];
 
-    if (tokens[0] == "workers") {
-      backlog = _stoi(tokens[1]);
-    }
-  }
-}
+    helper.set_tokens(tokens);
 
-void Config::_parse_vhost(const std::vector<std::string>& vhost) {
-  for (size_t i = 0; i < vhost.size(); i++) {
-    std::istringstream is(vhost[i]);
-    std::string line;
-    std::vector<std::string> tokens;
-
-    Server srv;
-
-    while (std::getline(is, line)) {
-      line = _trim(line, "; ");
-      tokens = _split(line, " ");
-
-      if (tokens[0] == "listen") {
-        if (tokens[1].find(":") != std::string::npos) {
-          tokens = _split(tokens[1], ":");
-          srv.ip = inet_addr(tokens[0].c_str());
-          srv.port = htons(_stoi(tokens[1]));
-        } else {
-          srv.ip = inet_addr(DFL_ADDRESS);
-          srv.port = htons(_stoi(tokens[1]));
-        }
-      }
-
-      if (tokens[0] == "server_name") {
-        if (srv.server_name[0] == DFL_SERVER_NAME1 &&
-            srv.server_name[1] == DFL_SERVER_NAME2) {
-          srv.server_name.clear();
-        }
-        for (size_t i = 1; i < tokens.size(); i++) {
-          srv.server_name.push_back(tokens[i]);
-        }
-      }
-
-      if (tokens[0] == "root") {
-        srv.root = _trim(std::string(tokens[1]), "/");
-      }
-
-      if (tokens[0] == "index") {
-        if (srv.index[0] == DFL_SERVER_INDEX_PAGE1 &&
-            srv.index[1] == DFL_SERVER_INDEX_PAGE2) {
-          srv.index.clear();
-        }
-        for (size_t i = 1; i < tokens.size(); i++) {
-          srv.index.push_back(tokens[i]);
-        }
-      }
-
-      if (tokens[0] == "error_page") {
-        srv.error_page[_stoi(tokens[1])] = _trim(std::string(tokens[2]), "/");
-      }
-
-      if (tokens[0] == "timeout") {
-        srv.timeout = _stoi(tokens[1]);
-      }
-
-      if (tokens[0] == "client_max_body_size") {
-        srv.client_max_body_size = _stoi(tokens[1]);
-      }
-
-      if (tokens[0] == "access_log") {
-        srv.log["access_log"] = tokens[1];
-      }
-
-      if (tokens[0] == "error_log") {
-        srv.log["error_log"] = tokens[1];
-      }
-
-      if (tokens[0] == "autoindex") {
-        srv.autoindex = (tokens[1] == "on") ? true : false;
-      }
-
-      if (tokens[0] == "cgi") {
-        srv.cgi["." + tokens[1]] = tokens[2];
-      }
-
-      if (tokens[0] == "return") {
-        srv.redirect.first = _stoi(tokens[1]);
-        srv.redirect.second = tokens[2];
-      }
-
-      if (tokens[0] == "location") {
-        std::string index = tokens[1];
-
-        if (srv.location.find(index) == srv.location.end()) {
-          srv.location[index].root = srv.root;
-          srv.location[index].index = srv.index;
-          srv.location[index].limit_except.push_back(DFL_LIM_EXCEPT);
-          srv.location[index].client_max_body_size = srv.client_max_body_size;
-          srv.location[index].cgi = srv.cgi;
-          srv.location[index].redirect = srv.redirect;
-        }
-
-        while (std::getline(is, line)) {
-          line = _trim(line, "; ");
-          tokens = _split(line, " ");
-
-          if (tokens[0] == "root") {
-            srv.location[index].root = _trim(std::string(tokens[1]), "/");
-          }
-
-          if (tokens[0] == "index") {
-            for (size_t i = 1; i < tokens.size(); i++) {
-              srv.location[index].index.push_back(tokens[i]);
-            }
-          }
-
-          if (tokens[0] == "limit_except") {
-            if (srv.location[index].limit_except[0] == DFL_LIM_EXCEPT) {
-              srv.location[index].limit_except.pop_back();
-            }
-            for (size_t i = 1; i < tokens.size(); i++) {
-              std::transform(tokens[i].begin(),
-                             tokens[i].end(),
-                             tokens[i].begin(),
-                             ::toupper);
-              srv.location[index].limit_except.push_back(tokens[i]);
-            }
-          }
-
-          if (tokens[0] == "client_max_body_size") {
-            srv.location[index].client_max_body_size = _stoi(tokens[1]);
-          }
-
-          if (tokens[0] == "autoindex") {
-            srv.location[index].autoindex = (tokens[1] == "on") ? true : false;
-          }
-
-          if (tokens[0] == "cgi") {
-            srv.location[index].cgi["." + tokens[1]] = tokens[2];
-          }
-
-          if (tokens[0] == "return") {
-            if (srv.location[index].redirect.first == 0 &&
-                srv.location[index].redirect.second.empty()) {
-              srv.location[index].redirect.first = _stoi(tokens[1]);
-              srv.location[index].redirect.second = tokens[2];
-            }
-          }
-
-          if (line == "}") {
-            break;
-          }
-        }
-      }
-    }
-
-    // srv.print();
-
-    _servers.push_back(srv);
-  }
-}
-
-void Config::_replace_all(std::string* str,
-                          const std::string& old_word,
-                          const std::string& new_word) {
-  size_t pos;
-
-  pos = str->find(old_word);
-  while (pos != std::string::npos) {
-    str->replace(pos, old_word.length(), new_word);
-    pos = str->find(old_word, pos + new_word.length());
-  }
-}
-
-void Config::_replace_unique(std::string* str, char pattern) {
-  std::string tmp("");
-
-  for (std::string::size_type i = 0; i < str->size() - 1; i++) {
-    if (str->at(i) == pattern && str->at(i + 1) == pattern) {
+    if (helper.directive_already_exists())
+      throw ConfigHelper::DirectiveDuplicate(tokens[0]);
+    if (directive == "root") {
+      location.root = helper.get_root();
+    } else if (directive == "index") {
+      location.index = helper.get_index();
+    } else if (directive == "limit_except") {
+      location.limit_except = helper.get_limit_except();
+    } else if (directive == "client_max_body_size") {
+      location.client_max_body_size = helper.get_client_max_body_size();
+    } else if (directive == "autoindex") {
+      location.autoindex = helper.get_autoindex();
+    } else if (directive == "cgi") {
+      location.cgi["." + tokens[1]] = helper.get_cgi();
+    } else if (directive == "return") {
+      location.redirect = helper.get_redirect();
+    } else if (directive[0] == '#') {
       continue;
+    } else if (directive == "}") {
+      break;
+    } else {
+      throw ConfigHelper::DirectiveUnknown(directive);
     }
-    tmp += str->at(i);
   }
-  *str = tmp;
+
+  return (location);
 }
 
-std::string Config::_trim(const std::string& str, const std::string& set) {
-  std::string tmp(str);
+Server Config::_parse_server(std::istringstream* is) {
+  std::string line, directive;
+  std::vector<std::string> tokens;
+  Server srv;
+  ConfigHelper helper;
 
-  tmp.erase(tmp.find_last_not_of(set) + 1);
-  tmp.erase(0, tmp.find_first_not_of(set));
+  while (std::getline(*is, line)) {
+    tokens = _split_line(line);
+    directive = tokens[0];
 
-  return (tmp);
-}
+    helper.set_tokens(tokens);
 
-void Config::_trim_line(std::string* str, const std::string& set) {
-  std::istringstream is(*str);
-  std::string line;
-
-  str->erase();
-  while (std::getline(is, line)) {
-    str->append(_trim(line, set));
-    str->append("\n");
+    if (helper.directive_already_exists())
+      throw ConfigHelper::DirectiveDuplicate(tokens[0]);
+    if (directive == "listen") {
+      srv.ip = helper.get_listen().first;
+      srv.port = helper.get_listen().second;
+    } else if (directive == "server_name") {
+      srv.server_name = helper.get_server_name();
+    } else if (directive == "root") {
+      srv.root = helper.get_root();
+    } else if (directive == "index") {
+      srv.index = helper.get_index();
+    } else if (directive == "error_page") {
+      int code = String::to_int(tokens[1]);
+      srv.error_page[code] = helper.get_error_page();
+    } else if (directive == "timeout") {
+      srv.timeout = helper.get_timeout();
+    } else if (directive == "client_max_body_size") {
+      srv.client_max_body_size = helper.get_client_max_body_size();
+    } else if (directive == "access_log") {
+      srv.log["access_log"] = helper.get_access_log();
+    } else if (directive == "error_log") {
+      srv.log["error_log"] = helper.get_error_log();
+    } else if (directive == "autoindex") {
+      srv.autoindex = helper.get_autoindex();
+    } else if (directive == "cgi") {
+      srv.cgi["." + tokens[1]] = helper.get_cgi();
+    } else if (directive == "return") {
+      srv.redirect = helper.get_redirect();
+    } else if (directive == "location") {
+      srv.location[tokens[1]] = _parse_location(is);
+    } else if (directive[0] == '#') {
+      continue;
+    } else if (directive == "}") {
+      break;
+    } else {
+      throw ConfigHelper::DirectiveUnknown(directive);
+    }
   }
+
+  srv.fill();
+  if (srv.is_invalid())
+    throw ConfigHelper::NotSpecified(srv.error);
+
+  return (srv);
 }
 
-std::vector<std::string> Config::_split(const std::string& str,
-                                        const std::string& del) {
-  std::vector<std::string> list;
-  std::string s(str);
-  size_t pos = 0;
+void Config::_parse(std::istringstream* is) {
+  std::string line, directive;
+  std::vector<std::string> tokens;
+  ConfigHelper helper;
 
-  std::string token;
-  while ((pos = s.find(del)) != std::string::npos) {
-    token = s.substr(0, pos);
-    list.push_back(token);
-    s.erase(0, pos + del.length());
+  while (std::getline(*is, line)) {
+    tokens = _split_line(line);
+    directive = tokens[0];
+
+    helper.set_tokens(tokens);
+
+    if (helper.directive_already_exists())
+      throw ConfigHelper::DirectiveDuplicate(tokens[0]);
+    if (directive == "workers" && _servers.size())
+      throw ConfigHelper::DirectiveGlobal(tokens[0]);
+    if (directive == "workers")
+      backlog = helper.get_backlog();
+    else if (directive == "server")
+      _servers.push_back(_parse_server(is));
+    else
+      throw ConfigHelper::DirectiveUnknown(tokens[0]);
   }
-  list.push_back(s);
-  return (list);
-}
-
-size_t Config::_stoi(const std::string& str) {
-  size_t n;
-  std::istringstream(str) >> n;
-  return (n);
 }

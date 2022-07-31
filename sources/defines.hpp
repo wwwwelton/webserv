@@ -9,15 +9,14 @@
 #define DEFINES_H
 
 // Server host default
-#define DFL_BACKLOG 500;
+#define DFL_BACKLOG 500
 // Server vhost default
 #define DFL_ADDRESS "127.0.0.1"
 #define DFL_PORT 8080
 #define DFL_SERVER_NAME1 "localhost"
 #define DFL_SERVER_NAME2 "www.localhost"
 #define DFL_SERVER_ROOT "server_root"
-#define DFL_SERVER_INDEX_PAGE1 "index.html"
-#define DFL_SERVER_INDEX_PAGE2 "index.php"
+#define DFL_SERVER_INDEX "index.html index.php"
 #define DFL_404_PAGE "custom_404.html"
 #define DFL_405_PAGE "custom_405.html"
 #define DFL_TIMEOUT 300
@@ -26,6 +25,20 @@
 #define DFL_SOCK_FD -1
 // Server vhost location default
 #define DFL_LIM_EXCEPT "ALL"
+
+#define CFG_FIELD_UNIQUE "server"
+#define CFG_FIELD_DOUBLE "error_page cgi return location"
+#define CFG_MIN_BACKLOG 1
+#define CFG_MAX_BACKLOG 4096
+#define CFG_MIN_ERR_CODE 400
+#define CFG_MAX_ERR_CODE 499
+#define CFG_MIN_TIMEOUT 0
+#define CFG_MAX_TIMEOUT 4096
+#define CFG_MIN_CLI_MAX_BODY_SIZE 0
+#define CFG_MAX_CLI_MAX_BODY_SIZE 1000
+#define CFG_MIN_RED_CODE 100
+#define CFG_MAX_RED_CODE 499
+#define CFG_FIELD_LIM_EXCEPT "ALL GET POST PUT DELETE"
 
 #define LOG_LEVEL LVL_DEBUG
 

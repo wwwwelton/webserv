@@ -48,7 +48,7 @@ WebServ::WebServ(int argc, char **argv) {
   log.info() << "WebServ Signals initialized\n";
 
   validate_input(argc, argv);
-  conf.parse(argv[1]);
+  conf.load(argv[1]);
   log.info() << "WebServ Loaded " << argv[1] << "\n";
 
   conn = 0;

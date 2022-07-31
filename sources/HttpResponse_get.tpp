@@ -25,9 +25,11 @@ int Response::validate_path(void) {
 
 int Response::validate_folder(void) {
   struct stat path_stat;
-//   server->print();
-  if (stat(path.c_str(), &path_stat) == -1)
+
+  std::cout << "here\n";
+  if (stat(path.c_str(), &path_stat) == -1) {
     return NOT_FOUND;
+  }
   if (S_ISREG(path_stat.st_mode)) {
     return CONTINUE;
   }
@@ -56,10 +58,13 @@ int Response::validate_index(void) {
         return OK;
       }
     }
-    if (errno == ENOENT)
-      return NOT_FOUND;
-    if (errno == EACCES)
+    if (location->autoindex == true) {
+      folder_request = true;
+    }
+    else if (errno == ENOENT)
       return FORBIDDEN;
+    else if (errno == EACCES)
+      return UNAUTHORIZED;
   }
   return CONTINUE;
 }

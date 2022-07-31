@@ -16,9 +16,13 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "ConfigHelper.hpp"
+#include "LoadException.hpp"
 #include "Server.hpp"
+#include "String.hpp"
 
 class Server;
 
@@ -32,39 +36,22 @@ class Config {
   const Server& operator[](size_t n);
 
   size_t size(void);
-
-  void parse(char* file);
-
-  const std::string& get_error(void);
+  void load(char* file);
 
  private:
+  std::string _open(char* file);
   std::string _sanitize(const std::string& file_content);
-  std::string _sub_host(const std::string& file_content);
-  std::vector<std::string> _sub_vhost(const std::string& file_content);
-  void _parse_host(const std::string& host);
-  void _parse_vhost(const std::vector<std::string>& vhost);
-
-  void _replace_all(std::string* str,
-                    const std::string& old_word,
-                    const std::string& new_word);
-
-  void _replace_unique(std::string* str, char pattern);
-
-  std::string _trim(const std::string& str, const std::string& set);
-  void _trim_line(std::string* str, const std::string& set);
-
-  std::vector<std::string> _split(const std::string& str,
-                                  const std::string& del);
-
-  size_t _stoi(const std::string& str);
+  bool _is_valid(const std::string& file_content);
+  std::vector<std::string> _split_line(std::string line);
+  void _parse(std::istringstream* is);
+  Server _parse_server(std::istringstream* is);
+  ServerLocation _parse_location(std::istringstream* is);
 
  public:
   int backlog;
 
  private:
   std::vector<Server> _servers;
-  int _error;
-  std::string _str_error;
 };
 
 #endif  // CONFIG_HPP_

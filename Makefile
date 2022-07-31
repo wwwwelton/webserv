@@ -19,6 +19,8 @@ SRC     = main.cpp \
           LoadException.cpp \
           validate_input.cpp \
           signal.cpp \
+          String.cpp \
+          ConfigHelper.cpp \
 
 
 INC     = defines.hpp \
@@ -35,6 +37,8 @@ INC     = defines.hpp \
           LoadException.hpp \
           validate_input.hpp \
           signal.hpp \
+          String.hpp \
+          ConfigHelper.hpp \
 
 OBJDIR  = objects
 SRC_DIR =	sources

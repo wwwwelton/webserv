@@ -17,6 +17,7 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <climits>
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -25,7 +26,10 @@
 #include <vector>
 
 #include "ServerLocation.hpp"
+#include "String.hpp"
 #include "defines.hpp"
+
+class ServerLocation;
 
 class Server {
  public:
@@ -41,7 +45,7 @@ class Server {
   std::map<std::string, std::string> cgi;
   std::pair<int, std::string> redirect;
   std::map<std::string, ServerLocation> location;
-  bool autoindex;
+  int autoindex;
   int sockfd;
 
   Server(void);
@@ -50,11 +54,15 @@ class Server {
 
   Server& operator=(const Server& rhs);
 
+  void fill(void);
+  bool is_invalid(void);
   void _socket(void);
   void _bind(void);
   void _listen(int backlog);
   int _connect(int backlog);
   void print(void);
+
+  std::string error;
 };
 
 #endif  // SERVER_HPP
