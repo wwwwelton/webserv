@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 
+#include<iomanip>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -110,6 +111,8 @@ public:
   void set_request(Request const* req);
   void process(void);
   void _send(int fd);
+  friend std::ostream& operator<<(std::ostream&o, Response const& rhs);
 };
+
 
 #endif // HTTPRESPONSE_HPP

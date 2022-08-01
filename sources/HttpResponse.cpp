@@ -7,6 +7,32 @@
 
 #include "HttpResponse.hpp"
 
+std::ostream& operator<<(std::ostream& o, Response const& rhs) {
+  o << std::setfill(' ') << " [ RESPONSE DUMP ]\n"
+    << std::setw(15) << std::left << "method" << " : "
+    << rhs.method << "\n"
+    << std::setw(15) << std::left << "httpversion" << " : "
+    << rhs.httpversion << "\n"
+    << std::setw(15) << std::left << "statuscode" << " : "
+    << rhs.statuscode << "\n"
+    << std::setw(15) << std::left << "statusmsg" << " : "
+    << rhs.statusmsg << "\n"
+    << std::setw(15) << std::left << "path" << " : "
+    << rhs.path << "\n"
+    << std::setw(15) << std::left << "root" << " : "
+    << rhs.root << "\n"
+    << std::setw(15) << std::left << "originalroot" << " : "
+    << rhs.originalroot << "\n"
+    << std::setw(15) << std::left << "contenttype" << " : "
+    << rhs.contenttype << "\n"
+    << std::setw(15) << std::left << "filetype" << " : "
+    << rhs.filetype << "\n"
+    << std::setw(15) << std::left << "response_path" << " : "
+    << rhs.response_path << "\n";
+  (void)o;
+  return o;
+}
+
 void Response::_send(int fd) {
   ssize_t bytes;
   bytes = send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
@@ -260,7 +286,6 @@ void Response::assemble(std::string const& body_path) {
   HttpBase::buffer_resp[HttpBase::size] = '\0';
   // WebServ::log.debug() << HttpBase::buffer_resp;
 }
-
 
 void Response::process(void) {
   for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)

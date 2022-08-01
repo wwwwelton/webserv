@@ -17,7 +17,10 @@ void Response::set_request(Request const*_req) {
   find_location(_req->path, server);
   originalroot = server->location["/"].root;
   root = "./" + location->root;
-  path = "./" + server->root + _req->path;
+  if (req->method == "POST")
+    path = "./" + req->headers.at("Referer") + _req->path;
+  else
+    path = "./" + server->root + _req->path;
   // std::cout << "location: " << location->root << "\n";
   // std::cout << "req path: " << _req->path << "\n";
   // std::cout << "root: " << root << "\n";
@@ -26,6 +29,8 @@ void Response::set_request(Request const*_req) {
   response_code = location->redirect.first;
   if (_req->error)
     response_code = _req->error;
+  WebServ::log.debug() << *this;
+  server->print();
 }
 
 Response::Response(void): req(NULL) { }
