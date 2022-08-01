@@ -10,6 +10,9 @@
     <p>
 <?php
 
+header('Content-Type: text/html');
+header_remove('Content-Type');
+
 // foreach($_SERVER as $key => $value){
 //       echo "<tr><td>" . $key . ":</td><td>" . $value . "</td><tr><br/>";
 //    }
