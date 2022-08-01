@@ -26,7 +26,6 @@ int Response::validate_path(void) {
 int Response::validate_folder(void) {
   struct stat path_stat;
 
-  std::cout << "here\n";
   if (stat(path.c_str(), &path_stat) == -1) {
     return NOT_FOUND;
   }

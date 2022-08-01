@@ -258,6 +258,7 @@ void Response::assemble(std::string const& body_path) {
   std::string       body;
   size_t            body_size = 0;
 
+  WebServ::log.debug() << *this;
   WebServ::log.debug() << "File requested: " << path << "\n";
   file.open(body_path.c_str(), file.ate);
   body_max_size = file.tellg();

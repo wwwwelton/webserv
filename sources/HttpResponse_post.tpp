@@ -8,38 +8,19 @@
 #include "HttpResponse.hpp"
 
 int Response::_post(void) {
-  // std::string   file;
-  // std::ofstream ofile;
-  // std::stringstream stream(req_body);
-
-  // std::getline(stream, file, '\n');
-  // std::getline(stream, file, '\n');
-  // std::getline(stream, file, '\n');
-  // std::getline(stream, file, '\n');
-  // // file = location->upload_store + "/" + file; // remove
-  // access(file.c_str(), W_OK);
-  // if (errno == EACCES)
-  //   return FORBIDDEN;
-  // ofile.open(file.c_str(), ofile.out | ofile.trunc);
-  // if (!ofile.good()) {
-  //   WebServ::log.warning() << "file creation failed returning 500\n";
-  //   return INTERNAL_SERVER_ERROR;
-  // }
-  // ofile << req_body;
-  // return CREATED;
-
+  int outfile;
   int pid;
   int io[2];
 
   pipe(io);
-  WebServ::log.error() << req->body;
-  WebServ::log.warning() << "test\n";
+  outfile = open(DFL_TMPFILE, O_CREAT | O_RDWR | O_TRUNC, 0777);
   // TODO: write dinamically
   write(io[1], req->body.c_str(), req->body.size());
   pid = fork();
   if (pid == 0) {
     close(io[1]);
     dup2(io[0], STDIN_FILENO);
+    dup2(outfile, STDOUT_FILENO);
 
     // setenv("HTTP_ACCEPT", "", 1);
     // setenv("HTTP_SEC_FETCH_USER", "?1", 1); // ?
@@ -91,6 +72,8 @@ int Response::_post(void) {
   close(io[1]);
   waitpid(pid, NULL, 0);
   close(io[0]);
-  std::cout << "here\n";
-  return 401;
+  close(outfile);
+  response_path = DFL_TMPFILE;
+  // remove_tmp = 1;
+  return OK;
 }
