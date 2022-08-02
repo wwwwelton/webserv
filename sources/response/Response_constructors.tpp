@@ -11,6 +11,8 @@ void Response::find_location(std::string path, Server *server) {
   while (path.find('/') != std::string::npos) {
     if (server->location.count(path)) {
       location = &server->location[path];
+      if (path.at(path.size() - 1) == '/')
+        path = path.erase(path.find_last_of('/'));
       return;
     }
     path = path.erase(path.find_last_of('/'));
@@ -27,6 +29,13 @@ void Response::set_request(Request const*_req) {
   }
 
   find_location(_req->path, server);
+
+  // gambis
+  server->location[location->root + "/"] = *location;
+  location = &server->location[location->root + "/"];
+  location->root.push_back('/');
+  // gambis
+
   originalroot = server->location["/"].root;
   root = "./" + location->root;
   if (req->method == "POST")
