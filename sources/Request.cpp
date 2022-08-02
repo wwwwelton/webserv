@@ -6,7 +6,7 @@
 //##############################################################################
 
 
-#include "HttpRequest.hpp"
+#include "Request.hpp"
 
 // TODO: remove this
 std::ostream& operator<<(std::ostream& out, const Request& request) {

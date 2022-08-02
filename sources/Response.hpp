@@ -27,8 +27,8 @@
 #include <vector>
 
 #include "Server.hpp"
-#include "HttpRequest.hpp"
-#include "HttpBase.hpp"
+#include "Request.hpp"
+#include "ResponseBase.hpp"
 #include "WebServ.hpp"
 #include "Logger.hpp"
 

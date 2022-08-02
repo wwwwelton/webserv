@@ -7,15 +7,15 @@ NAME    = webserv
 
 SRC     = main.cpp \
           WebServ.cpp \
-          HttpBase.cpp \
-          HttpRequest.cpp \
+          ResponseBase.cpp \
+          Request.cpp \
           RequestParser.cpp \
           Pollfd.cpp \
           Server.cpp \
           ServerLocation.cpp \
           Config.cpp \
           Logger.cpp \
-          HttpResponse.cpp \
+          Response.cpp \
           LoadException.cpp \
           validate_input.cpp \
           signal.cpp \
@@ -25,15 +25,15 @@ SRC     = main.cpp \
 
 INC     = defines.hpp \
           WebServ.hpp \
-          HttpBase.hpp \
-          HttpRequest.hpp \
+          ResponseBase.hpp \
+          Request.hpp \
           RequestParser.hpp \
           Pollfd.hpp \
           Server.hpp \
           ServerLocation.hpp \
           Config.hpp \
           Logger.hpp \
-          HttpResponse.hpp \
+          Response.hpp \
           LoadException.hpp \
           validate_input.hpp \
           signal.hpp \

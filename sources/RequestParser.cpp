@@ -1,5 +1,5 @@
 #include "RequestParser.hpp"
-#include "HttpRequest.hpp"
+#include "Request.hpp"
 #include "WebServ.hpp"
 #include <cctype>
 #include <cstddef>
@@ -173,7 +173,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
       case S_INIT:
       case S_METHOD_START:
         if (!is_ualpha(c)) {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         }
         _request->method.push_back(c);
         current_state = S_METHOD;
@@ -183,7 +183,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         if (is_space(c)) {
           current_state = S_URI_START;
         } else if (!is_ualpha(c)) {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         } else {
           _request->method.push_back(c);
         }
@@ -191,7 +191,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 
       case S_URI_START:
         if (is_ctl(c)) {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         }
         _request->path.push_back(c);
         current_state = S_URI;
@@ -201,7 +201,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         if(is_space(c)) {
           current_state = S_HTTP_VERSION;
         } else if (is_ctl(c)) {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         } else {
           _request->path.push_back(c);
         }
@@ -214,7 +214,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
             _request->http_version = supported_version;
             current_state = S_REQUEST_LINE_CRLF;
           } else if (c != supported_version[idx]) {
-            throw InvalidHttpRequestException(BadRequest);
+            throw InvalidRequestException(BadRequest);
           } else {
             supported_version_index++;
           }
@@ -227,14 +227,14 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         } else if (c == '\n') {
           current_state = S_HEADER_LINE_START;
         } else
-            throw InvalidHttpRequestException(BadRequest);
+            throw InvalidRequestException(BadRequest);
         break;
 
       case S_REQUEST_LINE_LF:
         if (c == '\n') {
           current_state = S_HEADER_LINE_START;
         } else
-            throw InvalidHttpRequestException(BadRequest);
+            throw InvalidRequestException(BadRequest);
         break;
 
       case S_HEADER_LINE_START:
@@ -243,7 +243,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         } else if (c == '\n') {
           current_state = S_BODY_START;
         } else if (!is_character(c)) {
-            throw InvalidHttpRequestException(BadRequest);
+            throw InvalidRequestException(BadRequest);
         } else {
           _header_key.clear();
           _header_key.push_back(c);
@@ -256,7 +256,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
           _request->headers[_header_key];
           current_state = S_HEADER_LINE_SPACE;
         } else if (is_ctl(c) || is_separator(c)) {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         } else {
           _header_key.push_back(c);
         }
@@ -264,7 +264,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 
       case S_HEADER_LINE_SPACE:
         if (c != ' ') {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         } else {
           _header_value.clear();
           current_state = S_HEADER_LINE_VALUE;
@@ -283,7 +283,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
                 << " but the serve max content-length acceptable is "
                 << max_content_length
                 << std::endl;
-              throw InvalidHttpRequestException(RequestEntityTooLarge);
+              throw InvalidRequestException(RequestEntityTooLarge);
             }
           } else if (str_iequals(_header_key, "transfer-encoding")) {
             if (_header_value != "identity")
@@ -295,7 +295,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         } else if (c == '\n') {
           current_state = S_HEADER_LINE_START; // check for a new header
         } else if (is_ctl(c)) {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         } else {
           _header_value.push_back(c);
           current_state = S_HEADER_LINE_VALUE;
@@ -304,7 +304,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 
       case S_HEADER_LINE_LF:
         if (c != '\n')
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
 
         _request->headers[_header_key] = _header_value;
         current_state = S_HEADER_LINE_START; // check for a new header
@@ -312,7 +312,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 
       case S_HEADERS_END_LF:
         if (c != '\n')
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         if (_request->method == "GET") {
           return P_PARSING_COMPLETE;
         } else if (chunked) {
@@ -336,7 +336,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
       case S_CHUNK_START:
         chunk_size = get_hex(c);
         if (chunk_size == (size_t)-1) {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         }
         if (chunk_size == 0)
           current_state = S_LAST_CHUNK;
@@ -359,7 +359,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
             int _hex = get_hex(c);
 
             if (_hex == -1) {
-              throw InvalidHttpRequestException(BadRequest);
+              throw InvalidRequestException(BadRequest);
 
             } else {
               chunk_size = chunk_size * 16 + _hex;
@@ -374,12 +374,12 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         } else if (c == '\n') {
           current_state = S_CHUNK_DATA;
         } else if (!is_token(c))
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         break;
 
       case S_CHUNK_SIZE_LF:
         if (c != '\n') {
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         }
         current_state = S_CHUNK_DATA;
         break;
@@ -387,7 +387,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
       case S_CHUNK_DATA:
         if (chunk_size == 0) {
           if (c != '\r') {
-            throw InvalidHttpRequestException(BadRequest);
+            throw InvalidRequestException(BadRequest);
           }
           current_state = S_CHUNK_DATA_LF;
         } else {
@@ -398,7 +398,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 
       case S_CHUNK_DATA_LF:
         if (c != '\n')
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         current_state = S_CHUNK_START;
         break;
 
@@ -408,19 +408,19 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 
       case S_LAST_CHUNK_LF:
         if (c != '\n')
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         current_state = S_CHUNK_END;
         break;
 
       case S_CHUNK_END:
         if (c != '\r')
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         current_state = S_CHUNK_END_LF;
         break;
 
       case S_CHUNK_END_LF:
         if (c != '\n')
-          throw InvalidHttpRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         return P_PARSING_COMPLETE;
         break;
 
@@ -466,7 +466,7 @@ void RequestParser::parse() {
       finished = true;
       WebServ::log.debug() << "Finished request: " << *_request << std::endl;
     }
-  } catch(InvalidHttpRequestException& ex) {
+  } catch(InvalidRequestException& ex) {
     WebServ::log.warning() << "Invalid http request: " << ex.what() << std::endl;
     _request->error = ex.get_error();
     finished = true;
@@ -483,11 +483,11 @@ Request &RequestParser::get_request() {
   return *_request;
 }
 
-RequestParser::InvalidHttpRequestException::InvalidHttpRequestException(RequestErrors error) {
+RequestParser::InvalidRequestException::InvalidRequestException(RequestErrors error) {
   _error = error;
 }
 
-const char *RequestParser::InvalidHttpRequestException::what() const throw() {
+const char *RequestParser::InvalidRequestException::what() const throw() {
   switch (_error) {
     case BadRequest:
       return "Bad request";
@@ -506,7 +506,7 @@ const char *RequestParser::InvalidHttpRequestException::what() const throw() {
   }
 }
 
-RequestErrors RequestParser::InvalidHttpRequestException::get_error() const {
+RequestErrors RequestParser::InvalidRequestException::get_error() const {
   return _error;
 }
 

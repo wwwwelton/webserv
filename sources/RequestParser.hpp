@@ -2,7 +2,7 @@
 #ifndef HTTP_REQUEST_PARSER_HPP
 #define HTTP_REQUEST_PARSER_HPP
 
-#include "HttpRequest.hpp"
+#include "Request.hpp"
 #include "defines.hpp"
 
 #include <exception>
@@ -81,10 +81,10 @@ public:
   void parse();
   Request &get_request();
 
-  class InvalidHttpRequestException: public std::exception {
+  class InvalidRequestException: public std::exception {
     RequestErrors _error;
   public:
-    InvalidHttpRequestException(RequestErrors error);
+    InvalidRequestException(RequestErrors error);
     const char* what() const throw();
     RequestErrors get_error() const;
   };

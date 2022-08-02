@@ -5,7 +5,7 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "HttpResponse.hpp"
+#include "Response.hpp"
 
 int Response::_delete(void) {
   return 0;

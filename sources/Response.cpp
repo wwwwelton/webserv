@@ -5,7 +5,7 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "HttpResponse.hpp"
+#include "Response.hpp"
 
 std::ostream& operator<<(std::ostream& o, Response const& rhs) {
   o << std::setfill(' ') << " [ RESPONSE DUMP ]\n"
@@ -35,7 +35,7 @@ std::ostream& operator<<(std::ostream& o, Response const& rhs) {
 
 void Response::_send(int fd) {
   ssize_t bytes;
-  bytes = send(fd, HttpBase::buffer_resp, HttpBase::size, 0);
+  bytes = send(fd, ResponseBase::buffer_resp, ResponseBase::size, 0);
   if (bytes == 0 || bytes == -1) {
     WebServ::log.error() << "unable to send response: "
                          << strerror(errno) << "\n";
@@ -156,12 +156,12 @@ void Response::assemble_followup(void) {
   if (body_size < BUFFER_SIZE || file.eof())
     finished = true;
 
-  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
-  HttpBase::size = body_size;
-  HttpBase::buffer_resp[HttpBase::size] = '\0';
+  std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
+  ResponseBase::size = body_size;
+  ResponseBase::buffer_resp[ResponseBase::size] = '\0';
   // WebServ::log.warning() << "Multipart response only partially implemented\n"
   //                        << "message: \n"
-  //                        << HttpBase::buffer_resp << "\n";
+  //                        << ResponseBase::buffer_resp << "\n";
 }
 
 void Response::assemble(std::string const& body_path) {
@@ -191,11 +191,11 @@ void Response::assemble(std::string const& body_path) {
                     contenttype +
                     DFL_CONTENTLEN;
   str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
-  std::memmove(HttpBase::buffer_resp, str.c_str(), str.size());
-  std::memmove(&HttpBase::buffer_resp[str.size()], buf, body_size);
-  HttpBase::size = str.size() + body_size;
-  HttpBase::buffer_resp[HttpBase::size] = '\0';
-  // WebServ::log.debug() << HttpBase::buffer_resp;
+  std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
+  std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
+  ResponseBase::size = str.size() + body_size;
+  ResponseBase::buffer_resp[ResponseBase::size] = '\0';
+  // WebServ::log.debug() << ResponseBase::buffer_resp;
 }
 
 void Response::process(void) {
@@ -209,9 +209,9 @@ void Response::process(void) {
     unlink(DFL_TMPFILE);
 }
 
-#include "HttpResponse_static.tpp"
-#include "HttpResponse_constructors.tpp"
-#include "HttpResponse_delete.tpp"
-#include "HttpResponse_get.tpp"
-#include "HttpResponse_post.tpp"
-#include "HttpResponse_dynamichtml.tpp"
+#include "Response_static.tpp"
+#include "Response_constructors.tpp"
+#include "Response_delete.tpp"
+#include "Response_get.tpp"
+#include "Response_post.tpp"
+#include "Response_dynamichtml.tpp"

@@ -5,8 +5,17 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "HttpBase.hpp"
+#ifndef HTTPBASE_HPP
+#define HTTPBASE_HPP
 
-char HttpBase::buffer_req[BUFFER_SIZE] = "";
-char HttpBase::buffer_resp[HEADER_SIZE + BUFFER_SIZE] = "";
-int  HttpBase::size = 42;
+#define BUFFER_SIZE 2000
+#define HEADER_SIZE 2000
+
+class ResponseBase {
+ public:
+  static char buffer_req[BUFFER_SIZE];
+  static char buffer_resp[HEADER_SIZE + BUFFER_SIZE];
+  static int size;
+};
+
+#endif  // HTTPBASE_HPP

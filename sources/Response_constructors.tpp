@@ -5,7 +5,7 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "HttpResponse.hpp"
+#include "Response.hpp"
 
 void Response::find_location(std::string path, Server *server) {
   while (path.find('/') != std::string::npos) {

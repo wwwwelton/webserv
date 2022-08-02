@@ -5,7 +5,7 @@
 //#                         Welton Leite - wleite                              #
 //##############################################################################
 
-#include "HttpResponse.hpp"
+#include "Response.hpp"
 
 int Response::validate_path(void) {
   if (!access(path.c_str(), R_OK)) {

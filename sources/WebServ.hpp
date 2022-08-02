@@ -29,9 +29,9 @@
 #include <vector>
 
 #include "Config.hpp"
-#include "HttpBase.hpp"
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
+#include "ResponseBase.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
 #include "LoadException.hpp"
 #include "Logger.hpp"
 #include "Pollfd.hpp"
