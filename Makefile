@@ -45,9 +45,12 @@ OBJDIR  = objects
 OBJ     = $(SRC:%.cpp=$(OBJDIR)/%.o)
 DEPS    = $(SRC:%.cpp=$(OBJDIR)/%.d)
 
-vpath %.cpp sources sources/response sources/server sources/request sources/utils
-vpath %.hpp sources sources/response sources/server sources/request sources/utils
-vpath %.h   sources sources/response sources/server sources/request sources/utils
+vpath %.cpp sources sources/response sources/server sources/request \
+sources/utils
+vpath %.cpp sources sources/response sources/server sources/request \
+sources/utils
+vpath %.hpp sources sources/response sources/server sources/request \
+sources/utils
 
 all: $(NAME)
 
