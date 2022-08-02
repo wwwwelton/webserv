@@ -187,7 +187,7 @@ void Response::assemble(std::string const& body_path) {
   std::string str;
   if (incorrect_path) {
     statuscode = "301 ";
-    statusmsg = " Moved Permanently\n";
+    statusmsg = "Moved Permanently\n";
     str = httpversion + statuscode + statusmsg + contenttype;
     str.append("Location: " + req->path + "/\n");
   }

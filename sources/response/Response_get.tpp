@@ -33,10 +33,6 @@ int Response::validate_folder(void) {
     return CONTINUE;
   }
   else if (S_ISDIR(path_stat.st_mode)) {
-    if (path.at(path.size() - 1) != '/') {
-      incorrect_path = true;
-      return CONTINUE;
-    }
     if (!location->autoindex) {
       WebServ::log.warning() << "check autoindex config\n";
       if (path == root)
@@ -45,6 +41,10 @@ int Response::validate_folder(void) {
         return NOT_FOUND;
     }
     folder_request = true;
+    if (path.at(path.size() - 1) != '/') {
+      incorrect_path = true;
+      return CONTINUE;
+    }
     return OK;
   }
   WebServ::log.warning() << "Unexpected outcome in Response::validate_folder\n";

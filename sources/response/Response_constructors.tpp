@@ -28,7 +28,7 @@ void Response::set_request(Request const*_req) {
 
   find_location(_req->path, server);
   originalroot = server->location["/"].root;
-  root = "./" + location->root + "/";
+  root = "./" + location->root;
   if (req->method == "POST")
     path = "./" + req->headers.at("Referer") + _req->path;
   else
