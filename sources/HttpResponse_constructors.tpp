@@ -7,6 +7,18 @@
 
 #include "HttpResponse.hpp"
 
+void Response::find_location(std::string path, Server *server) {
+  while (path.find('/') != std::string::npos) {
+    if (server->location.count(path)) {
+      location = &server->location[path];
+      return;
+    }
+    path = path.erase(path.find_last_of('/'));
+  }
+  location = &server->location["/"];
+}
+
+
 void Response::set_request(Request const*_req) {
   req = _req;
   if (_req->body.size()) {

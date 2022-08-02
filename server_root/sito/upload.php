@@ -34,7 +34,7 @@ function file_upload_handler() {
       echo "<p>Sorry, there was an error uploading your file.</p>";
     }
     echo "<p>Redirecting to homepage in 10 seconds</p>";
-}
+  }
 }
 ?>
 
