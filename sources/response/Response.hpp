@@ -101,6 +101,7 @@ private:
 public:
   bool          finished;
   bool          inprogress;
+  bool          incorrect_path;
   std::string   response_path;
 
   ~Response(void);

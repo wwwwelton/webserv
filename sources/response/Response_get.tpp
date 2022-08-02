@@ -33,6 +33,10 @@ int Response::validate_folder(void) {
     return CONTINUE;
   }
   else if (S_ISDIR(path_stat.st_mode)) {
+    if (path.at(path.size() - 1) != '/') {
+      incorrect_path = true;
+      return CONTINUE;
+    }
     if (!location->autoindex) {
       WebServ::log.warning() << "check autoindex config\n";
       if (path == root)

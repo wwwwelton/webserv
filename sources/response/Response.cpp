@@ -85,13 +85,13 @@ void Response::php_cgi(std::string const& body_path) {
 
 void Response::dispatch(std::string const& body_path) {
   std::string extension;
+
   std::string tmp(body_path.substr(1));
 
   if (tmp.find_last_of('.') == std::string::npos)
     extension = "text";
   else
     extension = tmp.substr(tmp.find_last_of('.'));
-
   // TODO(VLN37) change to dynamic extension
   if (location->cgi.count(extension)) {
     contenttype = "Content-Type: text/html; charset=utf-8\n";
@@ -168,7 +168,6 @@ void Response::assemble(std::string const& body_path) {
   std::string       body;
   size_t            body_size = 0;
 
-  WebServ::log.debug() << *this;
   WebServ::log.debug() << "File requested: " << path << "\n";
   file.open(body_path.c_str(), file.ate);
   body_max_size = file.tellg();
@@ -185,25 +184,34 @@ void Response::assemble(std::string const& body_path) {
     // contenttype = "Content-Type: application/octet-stream\n";
     inprogress = true;
   }
-  std::string str = httpversion +
-                    statuscode +
-                    statusmsg +
-                    contenttype +
-                    DFL_CONTENTLEN;
+  std::string str;
+  if (incorrect_path) {
+    statuscode = "301 ";
+    statusmsg = " Moved Permanently\n";
+    str = httpversion + statuscode + statusmsg + contenttype;
+    str.append("Location: " + req->path + "/\n");
+  }
+  else
+    str = httpversion + statuscode + statusmsg + contenttype;
+  str.append(DFL_CONTENTLEN);
   str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
   std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
+  std::cout << ResponseBase::buffer_resp << "\n";
   // WebServ::log.debug() << ResponseBase::buffer_resp;
+  WebServ::log.debug() << *this;
 }
 
 void Response::process(void) {
   for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)
   response_code = (this->*validation_functions[i])();
-  if (response_code == 0)
+  if (response_code == 0) {
     response_code = (this->*method_map[method])();
+  }
   set_statuscode(response_code);
+  std::cout << "here\n";
   dispatch(response_path);
   if (remove_tmp)
     unlink(DFL_TMPFILE);

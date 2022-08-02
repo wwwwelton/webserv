@@ -28,7 +28,7 @@ void Response::set_request(Request const*_req) {
 
   find_location(_req->path, server);
   originalroot = server->location["/"].root;
-  root = "./" + location->root;
+  root = "./" + location->root + "/";
   if (req->method == "POST")
     path = "./" + req->headers.at("Referer") + _req->path;
   else
@@ -51,6 +51,7 @@ Response::Response(Request *_req, Server *_server)
   remove_tmp = false;
   finished = false;
   inprogress = false;
+  incorrect_path = false;
   server = _server;
 }
 
