@@ -2,7 +2,8 @@ CC      = c++
 CFLAGS  = -g3 -Wall -Wextra -Werror -std=c++98 -pedantic
 CFLAGS  += -MMD -MP
 
-INCPATH = -I./sources
+INCPATH  = -I./sources -I./sources/response -I./sources/request
+INCPATH += -I./sources/server -I./sources/utils
 NAME    = webserv
 
 SRC     = main.cpp \
@@ -41,13 +42,12 @@ INC     = defines.hpp \
           ConfigHelper.hpp \
 
 OBJDIR  = objects
-SRC_DIR =	sources
 OBJ     = $(SRC:%.cpp=$(OBJDIR)/%.o)
 DEPS    = $(SRC:%.cpp=$(OBJDIR)/%.d)
 
-vpath %.cpp sources
-vpath %.hpp sources
-vpath %.h   sources
+vpath %.cpp sources sources/response sources/server sources/request sources/utils
+vpath %.hpp sources sources/response sources/server sources/request sources/utils
+vpath %.h   sources sources/response sources/server sources/request sources/utils
 
 all: $(NAME)
 
