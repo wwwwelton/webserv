@@ -93,6 +93,7 @@ private:
   void cgi(std::string const& body_path, std::string const &bin);
   void dispatch(std::string const& body_path);
   int _post(void);
+  int check_ext(std::string const& body_path);
   int _delete(void);
   void find_location(std::string path, Server *_server);
   void create_error_page(void);

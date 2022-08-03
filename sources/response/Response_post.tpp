@@ -7,11 +7,28 @@
 
 #include "Response.hpp"
 
+int Response::check_ext(std::string const& extension) {
+  if (server->cgi.count(extension))
+    return 0;
+  return 1;
+}
+
 int Response::_post(void) {
   int outfile;
   int pid;
   int io[2];
+  std::string bin;
+  std::string extension;
 
+  if (path.find('.') == std::string::npos) {
+    return INTERNAL_SERVER_ERROR;
+  }
+  extension = path.substr(path.find_last_of('.'));
+  if (extension.at(extension.size() - 1) == '/')
+    extension.resize(extension.size() - 1);
+  if (check_ext(extension))
+    return INTERNAL_SERVER_ERROR;
+  bin = server->cgi[extension];
   pipe(io);
   outfile = open(DFL_TMPFILE, O_CREAT | O_RDWR | O_TRUNC, 0777);
   pid = fork();
@@ -24,14 +41,13 @@ int Response::_post(void) {
     // setenv("HTTP_SEC_FETCH_DEST", "", 1);   // ?
 
     // setenv("REDIRECT_HANDLER", "", 1);
-    setenv("REDIRECT_STATUS", "200", 1);
     // setenv("HTTP_HOST", "", 1);
     // setenv("HTTP_CONNECTION", "", 1);
     // setenv("CONTENT_TYPE", "", 1);
     // setenv("HTTP_ACCEPT_LANGUAGE", "", 1);
     // setenv("HTTP_SEC_GPC", "1", 1);
     // setenv("HTTP_SEC_FETCH_MODE", "", 1);
-    // setenv("HPTTP_REFERER", "", 1);
+    // setenv("HTTP_REFERER", "", 1);
     // setenv("HTTP_ACEPT_ENCODING", "", 1);
 
     // setenv("AUTH_TYPE", "", 1);
@@ -51,6 +67,7 @@ int Response::_post(void) {
     setenv("REQUEST_METHOD", "POST", 1);
     // setenv("QUERY_STRING", "", 1);
 
+    setenv("REDIRECT_STATUS", "200", 1);
     setenv("REQUEST_URI", "/post/upload_handler.php", 1);
     setenv("PATH_INFO", "/", 1);
     setenv("SCRIPT_NAME", "/usr/bin/php-cgi", 1);
@@ -58,7 +75,7 @@ int Response::_post(void) {
     setenv("CONTENT_LENGTH", _itoa(req->body.size()).c_str(), 1);
     setenv("CONTENT_TYPE", req->headers.at("Content-Type").c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
-    execlp("php-cgi", "php-cgi", "--no-header", (char *)NULL);
+    execlp(bin.c_str(), bin.c_str(), (char *)NULL);
   }
   write(io[1], req->body.c_str(), req->body.size());
   close(io[1]);
