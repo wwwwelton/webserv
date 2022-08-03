@@ -66,6 +66,6 @@ int Response::_post(void) {
   close(io[0]);
   close(outfile);
   response_path = DFL_TMPFILE;
-  // remove_tmp = 1;
+  remove_tmp = true;
   return OK;
 }
