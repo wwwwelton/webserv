@@ -184,22 +184,15 @@ void Response::assemble(std::string const& body_path) {
     // contenttype = "Content-Type: application/octet-stream\n";
     inprogress = true;
   }
-  std::string str;
-  if (incorrect_path) {
-    statuscode = "301 ";
-    statusmsg = "Moved Permanently\n";
-    str = httpversion + statuscode + statusmsg + contenttype;
+  std::string str(httpversion + statuscode + statusmsg + contenttype);
+  if (incorrect_path)
     str.append("Location: " + req->path + "/\n");
-  }
-  else
-    str = httpversion + statuscode + statusmsg + contenttype;
   str.append(DFL_CONTENTLEN);
   str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
   std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  std::cout << ResponseBase::buffer_resp << "\n";
   // WebServ::log.debug() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }

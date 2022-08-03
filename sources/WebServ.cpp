@@ -59,6 +59,14 @@ WebServ::WebServ(int argc, char **argv) {
   for (i = 0; i < conf.size(); i++) {
     Server *srv = new Server(conf[i]);
     srv->_connect(conf.backlog);
+    std::map<std::string, ServerLocation>::iterator it = srv->location.begin();
+    for (; it != srv->location.end(); it++) {
+      if (it->first.find('/') != std::string::npos &&
+          it->first.at(it->first.size() - 1) != '/') {
+        srv->location[it->first + "/"] = srv->location[it->first];
+        srv->location[it->first + "/"].root.push_back('/');
+      }
+    }
     serverlist.insert(std::make_pair(srv->sockfd, srv));
     pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
   }

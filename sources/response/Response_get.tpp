@@ -43,7 +43,7 @@ int Response::validate_folder(void) {
     folder_request = true;
     if (path.at(path.size() - 1) != '/') {
       incorrect_path = true;
-      return CONTINUE;
+      return MOVED_PERMANENTLY;
     }
     return OK;
   }

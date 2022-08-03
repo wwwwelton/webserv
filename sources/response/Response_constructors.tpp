@@ -11,8 +11,8 @@ void Response::find_location(std::string path, Server *server) {
   while (path.find('/') != std::string::npos) {
     if (server->location.count(path)) {
       location = &server->location[path];
-      if (path.at(path.size() - 1) == '/')
-        path = path.erase(path.find_last_of('/'));
+      // if (path.at(path.size() - 1) == '/')
+      //   path = path.erase(path.find_last_of('/'));
       return;
     }
     path = path.erase(path.find_last_of('/'));
@@ -31,17 +31,25 @@ void Response::set_request(Request const*_req) {
   find_location(_req->path, server);
 
   // gambis
-  server->location[location->root + "/"] = *location;
-  location = &server->location[location->root + "/"];
-  location->root.push_back('/');
+  // if (path.find("/") != std::string::npos && path.at(path.size() - 1) == '/'
+  //  && root.find("/") != std::string::npos && root.at(path.size() - 1) != '/') {
+  //   server->location[location->root + "/"] = *location;
+  //   location = &server->location[location->root + "/"];
+  //   location->root.push_back('/');
+  // }
   // gambis
 
   originalroot = server->location["/"].root;
   root = "./" + location->root;
   if (req->method == "POST")
     path = "./" + req->headers.at("Referer") + _req->path;
-  else
+  else {
     path = "./" + server->root + _req->path;
+    if (location->root == originalroot)
+      if (root.at(root.size() - 1) != '/')
+        root.push_back('/');
+  }
+  std::cout << location->index[0] << "\n";
   std::cout << "location: " << location->root << "\n";
   std::cout << "req path: " << _req->path << "\n";
   std::cout << "root: " << root << "\n";
