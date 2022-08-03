@@ -14,6 +14,7 @@ Response::status_map Response::init_status_map(void) {
   _map[200] = "OK\n";
   _map[201] = "Created\n";
   _map[202] = "Accepted\n";
+  _map[204] = "No Content\n";
   _map[300] = "Multiple Choice\n";
   _map[301] = "Moved Permanently\n";
   _map[302] = "Found\n";

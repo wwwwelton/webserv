@@ -48,9 +48,9 @@ function file_upload_handler() {
 </head>
 <body>
     <p>
-<?php
-  file_upload_handler();
-?>
+      <?php
+        file_upload_handler();
+      ?>
     </p>
 </body>
 </html>

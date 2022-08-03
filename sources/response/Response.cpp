@@ -86,6 +86,11 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
 void Response::dispatch(std::string const& body_path) {
   std::string extension;
 
+  std::cout << "path: " << body_path << "\n";
+  if (body_path.empty()) {
+    assemble();
+    return;
+  }
   std::string tmp(body_path.substr(1));
 
   if (tmp.find_last_of('.') == std::string::npos)
@@ -162,6 +167,17 @@ void Response::assemble_followup(void) {
   // WebServ::log.warning() << "Multipart response only partially implemented\n"
   //                        << "message: \n"
   //                        << ResponseBase::buffer_resp << "\n";
+}
+
+void Response::assemble(void) {
+  std::string str(httpversion + statuscode + statusmsg + contenttype);
+  str.append(DFL_CONTENTLEN);
+  str.replace(str.find("LENGTH"), 6, _itoa(0));
+  std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
+  ResponseBase::size = str.size();
+  ResponseBase::buffer_resp[ResponseBase::size] = '\0';
+  // WebServ::log.debug() << ResponseBase::buffer_resp;
+  WebServ::log.debug() << *this;
 }
 
 void Response::assemble(std::string const& body_path) {

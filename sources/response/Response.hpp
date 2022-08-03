@@ -111,6 +111,7 @@ public:
   Response(void);
   void assemble_followup(void);
   void assemble(std::string const& body_path);
+  void assemble(void);
   void set_request(Request const* req);
   void process(void);
   void _send(int fd);
