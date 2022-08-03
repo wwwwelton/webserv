@@ -73,6 +73,7 @@ private:
   std::string originalroot;
   std::string path;
   std::string root;
+  std::string bin;
 
   Server*     server;
   ServerLocation* location;
@@ -89,7 +90,7 @@ private:
   int validate_path(void);
   int validate_folder(void);
   void set_statuscode(int code);
-  void php_cgi(std::string const& body_path);
+  void cgi(std::string const& body_path, std::string const &bin);
   void dispatch(std::string const& body_path);
   int _post(void);
   int _delete(void);

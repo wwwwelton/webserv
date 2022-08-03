@@ -63,7 +63,7 @@ int Response::validate_http_version(void) {
   return CONTINUE;
 }
 
-void Response::php_cgi(std::string const& body_path) {
+void Response::cgi(std::string const &body_path, std::string const &bin) {
   int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC, 0644);
   if (fd == -1)
     throw(std::exception());
@@ -75,7 +75,7 @@ void Response::php_cgi(std::string const& body_path) {
       exit(1);
     }
     // std::cout << body_path.c_str();
-    execlp("php-cgi", "-f", "-q", body_path.substr(2).c_str(), NULL);
+    execlp(bin.c_str(), "-f", "-q", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
   close(fd);
@@ -95,7 +95,7 @@ void Response::dispatch(std::string const& body_path) {
   // TODO(VLN37) change to dynamic extension
   if (location->cgi.count(extension)) {
     contenttype = "Content-Type: text/html; charset=utf-8\n";
-    php_cgi(body_path);
+    cgi(body_path, location->cgi[extension]);
   }
   else if (mimetypes.count(extension)) {
     contenttype = mimetypes[extension];
@@ -204,7 +204,6 @@ void Response::process(void) {
     response_code = (this->*method_map[method])();
   }
   set_statuscode(response_code);
-  std::cout << "here\n";
   dispatch(response_path);
   if (remove_tmp)
     unlink(DFL_TMPFILE);
