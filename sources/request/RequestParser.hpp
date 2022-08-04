@@ -65,7 +65,9 @@ enum RequestErrors {
   RequestTimeout = REQUEST_TIMEOUT,
   LengthRequired = LENGTH_REQUIRED,
   RequestEntityTooLarge = REQUEST_ENTITY_TOO_LARGE,
-  RequestUriTooLong = REQUEST_URI_TOO_LONG
+  RequestUriTooLong = REQUEST_URI_TOO_LONG,
+  HttpVersionUnsupported = HTTP_VERSION_UNSUPPORTED
+
 };
 
 class RequestParser

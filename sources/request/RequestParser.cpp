@@ -221,7 +221,8 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
             _request->http_version = supported_version;
             current_state = S_REQUEST_LINE_CRLF;
           } else if (c != supported_version[idx]) {
-            throw InvalidRequestException(BadRequest);
+            RequestErrors error = idx > 4 ? HttpVersionUnsupported : BadRequest;
+            throw InvalidRequestException(error);
           } else {
             supported_version_index++;
           }
@@ -508,6 +509,8 @@ const char *RequestParser::InvalidRequestException::what() const throw() {
       return "Request entity too large";
     case RequestUriTooLong:
       return "Request URI too long";
+    case HttpVersionUnsupported:
+      return "HTTP version not supported";
     default:
       return "Unknown error";
   }

@@ -28,7 +28,7 @@ Response::status_map Response::init_status_map(void) {
   _map[500] = "Internal Server Error\n";
   _map[502] = "Bad Gateway\n";
   _map[504] = "Gateway Timeout\n";
-  _map[506] = "Http Version Unsupported\n";
+  _map[505] = "HTTP Version Not Supported\n";
   return _map;
 }
 
