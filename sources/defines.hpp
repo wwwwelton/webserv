@@ -8,6 +8,8 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#define LOG_LEVEL LVL_DEBUG
+
 // Server host default
 #define DFL_BACKLOG 500
 // Server vhost default
@@ -41,7 +43,6 @@
 #define CFG_MAX_RED_CODE 499
 #define CFG_FIELD_LIM_EXCEPT "ALL GET POST PUT DELETE"
 
-#define LOG_LEVEL LVL_DEBUG
 
 #define CFG_FILE_EXT ".conf"
 // file size in Kilobytes (KB), 1000KB => 1 Megabytes (MB)
