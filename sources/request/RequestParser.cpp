@@ -51,6 +51,13 @@ static inline int get_hex(char c) {
     case 'E':
     case 'F':
       return (c - 'A' + 10);
+    case 'a':
+    case 'b':
+    case 'c':
+    case 'd':
+    case 'e':
+    case 'f':
+      return (c - 'a' + 10);
     default:
       return -1;
   }
