@@ -41,8 +41,10 @@ void Response::set_request(Request const*_req) {
 
   originalroot = server->location["/"].root;
   root = "./" + location->root;
-  if (req->method == "POST")
-    path = "./" + req->headers.at("Origin") + _req->path;
+  if (req->method == "POST") {
+    if (req->headers.count("Origin"))
+      path = "./" + req->headers.at("Origin") + _req->path;
+  }
   else {
     path = "./" + server->root + _req->path;
     if (location->root == originalroot)
