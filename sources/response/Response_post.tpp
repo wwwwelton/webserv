@@ -87,8 +87,8 @@ int Response::_post(void) {
     // setenv("QUERY_STRING", "", 1);
 
     setenv("REDIRECT_STATUS", "200", 1);
-    setenv("REQUEST_URI", "/post/upload_handler.php", 1);
-    // setenv("REQUEST_URI", req->path.c_str(), 1);
+    // setenv("REQUEST_URI", "/post/upload_handler.php", 1);
+    setenv("REQUEST_URI", req->path.c_str(), 1);
     setenv("PATH_INFO", "/", 1);
 
     // setenv("SCRIPT_NAME", "/usr/bin/php-cgi", 1);
