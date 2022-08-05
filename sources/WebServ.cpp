@@ -18,6 +18,11 @@ Logger WebServ::init_log(void) {
   return logger;
 }
 
+WebServ::WebServ(void) {
+  conn = 0;
+  compress = false;
+}
+
 WebServ::~WebServ(void) {
   log.debug() << "WebServ destructor called\n";
   std::map<int, Server *>::iterator it = serverlist.begin();
@@ -38,11 +43,6 @@ WebServ::~WebServ(void) {
       it->fd = -1;
     }
   }
-}
-
-WebServ::WebServ(void) {
-  conn = 0;
-  compress = false;
 }
 
 void WebServ::init(int argc, char **argv) {
@@ -88,19 +88,6 @@ void WebServ::_accept(int i) {
   }
 }
 
-void WebServ::end_connection(int i) {
-  int fd = pollfds[i].fd;
-
-  delete clientlist[fd].request_parser;
-  delete clientlist[fd].response;
-  clientlist[fd].request_parser = NULL;
-  clientlist[fd].server = NULL;
-  close(pollfds[i].fd);
-  log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
-  pollfds[i].fd = -1;
-  compress = true;
-}
-
 void WebServ::_receive(int i) {
   int fd = pollfds[i].fd;
   RequestParser &parser = *clientlist[fd].request_parser;
@@ -134,6 +121,19 @@ void WebServ::_respond(int i) {
   }
   if (response.finished)
     end_connection(i);
+}
+
+void WebServ::end_connection(int i) {
+  int fd = pollfds[i].fd;
+
+  delete clientlist[fd].request_parser;
+  delete clientlist[fd].response;
+  clientlist[fd].request_parser = NULL;
+  clientlist[fd].server = NULL;
+  close(pollfds[i].fd);
+  log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
+  pollfds[i].fd = -1;
+  compress = true;
 }
 
 void WebServ::purge_conns(void) {
