@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include <cerrno>
 #include <csignal>
@@ -53,10 +54,13 @@ typedef struct s_request {
   Server *server;
   RequestParser *request_parser;
   Response *response;
+  size_t timestamp;
 } req;
 
 class WebServ {
  public:
+  static size_t get_time_in_ms(void);
+
   WebServ(int argc, char **argv);
   ~WebServ();
   int _poll(void);
@@ -65,6 +69,8 @@ class WebServ {
   void _respond(int fd);
   void end_connection(int fd);
   void purge_conns(void);
+  void purge_timeouts(void);
+  bool timed_out(int fd);
   static Logger init_log(void);
 
  public:

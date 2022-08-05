@@ -21,6 +21,8 @@ void loop(int argc, char **argv) {
       if (webserv.serverlist.count(webserv.pollfds[i].fd)) {
         webserv._accept(i);
       } else {
+        if (webserv.timed_out(i))
+          continue;
         if (revents & POLLIN)
           webserv._receive(i);
         else if (revents & POLLOUT)

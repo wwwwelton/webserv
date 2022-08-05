@@ -113,6 +113,7 @@ public:
   void assemble(std::string const& body_path);
   void assemble(void);
   void set_request(Request const* req);
+  void reset(void);
   void process(void);
   void _send(int fd);
   friend std::ostream& operator<<(std::ostream&o, Response const& rhs);

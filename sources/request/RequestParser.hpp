@@ -120,7 +120,10 @@ private:
 
   Request *_request;
 
+public:
   int fd;
+
+private:
   char *buffer;
   size_t bytes_read;
   size_t buff_max;

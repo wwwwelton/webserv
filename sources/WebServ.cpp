@@ -8,9 +8,13 @@
 #include "WebServ.hpp"
 
 s_request::s_request(void)
-    : server(NULL), request_parser(NULL) {}
+: server(NULL), request_parser(NULL) {
+  timestamp = WebServ::get_time_in_ms();
+}
 s_request::s_request(Server *_server, int fd)
-    : server(_server), request_parser(new RequestParser(fd)) {}
+: server(_server), request_parser(new RequestParser(fd)) {
+  timestamp = WebServ::get_time_in_ms();
+}
 
 Logger WebServ::log = WebServ::init_log();
 Logger WebServ::init_log(void) {
@@ -75,9 +79,45 @@ WebServ::WebServ(int argc, char **argv) {
   for (; iter != serverlist.end(); iter++) {
     log.info()
       << "Server " << iter->second->server_name[0]
-      << " is listening port " << ntohs(iter->second->port)
+      << " is listening on port " << ntohs(iter->second->port)
       << std::endl;
   }
+}
+
+bool WebServ::timed_out(int i) {
+  size_t time_now;
+  int fd = pollfds[i].fd;
+
+  time_now = WebServ::get_time_in_ms();
+  WebServ::log.error() << (time_now - clientlist[fd].timestamp) << "\n";
+  if (time_now - clientlist[fd].timestamp > 1000) {
+    WebServ::log.info() << "Client " << fd << " timed out after "
+                        << (time_now - clientlist[fd].timestamp) << " ms\n";
+    end_connection(i);
+    compress = true;
+    return true;
+  }
+  return false;
+}
+
+void WebServ::purge_timeouts(void) {
+  size_t time_now;
+
+  time_now = WebServ::get_time_in_ms();
+  std::vector<req>::iterator it = clientlist.begin();
+  for (; it != clientlist.end(); it++) {
+    if (time_now - it->timestamp > 300) {
+      end_connection(it->request_parser->fd);
+      compress = true;
+    }
+  }
+}
+
+size_t WebServ::get_time_in_ms(void) {
+  struct timeval time_now;
+
+  gettimeofday(&time_now, NULL);
+  return ((time_now.tv_sec * 1000) + (time_now.tv_usec / 1000));
 }
 
 int WebServ::_poll(void) {
@@ -150,11 +190,16 @@ void WebServ::_respond(int i) {
     response.process();
     response._send(fd);
   }
-  if (response.finished)
-    end_connection(i);
+  if (response.finished) {
+    parser.reset();
+    response.reset();
+    // end_connection(i);
+  }
 }
 
 void WebServ::purge_conns(void) {
+  // TODO(VLN37): see if necessary to remove timeouts here
+  // purge_timeouts();
   std::vector<_pollfd>::iterator it = pollfds.begin();
   std::vector<_pollfd>::iterator ite = pollfds.end();
   for (; it != ite; it++) {

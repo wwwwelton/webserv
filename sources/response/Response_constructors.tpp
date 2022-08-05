@@ -20,6 +20,19 @@ void Response::find_location(std::string path, Server *server) {
   location = &server->location["/"];
 }
 
+void Response::reset(void) {
+  finished = false;
+  inprogress = false;
+  incorrect_path = false;
+  folder_request = false;
+  remove_tmp = false;
+  valid = true;
+  response_code = CONTINUE;
+  response_path.clear();
+  file.close();
+  statuscode = " 200";
+  statusmsg = "OK\n";
+}
 
 void Response::set_request(Request const*_req) {
   req = _req;
