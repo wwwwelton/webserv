@@ -197,7 +197,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         break;
 
       case S_URI_START:
-        if (is_ctl(c)) {
+        if (c != '/') {
           throw InvalidRequestException(BadRequest);
         }
         _request->path.push_back(c);
