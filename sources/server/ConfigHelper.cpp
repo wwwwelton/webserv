@@ -145,7 +145,7 @@ std::string ConfigHelper::get_error_page(void) {
   return (String::trim(std::string(_tokens[2]), "/"));
 }
 
-int ConfigHelper::get_timeout(void) {
+size_t ConfigHelper::get_timeout(void) {
   if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
   if (String::to_int(_tokens[1]) <= CFG_MIN_TIMEOUT ||

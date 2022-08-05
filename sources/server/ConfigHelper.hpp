@@ -43,7 +43,7 @@ class ConfigHelper {
   std::string get_root(void);
   std::vector<std::string> get_index(void);
   std::string get_error_page(void);
-  int get_timeout(void);
+  size_t get_timeout(void);
   int get_client_max_body_size(void);
   std::string get_access_log(void);
   std::string get_error_log(void);

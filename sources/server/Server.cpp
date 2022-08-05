@@ -11,7 +11,7 @@ Server::Server(void) {
   ip = INT_MAX;
   port = -1;
   root = "";
-  timeout = -1;
+  timeout = 0;
   client_max_body_size = -1;
   redirect = std::make_pair(0, "");
   autoindex = -1;
@@ -60,7 +60,7 @@ void Server::fill(void) {
     error_page[404] = DFL_404_PAGE;
   if (error_page.count(405) > 0)
     error_page[405] = DFL_405_PAGE;
-  if (timeout == -1)
+  if (timeout == 0)
     timeout = DFL_TIMEOUT;
   if (client_max_body_size == -1)
     client_max_body_size = DFL_CLI_MAX_BODY_SIZE;

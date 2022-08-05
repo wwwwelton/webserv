@@ -59,7 +59,7 @@ void Response::set_request(Request const*_req) {
       path = "./" + req->headers.at("Origin") + _req->path;
   }
   else {
-    path = "./" + location->root + _req->path;
+    path = "./" + server->root + _req->path;
     if (location->root == originalroot)
       if (root.at(root.size() - 1) != '/')
         root.push_back('/');

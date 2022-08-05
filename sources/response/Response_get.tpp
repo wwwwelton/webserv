@@ -53,6 +53,8 @@ int Response::validate_folder(void) {
 
 
 int Response::validate_index(void) {
+  if (path != originalroot && path[path.size() - 1] != '/')
+    return CONTINUE;
   if (path == root && location->index.size()) {
     for (size_t i = 0; i < server->index.size(); i++) {
       std::string indexpath = root + "/" + server->index[i];

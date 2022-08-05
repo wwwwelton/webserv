@@ -70,11 +70,16 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
   int status;
   int pid = fork();
   if (pid == 0) {
+    setenv("SERVER_PORT", _itoa(server->port).c_str(), 1);
+    setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
+    setenv("REDIRECT_STATUS", "200", 1);
+    setenv("REQUEST_URI", req->path.c_str(), 1);
+    setenv("REDIRECT_STATUS", "true", 1);
     if (dup2(fd, STDOUT_FILENO) == -1) {
       perror("dup2");
       exit(1);
     }
-    // std::cout << body_path.c_str();
+    std::cout << body_path.c_str();
     execlp(bin.c_str(), "-f", "-q", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
@@ -97,8 +102,8 @@ void Response::dispatch(std::string const& body_path) {
     extension = "text";
   else
     extension = tmp.substr(tmp.find_last_of('.'));
-  // TODO(VLN37) change to dynamic extension
   if (location->cgi.count(extension)) {
+    WebServ::log.error() << "here\n";
     contenttype = "Content-Type: text/html; charset=utf-8\n";
     cgi(body_path, location->cgi[extension]);
   }
