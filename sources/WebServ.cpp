@@ -64,8 +64,7 @@ void WebServ::init(int argc, char **argv) {
     try {
       srv->_connect(conf.backlog);
     } catch (LoadException &e) {
-      delete srv;
-      throw e;
+      delete srv, throw e;
     }
     std::map<std::string, ServerLocation>::iterator it = srv->location.begin();
     for (; it != srv->location.end(); it++) {

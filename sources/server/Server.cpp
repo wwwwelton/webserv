@@ -103,10 +103,8 @@ void Server::_bind(void) {
   int yes = 1;
   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes))
     throw ConnectException("setsockopt");
-  if (bind(sockfd, (const sockaddr*)&sockaddress, sizeof(sockaddr_in))) {
-    close(sockfd);
+  if (bind(sockfd, (const sockaddr*)&sockaddress, sizeof(sockaddr_in)))
     throw ConnectException("bind");
-  }
 }
 
 void Server::_listen(int backlog) {
