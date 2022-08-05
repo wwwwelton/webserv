@@ -22,8 +22,8 @@ void loop(int argc, char **argv) {
         webserv._accept(i);
       } else {
         if (webserv.timed_out(i))
-          continue;
-        if (revents & POLLIN)
+          webserv.compress = true;
+        else if (revents & POLLIN)
           webserv._receive(i);
         else if (revents & POLLOUT)
           webserv._respond(i);

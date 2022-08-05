@@ -137,6 +137,7 @@ void WebServ::_accept(int i) {
     int max_body_size = host->client_max_body_size;
     clientlist[_fd].request_parser = new RequestParser(_fd, max_body_size);
     clientlist[_fd].response = new Response(NULL, host);
+    clientlist[_fd].timestamp = get_time_in_ms();
     pollfds.push_back(_pollfd(_fd, POLLIN));
     log.info() << host->server_name[0]
                << " accepted connection of client "
