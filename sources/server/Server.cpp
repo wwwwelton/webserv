@@ -87,11 +87,10 @@ bool Server::is_invalid(void) {
 
 void Server::_socket(void) {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd == -1) {
-    perror("socket");
-    exit(errno);
-  }
-  fcntl(sockfd, F_SETFL, O_NONBLOCK);
+  if (sockfd == -1)
+    throw ConnectException("socket");
+  if (fcntl(sockfd, F_SETFL, O_NONBLOCK) == -1)
+    throw ConnectException("fcntl");
 }
 
 void Server::_bind(void) {
@@ -102,22 +101,15 @@ void Server::_bind(void) {
   sockaddress.sin_addr.s_addr = ip;
 
   int yes = 1;
-  if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes)) {
-    perror("setsockopt");
-    exit(42);
-  }
-  if (bind(sockfd, (const sockaddr*)&sockaddress, sizeof(sockaddr_in))) {
-    perror("bind");
-    close(sockfd);
-    exit(errno);
-  }
+  if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes))
+    throw ConnectException("setsockopt");
+  if (bind(sockfd, (const sockaddr*)&sockaddress, sizeof(sockaddr_in)))
+    throw ConnectException("bind");
 }
 
 void Server::_listen(int backlog) {
-  if (listen(sockfd, backlog)) {
-    perror("listen");
-    exit(errno);
-  }
+  if (listen(sockfd, backlog))
+    throw ConnectException("listen");
 }
 
 int Server::_connect(int backlog) {
@@ -213,4 +205,29 @@ void Server::print(void) {
 
   std::cout << "\n";
   n++;
+}
+
+void Server::print_addr(std::pair<const int, Server*>& p) {
+  std::ios cout_default(NULL);
+  cout_default.copyfmt(std::cout);
+  Logger log(LOG_LEVEL);
+  in_addr t;
+
+  t.s_addr = p.second->ip;
+  log.info()
+      << "Server " << std::left << std::setw(14) << std::setfill(' ')
+      << p.second->server_name[0]
+      << " is listening on " << "http://" << inet_ntoa(t) << ":"
+      << ntohs(p.second->port)
+      << std::endl;
+  std::cout.copyfmt(cout_default);
+}
+
+Server::ConnectException::ConnectException(const std::string& str)
+    : LoadException(str) {
+  _m = "WebServ Failed to start (" + str + "): " + strerror(errno);
+}
+
+const char* Server::ConnectException::what(void) const throw() {
+  return (_m.c_str());
 }

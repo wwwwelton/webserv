@@ -61,8 +61,9 @@ class WebServ {
  public:
   static size_t get_time_in_ms(void);
 
-  WebServ(int argc, char **argv);
-  ~WebServ();
+  WebServ(void);
+  ~WebServ(void);
+  void init(int argc, char **argv);
   int _poll(void);
   void _accept(int fd);
   void _receive(int fd);
@@ -72,6 +73,7 @@ class WebServ {
   void purge_timeouts(void);
   bool timed_out(int fd);
   static Logger init_log(void);
+  void init_servers(void);
 
  public:
   Config conf;

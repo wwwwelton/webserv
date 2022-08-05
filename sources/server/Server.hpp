@@ -19,12 +19,16 @@
 #include <cerrno>
 #include <climits>
 #include <cstdlib>
+#include <cstring>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "LoadException.hpp"
+#include "Logger.hpp"
 #include "ServerLocation.hpp"
 #include "String.hpp"
 #include "defines.hpp"
@@ -61,8 +65,15 @@ class Server {
   void _listen(int backlog);
   int _connect(int backlog);
   void print(void);
+  static void print_addr(std::pair<const int, Server*>& p);
 
   std::string error;
+
+  class ConnectException : public LoadException {
+   public:
+    explicit ConnectException(const std::string& str);
+    const char* what(void) const throw();
+  };
 };
 
 #endif  // SERVER_HPP

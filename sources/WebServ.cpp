@@ -22,6 +22,11 @@ Logger WebServ::init_log(void) {
   return logger;
 }
 
+WebServ::WebServ(void) {
+  conn = 0;
+  compress = false;
+}
+
 WebServ::~WebServ(void) {
   log.debug() << "WebServ destructor called\n";
   std::map<int, Server *>::iterator it = serverlist.begin();
@@ -44,9 +49,8 @@ WebServ::~WebServ(void) {
   }
 }
 
-WebServ::WebServ(int argc, char **argv) {
+void WebServ::init(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
-  size_t i;
 
   init_signals(this);
   log.info() << "WebServ Signals initialized\n";
@@ -55,33 +59,12 @@ WebServ::WebServ(int argc, char **argv) {
   conf.load(argv[1]);
   log.info() << "WebServ Loaded " << argv[1] << "\n";
 
-  conn = 0;
-  compress = false;
   clientlist.reserve(1024);
   clientlist.resize(1024);
 
-  for (i = 0; i < conf.size(); i++) {
-    Server *srv = new Server(conf[i]);
-    srv->_connect(conf.backlog);
-    std::map<std::string, ServerLocation>::iterator it = srv->location.begin();
-    for (; it != srv->location.end(); it++) {
-      if (it->first.find('/') != std::string::npos &&
-          it->first.at(it->first.size() - 1) != '/') {
-        srv->location[it->first + "/"] = srv->location[it->first];
-        srv->location[it->first + "/"].root.push_back('/');
-      }
-    }
-    serverlist.insert(std::make_pair(srv->sockfd, srv));
-    pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
-  }
+  init_servers();
   log.info() << "WebServ initialized 🚀" << std::endl;
-  std::map<int, Server *>::iterator iter = serverlist.begin();
-  for (; iter != serverlist.end(); iter++) {
-    log.info()
-        << "Server " << iter->second->server_name[0]
-        << " is listening on port " << ntohs(iter->second->port)
-        << std::endl;
-  }
+  std::for_each(serverlist.begin(), serverlist.end(), Server::print_addr);
 }
 
 bool WebServ::timed_out(int i) {
@@ -144,19 +127,6 @@ void WebServ::_accept(int i) {
   }
 }
 
-void WebServ::end_connection(int i) {
-  int fd = pollfds[i].fd;
-
-  delete clientlist[fd].request_parser;
-  delete clientlist[fd].response;
-  clientlist[fd].request_parser = NULL;
-  clientlist[fd].server = NULL;
-  close(pollfds[i].fd);
-  log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
-  pollfds[i].fd = -1;
-  compress = true;
-}
-
 void WebServ::_receive(int i) {
   int fd = pollfds[i].fd;
   RequestParser &parser = *clientlist[fd].request_parser;
@@ -196,6 +166,19 @@ void WebServ::_respond(int i) {
   }
 }
 
+void WebServ::end_connection(int i) {
+  int fd = pollfds[i].fd;
+
+  delete clientlist[fd].request_parser;
+  delete clientlist[fd].response;
+  clientlist[fd].request_parser = NULL;
+  clientlist[fd].server = NULL;
+  close(pollfds[i].fd);
+  log.info() << "Connection closed with client " << pollfds[i].fd << "\n";
+  pollfds[i].fd = -1;
+  compress = true;
+}
+
 void WebServ::purge_conns(void) {
   // TODO(VLN37): see if necessary to remove timeouts here
   // purge_timeouts();
@@ -208,5 +191,26 @@ void WebServ::purge_conns(void) {
       if (it == ite)
         break;
     }
+  }
+}
+
+void WebServ::init_servers(void) {
+  for (size_t i = 0; i < conf.size(); i++) {
+    Server *srv = new Server(conf[i]);
+    try {
+      srv->_connect(conf.backlog);
+    } catch (LoadException &e) {
+      delete srv, throw e;
+    }
+    std::map<std::string, ServerLocation>::iterator it = srv->location.begin();
+    for (; it != srv->location.end(); it++) {
+      if (it->first.find('/') != std::string::npos &&
+          it->first.at(it->first.size() - 1) != '/') {
+        srv->location[it->first + "/"] = srv->location[it->first];
+        srv->location[it->first + "/"].root.push_back('/');
+      }
+    }
+    serverlist.insert(std::make_pair(srv->sockfd, srv));
+    pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
   }
 }
