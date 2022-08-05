@@ -22,7 +22,7 @@
 #define DFL_404_PAGE "custom_404.html"
 #define DFL_405_PAGE "custom_405.html"
 #define DFL_TIMEOUT 300
-#define DFL_CLI_MAX_BODY_SIZE 1024000
+#define DFL_CLI_MAX_BODY_SIZE 1024000000
 
 #define DFL_AUTO_INDEX 0
 #define DFL_SOCK_FD -1
