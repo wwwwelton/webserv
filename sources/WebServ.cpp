@@ -47,7 +47,6 @@ WebServ::WebServ(void) {
 
 void WebServ::init(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
-  size_t i;
 
   init_signals(this);
   log.info() << "WebServ Signals initialized\n";
@@ -59,25 +58,9 @@ void WebServ::init(int argc, char **argv) {
   clientlist.reserve(1024);
   clientlist.resize(1024);
 
-  for (i = 0; i < conf.size(); i++) {
-    Server *srv = new Server(conf[i]);
-    try {
-      srv->_connect(conf.backlog);
-    } catch (LoadException &e) {
-      delete srv, throw e;
-    }
-    std::map<std::string, ServerLocation>::iterator it = srv->location.begin();
-    for (; it != srv->location.end(); it++) {
-      if (it->first.find('/') != std::string::npos &&
-          it->first.at(it->first.size() - 1) != '/') {
-        srv->location[it->first + "/"] = srv->location[it->first];
-        srv->location[it->first + "/"].root.push_back('/');
-      }
-    }
-    serverlist.insert(std::make_pair(srv->sockfd, srv));
-    pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
-  }
+  init_servers();
   log.info() << "WebServ initialized 🚀" << std::endl;
+
   std::map<int, Server *>::iterator iter = serverlist.begin();
   for (; iter != serverlist.end(); iter++) {
     log.info()
@@ -170,5 +153,26 @@ void WebServ::purge_conns(void) {
       if (it == ite)
         break;
     }
+  }
+}
+
+void WebServ::init_servers(void) {
+  for (size_t i = 0; i < conf.size(); i++) {
+    Server *srv = new Server(conf[i]);
+    try {
+      srv->_connect(conf.backlog);
+    } catch (LoadException &e) {
+      delete srv, throw e;
+    }
+    std::map<std::string, ServerLocation>::iterator it = srv->location.begin();
+    for (; it != srv->location.end(); it++) {
+      if (it->first.find('/') != std::string::npos &&
+          it->first.at(it->first.size() - 1) != '/') {
+        srv->location[it->first + "/"] = srv->location[it->first];
+        srv->location[it->first + "/"].root.push_back('/');
+      }
+    }
+    serverlist.insert(std::make_pair(srv->sockfd, srv));
+    pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
   }
 }

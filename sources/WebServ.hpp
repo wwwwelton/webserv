@@ -67,6 +67,7 @@ class WebServ {
   void end_connection(int fd);
   void purge_conns(void);
   static Logger init_log(void);
+  void init_servers(void);
 
  public:
   Config conf;
