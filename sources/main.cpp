@@ -16,9 +16,14 @@ void loop(int argc, char **argv) {
       break;
     for (int i = 0, size = webserv.pollfds.size(); i < size; i++) {
       int16_t revents = webserv.pollfds[i].revents;
+      bool server_request = webserv.serverlist.count(webserv.pollfds[i].fd);
+      if (!server_request && webserv.timed_out(i)) {
+        webserv.end_connection(i);
+        continue;
+      }
       if (revents == 0)
         continue;
-      if (webserv.serverlist.count(webserv.pollfds[i].fd)) {
+      if (server_request) {
         webserv._accept(i);
       } else {
         if (revents & POLLERR ||
