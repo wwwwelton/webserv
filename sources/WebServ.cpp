@@ -93,8 +93,6 @@ bool WebServ::timed_out(int i) {
   if (time_now - clientlist[fd].timestamp > 1000) {
     WebServ::log.info() << "Client " << fd << " timed out after "
                         << (time_now - clientlist[fd].timestamp) << " ms\n";
-    end_connection(i);
-    compress = true;
     return true;
   }
   return false;
@@ -192,6 +190,7 @@ void WebServ::_respond(int i) {
     response._send(fd);
   }
   if (response.finished) {
+    pollfds[i].events = POLLIN;
     parser.reset();
     response.reset();
     // end_connection(i);

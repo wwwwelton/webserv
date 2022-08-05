@@ -21,12 +21,21 @@ void loop(int argc, char **argv) {
       if (webserv.serverlist.count(webserv.pollfds[i].fd)) {
         webserv._accept(i);
       } else {
-        if (webserv.timed_out(i))
-          webserv.compress = true;
-        else if (revents & POLLIN)
+        if (revents & POLLERR ||
+            revents & POLLRDHUP ||
+            revents & POLLNVAL ||
+            revents & POLLHUP)
+            webserv.end_connection(i);
+        else if (webserv.timed_out(i))
+              webserv.end_connection(i);
+        else if (revents & POLLIN) {
+          webserv.log.error() << webserv.pollfds[i].fd << " pollin\n";
           webserv._receive(i);
-        else if (revents & POLLOUT)
+        }
+        else if (revents & POLLOUT) {
+          webserv.log.error() << webserv.pollfds[i].fd << " pollout\n";
           webserv._respond(i);
+        }
         else
           WebServ::log.warning() << "unexpected error returned on poll";
       }
