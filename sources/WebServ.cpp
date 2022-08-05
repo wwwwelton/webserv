@@ -60,14 +60,7 @@ void WebServ::init(int argc, char **argv) {
 
   init_servers();
   log.info() << "WebServ initialized 🚀" << std::endl;
-
-  std::map<int, Server *>::iterator iter = serverlist.begin();
-  for (; iter != serverlist.end(); iter++) {
-    log.info()
-        << "Server " << iter->second->server_name[0]
-        << " is listening on port " << ntohs(iter->second->port)
-        << std::endl;
-  }
+  std::for_each(serverlist.begin(), serverlist.end(), Server::print_addr);
 }
 
 int WebServ::_poll(void) {

@@ -207,6 +207,22 @@ void Server::print(void) {
   n++;
 }
 
+void Server::print_addr(std::pair<const int, Server*>& p) {
+  std::ios cout_default(NULL);
+  cout_default.copyfmt(std::cout);
+  Logger log(LOG_LEVEL);
+  in_addr t;
+
+  t.s_addr = p.second->ip;
+  log.info()
+      << "Server " << std::left << std::setw(14) << std::setfill(' ')
+      << p.second->server_name[0]
+      << " is listening on " << "http://" << inet_ntoa(t) << ":"
+      << ntohs(p.second->port)
+      << std::endl;
+  std::cout.copyfmt(cout_default);
+}
+
 Server::ConnectException::ConnectException(const std::string& str)
     : LoadException(str) {
   _m = "WebServ Failed to start (" + str + "): " + strerror(errno);
