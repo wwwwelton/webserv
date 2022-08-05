@@ -497,6 +497,7 @@ void RequestParser::reset() {
 
   finished = false;
   valid = false;
+  supported_version_index = 0;
   content_length = 0;
   max_content_length = 0;
   bytes_consumed = 0;
