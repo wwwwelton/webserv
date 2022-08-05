@@ -19,12 +19,14 @@
 #include <cerrno>
 #include <climits>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "LoadException.hpp"
 #include "ServerLocation.hpp"
 #include "String.hpp"
 #include "defines.hpp"
@@ -63,6 +65,12 @@ class Server {
   void print(void);
 
   std::string error;
+
+  class ConnectException : public LoadException {
+   public:
+    explicit ConnectException(const std::string& str);
+    const char* what(void) const throw();
+  };
 };
 
 #endif  // SERVER_HPP
