@@ -74,9 +74,9 @@ WebServ::WebServ(int argc, char **argv) {
   std::map<int, Server *>::iterator iter = serverlist.begin();
   for (; iter != serverlist.end(); iter++) {
     log.info()
-      << "Server " << iter->second->server_name[0]
-      << " is listening on port " << ntohs(iter->second->port)
-      << std::endl;
+        << "Server " << iter->second->server_name[0]
+        << " is listening on port " << ntohs(iter->second->port)
+        << std::endl;
   }
 }
 
@@ -144,8 +144,7 @@ void WebServ::_respond(int i) {
   if (response.inprogress) {
     response.assemble_followup();
     response._send(fd);
-  }
-  else if (parser.finished) {
+  } else if (parser.finished) {
     response.set_request(&parser.get_request());
     response.process();
     response._send(fd);
