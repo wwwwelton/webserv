@@ -235,7 +235,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         } else if (c == '\n') {
           current_state = S_HEADER_LINE_START;
         } else
-            throw InvalidRequestException(BadRequest);
+          throw InvalidRequestException(BadRequest);
         break;
 
       case S_REQUEST_LINE_LF:
