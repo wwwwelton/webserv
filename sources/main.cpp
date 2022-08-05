@@ -7,9 +7,10 @@
 
 #include "WebServ.hpp"
 
-void loop(int argc, char **argv) {
-  WebServ webserv(argc, argv);
+void loop(int argc, char** argv) {
+  WebServ webserv;
 
+  webserv.init(argc, argv);
   while (true) {
     webserv._poll();
     if (webserv.conn <= 0)
@@ -34,7 +35,7 @@ void loop(int argc, char **argv) {
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   while (true) {
     try {
       loop(argc, argv);

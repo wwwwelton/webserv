@@ -40,7 +40,12 @@ WebServ::~WebServ(void) {
   }
 }
 
-WebServ::WebServ(int argc, char **argv) {
+WebServ::WebServ(void) {
+  conn = 0;
+  compress = false;
+}
+
+void WebServ::init(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
   size_t i;
 
@@ -51,14 +56,17 @@ WebServ::WebServ(int argc, char **argv) {
   conf.load(argv[1]);
   log.info() << "WebServ Loaded " << argv[1] << "\n";
 
-  conn = 0;
-  compress = false;
   clientlist.reserve(1024);
   clientlist.resize(1024);
 
   for (i = 0; i < conf.size(); i++) {
     Server *srv = new Server(conf[i]);
-    srv->_connect(conf.backlog);
+    try {
+      srv->_connect(conf.backlog);
+    } catch (LoadException &e) {
+      delete srv;
+      throw e;
+    }
     std::map<std::string, ServerLocation>::iterator it = srv->location.begin();
     for (; it != srv->location.end(); it++) {
       if (it->first.find('/') != std::string::npos &&

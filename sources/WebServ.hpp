@@ -57,8 +57,9 @@ typedef struct s_request {
 
 class WebServ {
  public:
-  WebServ(int argc, char **argv);
-  ~WebServ();
+  WebServ(void);
+  ~WebServ(void);
+  void init(int argc, char **argv);
   int _poll(void);
   void _accept(int fd);
   void _receive(int fd);
