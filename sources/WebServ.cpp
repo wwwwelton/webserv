@@ -75,7 +75,7 @@ WebServ::WebServ(int argc, char **argv) {
   for (; iter != serverlist.end(); iter++) {
     log.info()
       << "Server " << iter->second->server_name[0]
-      << " is listening port " << ntohs(iter->second->port)
+      << " is listening on port " << ntohs(iter->second->port)
       << std::endl;
   }
 }
