@@ -70,7 +70,14 @@ WebServ::WebServ(int argc, char **argv) {
     serverlist.insert(std::make_pair(srv->sockfd, srv));
     pollfds.push_back(_pollfd(srv->sockfd, POLLIN));
   }
-  log.info() << "WebServ initialized. Listening..." << std::endl;
+  log.info() << "WebServ initialized 🚀" << std::endl;
+  std::map<int, Server *>::iterator iter = serverlist.begin();
+  for (; iter != serverlist.end(); iter++) {
+    log.info()
+      << "Server " << iter->second->server_name[0]
+      << " is listening port " << ntohs(iter->second->port)
+      << std::endl;
+  }
 }
 
 int WebServ::_poll(void) {
