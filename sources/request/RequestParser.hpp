@@ -82,6 +82,8 @@ public:
 
   void parse();
   Request &get_request();
+  bool is_parsing_body() const;
+  void reset();
 
   class InvalidRequestException: public std::exception {
     RequestErrors _error;

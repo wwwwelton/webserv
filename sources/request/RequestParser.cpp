@@ -119,7 +119,7 @@ std::string RequestParser::supported_version = "HTTP/1.1";
 RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
   finished(false),
   valid(false),
-  content_length(false),
+  content_length(),
   max_content_length(max_body_size),
   bytes_consumed(),
   parsing_body(false),
@@ -489,6 +489,22 @@ void RequestParser::parse() {
 Request &RequestParser::get_request() {
   _request->finished = this->finished;
   return *_request;
+}
+
+void RequestParser::reset() {
+  delete this->_request;
+  this->_request = new Request();
+
+  finished = false;
+  valid = false;
+  content_length = 0;
+  max_content_length = 0;
+  bytes_consumed = 0;
+  parsing_body = false;
+  chunked = false;
+  chunk_size = 0;
+  bytes_read = 0;
+  current_state = S_INIT;
 }
 
 RequestParser::InvalidRequestException::InvalidRequestException(RequestErrors error) {
