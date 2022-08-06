@@ -482,6 +482,7 @@ void RequestParser::parse() {
     WebServ::log.error()
       << "Unexpected exception on RequestParser: "
       << e.what() << std::endl;
+    _request->error = 500;
     finished = true;
   }
 }
