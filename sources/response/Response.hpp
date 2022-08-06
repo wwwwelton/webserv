@@ -72,6 +72,7 @@ private:
   std::string req_body;
   std::string originalroot;
   std::string path;
+  std::string trailing_path;
   std::string root;
   std::string bin;
 
@@ -81,6 +82,7 @@ private:
   bool        folder_request;
   bool        valid;
   bool        remove_tmp;
+  bool        path_ends_in_slash;
 
   std::string _itoa(size_t nbr);
   int validate_limit_except(void);

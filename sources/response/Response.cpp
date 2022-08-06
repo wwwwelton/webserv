@@ -111,8 +111,11 @@ void Response::dispatch(std::string const& body_path) {
     contenttype = mimetypes[extension];
     assemble(body_path);
   }
-  else
+  else {
     WebServ::log.warning() << extension << " support not yet implemented\n";
+    contenttype = "Content-Type: application/octet-stream\n";
+    assemble(body_path);
+  }
 }
 
 std::string Response::_itoa(size_t nbr) {
@@ -181,7 +184,7 @@ void Response::assemble(void) {
   std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
   ResponseBase::size = str.size();
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  // WebServ::log.debug() << ResponseBase::buffer_resp;
+  WebServ::log.debug() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
@@ -206,8 +209,10 @@ void Response::assemble(std::string const& body_path) {
     inprogress = true;
   }
   std::string str(httpversion + statuscode + statusmsg + contenttype);
-  if (incorrect_path)
+  if (incorrect_path) {
+    // req->path[req->path.size() - 1] != '/';
     str.append("Location: " + req->path + "/\n");
+  }
   str.append(DFL_CONTENTLEN);
   str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
   std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());

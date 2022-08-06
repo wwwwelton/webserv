@@ -15,6 +15,7 @@ void Response::find_location(std::string path, Server *server) {
       //   path = path.erase(path.find_last_of('/'));
       return;
     }
+    trailing_path = path.substr(path.find_last_of('/'));
     path = path.erase(path.find_last_of('/'));
   }
   location = &server->location["/"];
@@ -27,7 +28,9 @@ void Response::reset(void) {
   folder_request = false;
   remove_tmp = false;
   valid = true;
+  path_ends_in_slash = false;
   response_code = CONTINUE;
+  trailing_path.clear();
   response_path.clear();
   file.close();
   statuscode = " 200";
@@ -52,6 +55,8 @@ void Response::set_request(Request const*_req) {
   // }
   // gambis
 
+  if (req->path[req->path.size() - 1] == '/')
+    path_ends_in_slash = true;
   originalroot = server->location["/"].root;
   root = "./" + location->root;
   if (req->method == "POST") {
@@ -59,16 +64,38 @@ void Response::set_request(Request const*_req) {
       path = "./" + req->headers.at("Origin") + _req->path;
   }
   else {
-    path = "./" + server->root + _req->path;
     if (location->root == originalroot)
       if (root.at(root.size() - 1) != '/')
         root.push_back('/');
+    // size_t index;
+    // if (location->root.find(req->path) == std::string::npos)
+    //   index = req->path.size();
+    // else
+    //   index = location->root.find(req->path) + req->path.size();
+    // std::string cutpath =
+    //   req->path.substr(index);
+    if (!trailing_path.empty() && trailing_path != "/" && root[root.size() - 1] == '/')
+      path = root + trailing_path.substr(1);
+    else if (trailing_path != "/")
+      path = root + trailing_path;
+    else
+      path = root;
+    if (path_ends_in_slash)
+      if (path[path.size() - 1] != '/')
+        path.push_back('/');
+    if (path.size() > 2 && path[path.size() - 1] == '/' &&
+                           path[path.size() - 2] == '/')
+      path.resize(path.size() - 1);
+    if (path.size() > 2 && path[path.size() - 1] == '/' &&
+                           path[path.size() - 2] == '/')
+      path.resize(path.size() - 1);
   }
   std::cout << location->index[0] << "\n";
   std::cout << "location: " << location->root << "\n";
   std::cout << "req path: " << _req->path << "\n";
   std::cout << "root: " << root << "\n";
   std::cout << "path: " << path << "\n";
+  std::cout << "trailing path: " << trailing_path << "\n";
   method = _req->method;
   response_code = location->redirect.first;
   if (_req->error)
