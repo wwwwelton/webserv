@@ -32,16 +32,10 @@ void loop(int argc, char** argv) {
             revents & POLLNVAL ||
             revents & POLLHUP)
             webserv.end_connection(i);
-        else if (webserv.timed_out(i))
-              webserv.end_connection(i);
-        else if (revents & POLLIN) {
-          webserv.log.error() << webserv.pollfds[i].fd << " pollin\n";
+        else if (revents & POLLIN)
           webserv._receive(i);
-        }
-        else if (revents & POLLOUT) {
-          webserv.log.error() << webserv.pollfds[i].fd << " pollout\n";
+        else if (revents & POLLOUT)
           webserv._respond(i);
-        }
         else
           WebServ::log.warning() << "unexpected error returned on poll";
       }

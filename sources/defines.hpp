@@ -8,7 +8,7 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define LOG_LEVEL LVL_DEBUG
+#define LOG_LEVEL LVL_INFO
 
 // Server host default
 #define DFL_BACKLOG 500
@@ -36,7 +36,7 @@
 #define CFG_MIN_ERR_CODE 400
 #define CFG_MAX_ERR_CODE 499
 #define CFG_MIN_TIMEOUT 0
-#define CFG_MAX_TIMEOUT 4096
+#define CFG_MAX_TIMEOUT 500000
 #define CFG_MIN_CLI_MAX_BODY_SIZE 0
 #define CFG_MAX_CLI_MAX_BODY_SIZE 1024000
 #define CFG_MIN_RED_CODE 100

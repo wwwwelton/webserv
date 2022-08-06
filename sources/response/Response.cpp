@@ -79,7 +79,7 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       perror("dup2");
       exit(1);
     }
-    std::cout << body_path.c_str();
+    // std::cout << body_path.c_str();
     execlp(bin.c_str(), "-f", "-q", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
@@ -91,7 +91,7 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
 void Response::dispatch(std::string const& body_path) {
   std::string extension;
 
-  std::cout << "path: " << body_path << "\n";
+  // std::cout << "path: " << body_path << "\n";
   if (body_path.empty()) {
     assemble();
     return;
