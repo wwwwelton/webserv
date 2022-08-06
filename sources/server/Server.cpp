@@ -16,6 +16,8 @@ Server::Server(void) {
   redirect = std::make_pair(0, "");
   autoindex = -1;
   sockfd = DFL_SOCK_FD;
+  upload = -1;
+  upload_store = "";
 }
 
 Server::Server(const Server& src) {
@@ -43,6 +45,8 @@ Server& Server::operator=(const Server& rhs) {
     location = rhs.location;
     autoindex = rhs.autoindex;
     sockfd = rhs.sockfd;
+    upload = rhs.upload;
+    upload_store = rhs.upload_store;
   }
   return (*this);
 }
@@ -66,11 +70,13 @@ void Server::fill(void) {
     client_max_body_size = DFL_CLI_MAX_BODY_SIZE;
   if (autoindex == -1)
     autoindex = DFL_AUTO_INDEX;
-  for (std::map<std::string, ServerLocation>::iterator it = location.begin();
-       it != location.end();
-       it++) {
+  std::map<std::string, ServerLocation>::iterator it;
+  for (it = location.begin(); it != location.end(); it++)
     it->second.fill(*this);
-  }
+  if (upload == -1)
+    upload = DFL_UPLOAD;
+  if (upload_store.empty())
+    upload_store = DFL_UPLOAD_STORE;
 }
 
 bool Server::is_invalid(void) {
@@ -165,6 +171,10 @@ void Server::print(void) {
   std::cout << "redirect: =>" << redirect.first << "<= =>"
             << redirect.second << "<=\n";
 
+  std::cout << "upload: =>" << upload << "<=\n";
+
+  std::cout << "upload_store: =>" << upload_store << "<=\n";
+
   std::cout << "sockfd: =>" << sockfd << "<=\n";
 
   for (std::map<std::string, ServerLocation>::const_iterator
@@ -201,6 +211,11 @@ void Server::print(void) {
 
     std::cout << "    redirect: =>" << location[index].redirect.first
               << "<= =>" << location[index].redirect.second << "<=\n";
+
+    std::cout << "    upload: =>" << location[index].upload << "<=\n";
+
+    std::cout << "    upload_store: =>"
+              << location[index].upload_store << "<=\n";
   }
 
   std::cout << "\n";
@@ -217,7 +232,8 @@ void Server::print_addr(std::pair<const int, Server*>& p) {
   log.info()
       << "Server " << std::left << std::setw(14) << std::setfill(' ')
       << p.second->server_name[0]
-      << " is listening on " << "http://" << inet_ntoa(t) << ":"
+      << " is listening on "
+      << "http://" << inet_ntoa(t) << ":"
       << ntohs(p.second->port)
       << std::endl;
   std::cout.copyfmt(cout_default);

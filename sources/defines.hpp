@@ -26,6 +26,8 @@
 
 #define DFL_AUTO_INDEX 0
 #define DFL_SOCK_FD -1
+#define DFL_UPLOAD 0
+#define DFL_UPLOAD_STORE "/tmp"
 // Server vhost location default
 #define DFL_LIM_EXCEPT "ALL"
 
@@ -42,6 +44,8 @@
 #define CFG_MIN_RED_CODE 100
 #define CFG_MAX_RED_CODE 499
 #define CFG_FIELD_LIM_EXCEPT "ALL GET POST PUT DELETE"
+#define CFG_MIN_PORT 80
+#define CFG_MAX_PORT 65000
 
 
 #define CFG_FILE_EXT ".conf"

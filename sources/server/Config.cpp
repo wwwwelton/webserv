@@ -120,9 +120,13 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
     } else if (directive == "autoindex") {
       location.autoindex = helper.get_autoindex();
     } else if (directive == "cgi") {
-      location.cgi["." + tokens[1]] = helper.get_cgi();
+      location.cgi[tokens[1]] = helper.get_cgi();
     } else if (directive == "return") {
       location.redirect = helper.get_redirect();
+    } else if (directive == "upload") {
+      location.upload = helper.get_upload();
+    } else if (directive == "upload_store") {
+      location.upload_store = helper.get_upload_store();
     } else if (directive[0] == '#') {
       continue;
     } else if (directive == "}") {
@@ -172,9 +176,13 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (directive == "autoindex") {
       srv.autoindex = helper.get_autoindex();
     } else if (directive == "cgi") {
-      srv.cgi["." + tokens[1]] = helper.get_cgi();
+      srv.cgi[tokens[1]] = helper.get_cgi();
     } else if (directive == "return") {
       srv.redirect = helper.get_redirect();
+    } else if (directive == "upload") {
+      srv.upload = helper.get_upload();
+    } else if (directive == "upload_store") {
+      srv.upload_store = helper.get_upload_store();
     } else if (directive == "location") {
       srv.location[tokens[1]] = _parse_location(is);
     } else if (directive[0] == '#') {

@@ -112,13 +112,14 @@ std::vector<std::string> ConfigHelper::get_server_name(void) {
 }
 
 std::string ConfigHelper::get_root(void) {
-  if (_tokens.size() == 1)
+  if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
   struct stat statbuf;
-  stat(_tokens[1].c_str(), &statbuf);
+  if (stat(_tokens[1].c_str(), &statbuf) == -1)
+    throw SystemError("root", _tokens[1]);
   if (!S_ISDIR(statbuf.st_mode | S_IRUSR))
-    throw InvFieldValue("root", _tokens[1]);
-  return (String::trim(std::string(_tokens[1]), "/"));
+    throw SystemError("root", _tokens[1]);
+  return (std::string(_tokens[1]));
 }
 
 std::vector<std::string> ConfigHelper::get_index(void) {
@@ -190,6 +191,10 @@ bool ConfigHelper::get_autoindex(void) {
 std::string ConfigHelper::get_cgi(void) {
   if (_tokens.size() != 3)
     throw InvalidNumberArgs(_tokens[0]);
+  if (!_valid_cgi_ext(_tokens[1]))
+    throw InvFieldValue("cgi", _tokens[1]);
+  if (!_valid_cgi_bin(_tokens[2]))
+    throw SystemError("cgi", _tokens[2]);
   return (_tokens[2]);
 }
 
@@ -219,6 +224,25 @@ std::vector<std::string> ConfigHelper::get_limit_except(void) {
   return (tmp);
 }
 
+bool ConfigHelper::get_upload(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (_tokens[1] != "on" && _tokens[1] != "off")
+    throw InvFieldValue("upload", _tokens[1]);
+  return ((_tokens[1] == "on") ? true : false);
+}
+
+std::string ConfigHelper::get_upload_store(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  struct stat statbuf;
+  if (stat(_tokens[1].c_str(), &statbuf) == -1)
+    throw SystemError("upload_store", _tokens[1]);
+  if (!S_ISDIR(statbuf.st_mode | S_IRUSR))
+    throw SystemError("upload_store", _tokens[1]);
+  return (std::string(_tokens[1]));
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 
@@ -235,7 +259,8 @@ bool ConfigHelper::_valid_ip(const std::string& ip) {
 
 bool ConfigHelper::_valid_port(const std::string& port) {
   if (port.find_first_not_of("0123456789") != std::string::npos ||
-      String::to_int(port) > 65000 || String::to_int(port) < 80) {
+      String::to_int(port) > CFG_MAX_PORT ||
+      String::to_int(port) < CFG_MIN_PORT) {
     return (false);
   }
   return (true);
@@ -260,9 +285,8 @@ bool ConfigHelper::_valid_index(const std::string& index) {
   char end = index[index.size() - 1];
   if (!::isalnum(start) || !::isalnum(end))
     return (false);
-  for (std::string::const_iterator it = index.begin();
-       it != index.end();
-       it++) {
+  std::string::const_iterator it;
+  for (it = index.begin(); it != index.end(); it++) {
     if (!::isalnum(*it) && *it != '.' && *it != '-' && *it != '_')
       return (false);
   }
@@ -299,6 +323,40 @@ bool ConfigHelper::_valid_log(const std::string& log) {
       return (false);
   }
   return (true);
+}
+
+bool ConfigHelper::_valid_cgi_ext(const std::string& ext) {
+  char start = ext[0];
+  char end = ext[ext.size() - 1];
+  if (start != '.' || !::isalpha(end))
+    return (false);
+  std::string::const_iterator it;
+  for (it = ext.begin() + 1; it != ext.end(); it++) {
+    if (!::isalpha(*it))
+      return (false);
+  }
+  return (true);
+}
+
+bool ConfigHelper::_valid_cgi_bin(const std::string& bin) {
+  struct stat statbuf;
+  if (stat(bin.c_str(), &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
+    return (true);
+  if (stat(bin.c_str(), &statbuf) == 0 && !(statbuf.st_mode & S_IXUSR)) {
+    errno = EACCES;
+    return (false);
+  }
+  std::vector<std::string> path = String::split(std::getenv("PATH"), ":");
+  for (size_t i = 0; i < path.size(); i++) {
+    std::string exe(path[i] + "/" + bin);
+    if (stat(exe.c_str(), &statbuf) == 0 && !(statbuf.st_mode & S_IXUSR)) {
+      errno = EACCES;
+      return (false);
+    }
+    if (stat(exe.c_str(), &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
+      return (true);
+  }
+  return (false);
 }
 
 ConfigHelper::InvalidNumberArgs::InvalidNumberArgs(const std::string& str)
@@ -371,5 +429,16 @@ ConfigHelper::UnclosedBrackets ::UnclosedBrackets(const std::string& str)
 }
 
 const char* ConfigHelper::UnclosedBrackets::what(void) const throw() {
+  return (_m.c_str());
+}
+
+ConfigHelper::SystemError::SystemError(const std::string& field,
+                                       const std::string& value)
+    : LoadException("") {
+  _m = PARSE_ERROR "invalid \"" + value + "\" in " +
+       field + " (" + strerror(errno) + ")";
+}
+
+const char* ConfigHelper::SystemError::what(void) const throw() {
   return (_m.c_str());
 }

@@ -16,6 +16,8 @@
 #include <sys/types.h>
 
 #include <algorithm>
+#include <cerrno>
+#include <cstring>
 #include <map>
 #include <set>
 #include <string>
@@ -51,6 +53,8 @@ class ConfigHelper {
   std::string get_cgi(void);
   std::pair<int, std::string> get_redirect(void);
   std::vector<std::string> get_limit_except(void);
+  bool get_upload(void);
+  std::string get_upload_store(void);
 
  private:
   bool _valid_ip(const std::string& ip);
@@ -59,6 +63,8 @@ class ConfigHelper {
   bool _valid_index(const std::string& index);
   bool _valid_error_page(const std::string& error_page);
   bool _valid_log(const std::string& log);
+  bool _valid_cgi_ext(const std::string& ext);
+  bool _valid_cgi_bin(const std::string& bin);
 
   std::vector<std::string> _tokens;
   std::multiset<std::string> _list;
@@ -109,6 +115,12 @@ class ConfigHelper {
   class UnclosedBrackets : public LoadException {
    public:
     explicit UnclosedBrackets(const std::string& str);
+    const char* what(void) const throw();
+  };
+
+  class SystemError : public LoadException {
+   public:
+    explicit SystemError(const std::string& field, const std::string& value);
     const char* what(void) const throw();
   };
 };
