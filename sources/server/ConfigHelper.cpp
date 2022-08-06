@@ -112,13 +112,14 @@ std::vector<std::string> ConfigHelper::get_server_name(void) {
 }
 
 std::string ConfigHelper::get_root(void) {
-  if (_tokens.size() == 1)
+  if (_tokens.size() != 2)
     throw InvalidNumberArgs(_tokens[0]);
   struct stat statbuf;
-  stat(_tokens[1].c_str(), &statbuf);
+  if (stat(_tokens[1].c_str(), &statbuf) == -1)
+    throw SystemError("root", _tokens[1]);
   if (!S_ISDIR(statbuf.st_mode | S_IRUSR))
-    throw InvFieldValue("root", _tokens[1]);
-  return (String::trim(std::string(_tokens[1]), "/"));
+    throw SystemError("root", _tokens[1]);
+  return (std::string(_tokens[1]));
 }
 
 std::vector<std::string> ConfigHelper::get_index(void) {
@@ -232,9 +233,9 @@ std::string ConfigHelper::get_upload_store(void) {
     throw InvalidNumberArgs(_tokens[0]);
   struct stat statbuf;
   if (stat(_tokens[1].c_str(), &statbuf) == -1)
-    throw InvFieldValue("upload_store", _tokens[1]);
+    throw SystemError("upload_store", _tokens[1]);
   if (!S_ISDIR(statbuf.st_mode | S_IRUSR))
-    throw InvFieldValue("upload_store", _tokens[1]);
+    throw SystemError("upload_store", _tokens[1]);
   return (std::string(_tokens[1]));
 }
 
@@ -390,5 +391,16 @@ ConfigHelper::UnclosedBrackets ::UnclosedBrackets(const std::string& str)
 }
 
 const char* ConfigHelper::UnclosedBrackets::what(void) const throw() {
+  return (_m.c_str());
+}
+
+ConfigHelper::SystemError::SystemError(const std::string& field,
+                                       const std::string& value)
+    : LoadException("") {
+  _m = PARSE_ERROR "invalid \"" + value + "\" in " +
+       field + " (" + strerror(errno) + ")";
+}
+
+const char* ConfigHelper::SystemError::what(void) const throw() {
   return (_m.c_str());
 }

@@ -16,6 +16,8 @@
 #include <sys/types.h>
 
 #include <algorithm>
+#include <cerrno>
+#include <cstring>
 #include <map>
 #include <set>
 #include <string>
@@ -111,6 +113,12 @@ class ConfigHelper {
   class UnclosedBrackets : public LoadException {
    public:
     explicit UnclosedBrackets(const std::string& str);
+    const char* what(void) const throw();
+  };
+
+  class SystemError : public LoadException {
+   public:
+    explicit SystemError(const std::string& field, const std::string& value);
     const char* what(void) const throw();
   };
 };
