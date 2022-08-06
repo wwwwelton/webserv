@@ -191,6 +191,10 @@ bool ConfigHelper::get_autoindex(void) {
 std::string ConfigHelper::get_cgi(void) {
   if (_tokens.size() != 3)
     throw InvalidNumberArgs(_tokens[0]);
+  if (!_valid_cgi_ext(_tokens[1]))
+    throw InvFieldValue("cgi", _tokens[1]);
+  if (!_valid_cgi_bin(_tokens[2]))
+    throw SystemError("cgi", _tokens[2]);
   return (_tokens[2]);
 }
 
@@ -318,6 +322,40 @@ bool ConfigHelper::_valid_log(const std::string& log) {
       return (false);
   }
   return (true);
+}
+
+bool ConfigHelper::_valid_cgi_ext(const std::string& ext) {
+  char start = ext[0];
+  char end = ext[ext.size() - 1];
+  if (start != '.' || !::isalpha(end))
+    return (false);
+  std::string::const_iterator it;
+  for (it = ext.begin() + 1; it != ext.end(); it++) {
+    if (!::isalpha(*it))
+      return (false);
+  }
+  return (true);
+}
+
+bool ConfigHelper::_valid_cgi_bin(const std::string& bin) {
+  struct stat statbuf;
+  if (stat(bin.c_str(), &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
+    return (true);
+  if (stat(bin.c_str(), &statbuf) == 0 && !(statbuf.st_mode & S_IXUSR)) {
+    errno = EACCES;
+    return (false);
+  }
+  std::vector<std::string> path = String::split(std::getenv("PATH"), ":");
+  for (size_t i = 0; i < path.size(); i++) {
+    std::string exe(path[i] + "/" + bin);
+    if (stat(exe.c_str(), &statbuf) == 0 && !(statbuf.st_mode & S_IXUSR)) {
+      errno = EACCES;
+      return (false);
+    }
+    if (stat(exe.c_str(), &statbuf) == 0 && statbuf.st_mode & S_IXUSR)
+      return (true);
+  }
+  return (false);
 }
 
 ConfigHelper::InvalidNumberArgs::InvalidNumberArgs(const std::string& str)

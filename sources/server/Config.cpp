@@ -120,7 +120,7 @@ ServerLocation Config::_parse_location(std::istringstream* is) {
     } else if (directive == "autoindex") {
       location.autoindex = helper.get_autoindex();
     } else if (directive == "cgi") {
-      location.cgi["." + tokens[1]] = helper.get_cgi();
+      location.cgi[tokens[1]] = helper.get_cgi();
     } else if (directive == "return") {
       location.redirect = helper.get_redirect();
     } else if (directive == "upload") {
@@ -176,7 +176,7 @@ Server Config::_parse_server(std::istringstream* is) {
     } else if (directive == "autoindex") {
       srv.autoindex = helper.get_autoindex();
     } else if (directive == "cgi") {
-      srv.cgi["." + tokens[1]] = helper.get_cgi();
+      srv.cgi[tokens[1]] = helper.get_cgi();
     } else if (directive == "return") {
       srv.redirect = helper.get_redirect();
     } else if (directive == "upload") {
