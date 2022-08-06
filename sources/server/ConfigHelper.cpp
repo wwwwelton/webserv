@@ -280,9 +280,8 @@ bool ConfigHelper::_valid_index(const std::string& index) {
   char end = index[index.size() - 1];
   if (!::isalnum(start) || !::isalnum(end))
     return (false);
-  for (std::string::const_iterator it = index.begin();
-       it != index.end();
-       it++) {
+  std::string::const_iterator it;
+  for (it = index.begin(); it != index.end(); it++) {
     if (!::isalnum(*it) && *it != '.' && *it != '-' && *it != '_')
       return (false);
   }
