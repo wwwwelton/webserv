@@ -26,6 +26,8 @@
 
 #define DFL_AUTO_INDEX 0
 #define DFL_SOCK_FD -1
+#define DFL_UPLOAD 0
+#define DFL_UPLOAD_STORE "/tmp"
 // Server vhost location default
 #define DFL_LIM_EXCEPT "ALL"
 

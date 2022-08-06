@@ -11,6 +11,8 @@ ServerLocation::ServerLocation(void) {
   root = "";
   client_max_body_size = -1;
   autoindex = -1;
+  upload = -1;
+  upload_store = "";
 }
 
 ServerLocation::ServerLocation(const ServerLocation& src) {
@@ -30,6 +32,8 @@ ServerLocation& ServerLocation::operator=(const ServerLocation& rhs) {
     cgi = rhs.cgi;
     redirect = rhs.redirect;
     autoindex = rhs.autoindex;
+    upload = rhs.upload;
+    upload_store = rhs.upload_store;
   }
   return (*this);
 }
@@ -49,4 +53,8 @@ void ServerLocation::fill(const Server& srv) {
     redirect = srv.redirect;
   if (autoindex == -1)
     autoindex = srv.autoindex;
+  if (upload == -1)
+    upload = DFL_UPLOAD;
+  if (upload_store.empty())
+    upload_store = DFL_UPLOAD_STORE;
 }

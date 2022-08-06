@@ -219,6 +219,25 @@ std::vector<std::string> ConfigHelper::get_limit_except(void) {
   return (tmp);
 }
 
+bool ConfigHelper::get_upload(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  if (_tokens[1] != "on" && _tokens[1] != "off")
+    throw InvFieldValue("upload", _tokens[1]);
+  return ((_tokens[1] == "on") ? true : false);
+}
+
+std::string ConfigHelper::get_upload_store(void) {
+  if (_tokens.size() != 2)
+    throw InvalidNumberArgs(_tokens[0]);
+  struct stat statbuf;
+  if (stat(_tokens[1].c_str(), &statbuf) == -1)
+    throw InvFieldValue("upload_store", _tokens[1]);
+  if (!S_ISDIR(statbuf.st_mode | S_IRUSR))
+    throw InvFieldValue("upload_store", _tokens[1]);
+  return (std::string(_tokens[1]));
+}
+
 bool ConfigHelper::_valid_ip(const std::string& ip) {
   std::vector<std::string> list = String::split(ip, ".");
 

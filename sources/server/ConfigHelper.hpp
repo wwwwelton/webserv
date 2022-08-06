@@ -51,6 +51,8 @@ class ConfigHelper {
   std::string get_cgi(void);
   std::pair<int, std::string> get_redirect(void);
   std::vector<std::string> get_limit_except(void);
+  bool get_upload(void);
+  std::string get_upload_store(void);
 
  private:
   bool _valid_ip(const std::string& ip);

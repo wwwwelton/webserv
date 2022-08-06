@@ -29,6 +29,8 @@ class ServerLocation {
   std::map<std::string, std::string> cgi;
   std::pair<int, std::string> redirect;
   int autoindex;
+  int upload;
+  std::string upload_store;
 
   ServerLocation(void);
   ServerLocation(const ServerLocation& src);

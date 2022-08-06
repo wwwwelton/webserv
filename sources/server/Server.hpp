@@ -51,6 +51,8 @@ class Server {
   std::map<std::string, ServerLocation> location;
   int autoindex;
   int sockfd;
+  int upload;
+  std::string upload_store;
 
   Server(void);
   Server(const Server& src);
