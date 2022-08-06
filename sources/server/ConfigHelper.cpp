@@ -259,7 +259,8 @@ bool ConfigHelper::_valid_ip(const std::string& ip) {
 
 bool ConfigHelper::_valid_port(const std::string& port) {
   if (port.find_first_not_of("0123456789") != std::string::npos ||
-      String::to_int(port) > 65000 || String::to_int(port) < 80) {
+      String::to_int(port) > CFG_MAX_PORT ||
+      String::to_int(port) < CFG_MIN_PORT) {
     return (false);
   }
   return (true);
