@@ -36,9 +36,9 @@ int Response::validate_folder(void) {
     if (!location->autoindex) {
       WebServ::log.warning() << "check autoindex config\n";
       if (path == root)
-        return FORBIDDEN;
-      else
         return NOT_FOUND;
+      else
+        return FORBIDDEN;
     }
     folder_request = true;
     if (path.at(path.size() - 1) != '/') {

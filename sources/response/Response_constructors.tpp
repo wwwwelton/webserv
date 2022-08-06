@@ -8,6 +8,7 @@
 #include "Response.hpp"
 
 void Response::find_location(std::string path, Server *server) {
+  std::string remainder;
   while (path.find('/') != std::string::npos) {
     if (server->location.count(path)) {
       location = &server->location[path];
@@ -15,7 +16,8 @@ void Response::find_location(std::string path, Server *server) {
       //   path = path.erase(path.find_last_of('/'));
       return;
     }
-    trailing_path = path.substr(path.find_last_of('/'));
+    remainder = path.substr(path.find_last_of('/'));
+    trailing_path = remainder + trailing_path;
     path = path.erase(path.find_last_of('/'));
   }
   location = &server->location["/"];
