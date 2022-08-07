@@ -81,6 +81,7 @@ public:
   ~RequestParser();
 
   void parse();
+  bool is_connected() const;
   Request &get_request();
   bool is_parsing_body() const;
   void reset();
@@ -108,6 +109,7 @@ public:
 
 private:
   bool valid;
+  bool connected;
 
   size_t content_length;
   size_t max_content_length;

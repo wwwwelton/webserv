@@ -119,6 +119,7 @@ std::string RequestParser::supported_version = "HTTP/1.1";
 RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
   finished(false),
   valid(false),
+  connected(true),
   content_length(),
   max_content_length(max_body_size),
   bytes_consumed(),
@@ -293,6 +294,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
                 << std::endl;
               throw InvalidRequestException(RequestEntityTooLarge);
             }
+            _request->body.reserve(content_length);
           } else if (str_iequals(_header_key, "transfer-encoding")) {
             if (_header_value != "identity")
               chunked = true;
@@ -458,7 +460,10 @@ void RequestParser::parse() {
     throw ReadException(error);
   } else if (bytes_read == 0) {
     finished = true;
-    WebServ::log.error() << "RequestParser: read 0 bytes" << std::endl;
+    WebServ::log.warning()
+      << "RequestParser: read 0 bytes, setting connection as closed"
+      << std::endl;
+    this->connected = false;
     return;
   }
 

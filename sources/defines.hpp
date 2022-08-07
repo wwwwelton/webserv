@@ -8,7 +8,7 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define LOG_LEVEL LVL_INFO
+#define LOG_LEVEL LVL_DEBUG
 
 // Server host default
 #define DFL_BACKLOG 500
