@@ -71,9 +71,11 @@ bool WebServ::timed_out(int i) {
   size_t time_now;
   int fd = pollfds[i].fd;
 
+  if (fd == -1)
+    return false;
   time_now = WebServ::get_time_in_ms();
-  WebServ::log.error() << (time_now - clientlist[fd].timestamp) << "\n";
-  if (time_now - clientlist[fd].timestamp > (size_t)clientlist[fd].server->timeout) {
+  // WebServ::log.error() << (time_now - clientlist[fd].timestamp) << "\n";
+  if (time_now - clientlist[fd].timestamp > clientlist[fd].server->timeout) {
     WebServ::log.info() << "Client " << fd << " timed out after "
                         << (time_now - clientlist[fd].timestamp) << " ms\n";
     return true;
@@ -87,7 +89,7 @@ void WebServ::purge_timeouts(void) {
   time_now = WebServ::get_time_in_ms();
   std::vector<req>::iterator it = clientlist.begin();
   for (; it != clientlist.end(); it++) {
-    if (time_now - it->timestamp > (size_t)it->server->timeout) {
+    if (time_now - it->timestamp > it->server->timeout) {
       end_connection(it->request_parser->fd);
       compress = true;
     }
@@ -135,6 +137,8 @@ void WebServ::_receive(int i) {
     parser.parse();
     if (parser.finished)
       pollfds[i].events = POLLIN | POLLOUT;
+    if (!parser.is_connected())
+      end_connection(i);
   } catch (std::exception &e) {
     WebServ::log.error()
         << "exception caught while tokenizing request: "
