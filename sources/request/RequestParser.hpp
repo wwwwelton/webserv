@@ -81,6 +81,7 @@ public:
   ~RequestParser();
 
   void parse();
+  bool is_connected() const;
   Request &get_request();
   bool is_parsing_body() const;
   void reset();
@@ -98,6 +99,11 @@ public:
     const char* what() const throw();
   };
 
+  class ConnectionClosedException: public std::exception {
+  public:
+    const char* what() const throw();
+  };
+
   class ReadException: public std::exception {
     std::string _message;
   public:
@@ -108,6 +114,7 @@ public:
 
 private:
   bool valid;
+  bool connected;
 
   size_t content_length;
   size_t max_content_length;
