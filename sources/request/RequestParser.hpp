@@ -99,6 +99,11 @@ public:
     const char* what() const throw();
   };
 
+  class ConnectionClosedException: public std::exception {
+  public:
+    const char* what() const throw();
+  };
+
   class ReadException: public std::exception {
     std::string _message;
   public:

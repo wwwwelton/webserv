@@ -452,6 +452,8 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
 void RequestParser::parse() {
   if (finished)
     throw RequestFinishedException();
+  if (!connected)
+    throw RequestFinishedException();
 
   bytes_read = recv(fd, buffer, buff_max, 0);
 
@@ -557,6 +559,10 @@ RequestParser::ReadException::ReadException(const std::string& mes)
 
 const char* RequestParser::ReadException::what() const throw()  {
   return _message.c_str();
+}
+
+const char* RequestParser::ConnectionClosedException::what() const throw()  {
+  return "Can't parse: connection closed";
 }
 
 RequestParser::ReadException::~ReadException() throw() { }
