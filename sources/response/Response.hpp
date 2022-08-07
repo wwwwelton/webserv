@@ -125,6 +125,7 @@ public:
   void reset(void);
   void process(void);
   void _send(int fd);
+  std::string get_path(std::string req_path);
   friend std::ostream& operator<<(std::ostream&o, Response const& rhs);
 };
 

@@ -39,13 +39,36 @@ void Response::reset(void) {
   statusmsg = "OK\n";
 }
 
+std::string Response::get_path(std::string req_path) {
+  find_location(req_path, server);
+
+  if (req->path[req->path.size() - 1] == '/')
+    path_ends_in_slash = true;
+  originalroot = server->location["/"].root;
+  root = "./" + location->root;
+  if (!trailing_path.empty() &&
+      trailing_path != "/" &&
+      root[root.size() - 1] == '/')
+    path = root + trailing_path.substr(1);
+  else if (trailing_path != "/")
+    path = root + trailing_path;
+  else
+    path = root;
+  if (path.size() > 2 && path[path.size() - 1] == '/' &&
+                          path[path.size() - 2] == '/')
+    path.resize(path.size() - 1);
+  return path;
+}
+
 void Response::set_request(Request const*_req) {
   req = _req;
   if (_req->body.size()) {
     WebServ::log.debug() << "Request body:\n" << _req->body << "\n";
     req_body = req->body;
   }
-
+  if (location->root == originalroot)
+    if (root.at(root.size() - 1) != '/')
+      root.push_back('/');
   find_location(_req->path, server);
 
   // gambis
