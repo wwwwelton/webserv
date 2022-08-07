@@ -27,10 +27,7 @@ void loop(int argc, char** argv) {
       if (server_request) {
         webserv._accept(i);
       } else {
-        if (revents & POLLERR ||
-            revents & POLLRDHUP ||
-            revents & POLLNVAL ||
-            revents & POLLHUP)
+        if (revents & (POLLERR | POLLRDHUP | POLLNVAL | POLLHUP))
             webserv.end_connection(i);
         else if (revents & POLLIN)
           webserv._receive(i);
