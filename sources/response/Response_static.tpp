@@ -51,6 +51,12 @@ Response::meth_map Response::init_map(void) {
   _map["GET"] = &Response::_get;
   _map["POST"] = &Response::_post;
   _map["DELETE"] = &Response::_delete;
+  _map["PUT"] = &Response::_put;
+  _map["HEAD"] = &Response::_head;
+  _map["CONNECT"] = &Response::_connect;
+  _map["OPTIONS"] = &Response::_options;
+  _map["TRACE"] = &Response::_trace;
+  _map["PATCH"] = &Response::_patch;
   return _map;
 }
 

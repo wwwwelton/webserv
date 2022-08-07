@@ -33,6 +33,30 @@ std::ostream& operator<<(std::ostream& o, Response const& rhs) {
   return o;
 }
 
+int Response::_put(void) {
+  return METHOD_NOT_ALLOWED;
+}
+
+int Response::_head(void) {
+  return METHOD_NOT_ALLOWED;
+}
+
+int Response::_connect(void) {
+  return METHOD_NOT_ALLOWED;
+}
+
+int Response::_options(void) {
+  return METHOD_NOT_ALLOWED;
+}
+
+int Response::_patch(void) {
+  return METHOD_NOT_ALLOWED;
+}
+
+int Response::_trace(void) {
+  return METHOD_NOT_ALLOWED;
+}
+
 void Response::_send(int fd) {
   ssize_t bytes;
   bytes = send(fd, ResponseBase::buffer_resp, ResponseBase::size, 0);

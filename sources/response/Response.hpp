@@ -98,6 +98,12 @@ private:
   void set_environment(void);
   int check_ext(std::string const& body_path);
   int _delete(void);
+  int _put(void);
+  int _head(void);
+  int _connect(void);
+  int _options(void);
+  int _patch(void);
+  int _trace(void);
   void find_location(std::string path, Server *_server);
   void create_error_page(void);
   void create_redir_page(void);
