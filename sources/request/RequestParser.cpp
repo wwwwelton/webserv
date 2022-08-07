@@ -491,6 +491,10 @@ void RequestParser::parse() {
   }
 }
 
+bool RequestParser::is_connected() const {
+  return this->connected;
+}
+
 Request &RequestParser::get_request() {
   _request->finished = this->finished;
   return *_request;
