@@ -59,8 +59,8 @@ void WebServ::init(int argc, char **argv) {
   conf.load(argv[1]);
   log.info() << "WebServ Loaded " << argv[1] << "\n";
 
-  clientlist.reserve(1024);
-  clientlist.resize(1024);
+  clientlist.reserve(conf.backlog);
+  clientlist.resize(conf.backlog);
 
   init_servers();
   log.info() << "WebServ initialized 🚀" << std::endl;
