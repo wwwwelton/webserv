@@ -453,7 +453,7 @@ void RequestParser::parse() {
   if (finished)
     throw RequestFinishedException();
   if (!connected)
-    throw RequestFinishedException();
+    throw ConnectionClosedException();
 
   bytes_read = recv(fd, buffer, buff_max, 0);
 
