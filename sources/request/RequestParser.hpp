@@ -1,4 +1,5 @@
 #pragma once
+#include "Logger.hpp"
 #ifndef HTTP_REQUEST_PARSER_HPP
 #define HTTP_REQUEST_PARSER_HPP
 
@@ -126,6 +127,8 @@ private:
   std::vector<char> chunk_data;
 
   Request *_request;
+
+  Logger& log;
 
 public:
   int fd;

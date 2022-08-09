@@ -126,6 +126,7 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
   parsing_body(false),
   chunked(false),
   chunk_size(),
+  log(WebServ::log),
   fd(fd),
   buffer(new char[buff_max]),
   bytes_read(),
@@ -135,7 +136,7 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
     _request = new Request();
   }
 
-RequestParser::RequestParser(const RequestParser &){ }
+RequestParser::RequestParser(const RequestParser &): log(WebServ::log) { }
 
 RequestParser& RequestParser::operator=(const RequestParser &) { return *this; }
 
@@ -170,12 +171,12 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
   size_t i = 0;
 
   // buff[bytes_read] = '\0';
-  // WebServ::log.debug() << "Incoming request data: [";
+  // log.debug() << "Incoming request data: [";
   // print_chunk(buff, 0, bytes_read);
   // std::cout << "]" << std::endl;
   while (i < bytes_read) {
     char c = buff[i++];
-    // WebServ::log.info() << "current request: " << *_request << std::endl;
+    // log.info() << "current request: " << *_request << std::endl;
 
     switch (current_state) {
       case S_INIT:
@@ -287,7 +288,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
             std::stringstream ss(_header_value);
             ss >> content_length;
             if (content_length > max_content_length) {
-              WebServ::log.warning() << "Request content-length is "
+              log.warning() << "Request content-length is "
                 << content_length
                 << " but the serve max content-length acceptable is "
                 << max_content_length
@@ -337,7 +338,7 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
         break;
 
       case S_BODY_START:
-        WebServ::log.debug() << "Request before body parsing: " << *_request << std::endl;
+        log.debug() << "Request before body parsing: " << *_request << std::endl;
         content_length--;
         _request->body.push_back(c);
         current_state = S_BODY;
@@ -462,14 +463,14 @@ void RequestParser::parse() {
     throw ReadException(error);
   } else if (bytes_read == 0) {
     finished = true;
-    WebServ::log.warning()
+    log.warning()
       << "RequestParser: read 0 bytes, setting connection as closed"
       << std::endl;
     this->connected = false;
     return;
   }
 
-  WebServ::log.debug() << "Bytes read: " << bytes_read << std::endl;
+  log.debug() << "Bytes read: " << bytes_read << std::endl;
 
   try {
     ParsingResult result = tokenize_partial_request(buffer);
@@ -479,14 +480,14 @@ void RequestParser::parse() {
       }
       _request->error = 0;
       finished = true;
-      WebServ::log.debug() << "Finished request: " << *_request << std::endl;
+      log.debug() << "Finished request: " << *_request << std::endl;
     }
   } catch(InvalidRequestException& ex) {
-    WebServ::log.warning() << "Invalid http request: " << ex.what() << std::endl;
+    log.warning() << "Invalid http request: " << ex.what() << std::endl;
     _request->error = ex.get_error();
     finished = true;
   } catch(std::exception& e) {
-    WebServ::log.error()
+    log.error()
       << "Unexpected exception on RequestParser: "
       << e.what() << std::endl;
     _request->error = 500;
