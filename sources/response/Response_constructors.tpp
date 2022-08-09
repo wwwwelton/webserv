@@ -66,10 +66,10 @@ void Response::set_request(Request const*_req) {
     WebServ::log.debug() << "Request body:\n" << _req->body << "\n";
     req_body = req->body;
   }
+  find_location(_req->path, server);
   if (location->root == originalroot)
     if (root.at(root.size() - 1) != '/')
       root.push_back('/');
-  find_location(_req->path, server);
 
   // gambis
   // if (path.find("/") != std::string::npos && path.at(path.size() - 1) == '/'
