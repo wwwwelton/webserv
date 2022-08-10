@@ -471,6 +471,15 @@ ParsingResult RequestParser::tokenize_partial_request(char *buff) {
   return P_PARSING_INCOMPLETE;
 }
 
+void RequestParser::handle_closed_connection() {
+    this->finished = true;
+    this->connected = false;
+    log.warning()
+      << "RequestParser: read 0 bytes, setting connection as closed"
+      << std::endl;
+    throw ConnectionClosedException();
+}
+
 void RequestParser::parse_header() {
   if (header_finished)
     throw HeaderFinishedException();
@@ -483,12 +492,7 @@ void RequestParser::parse_header() {
     throw ReadException(strerror(errno));
 
   } else if (bytes_read == 0) {
-    this->finished = true;
-    this->connected = false;
-    log.warning()
-      << "RequestParser: read 0 bytes, setting connection as closed"
-      << std::endl;
-    return;
+    return handle_closed_connection();
   }
   log.debug() << "Bytes read: " << bytes_read << std::endl;
 
@@ -517,6 +521,32 @@ void RequestParser::parse_header() {
 
 void RequestParser::parse() {
   parse_header();
+}
+
+void RequestParser::prepare_chunk() {
+  if (finished)
+    throw RequestFinishedException();
+  if (!connected)
+    throw ConnectionClosedException();
+
+  if (!chunked) {
+    return;
+  }
+  return;
+  bytes_read = recv(fd, buffer, buffer_size, 0);
+  
+  if (bytes_read == 0) {
+    return handle_closed_connection();
+  }
+}
+
+bool RequestParser::chunk_ready() const {
+  return true;
+}
+
+const std::vector<char>& RequestParser::get_chunk() {
+  chunk_data.reserve(65535);
+  return chunk_data;
 }
 
 bool RequestParser::is_connected() const {
@@ -594,7 +624,7 @@ const char* RequestParser::ReadException::what() const throw()  {
 }
 
 const char* RequestParser::ConnectionClosedException::what() const throw()  {
-  return "Can't parse: connection closed";
+  return "Connection closed";
 }
 
 RequestParser::ReadException::~ReadException() throw() { }

@@ -93,7 +93,7 @@ public:
 
   void prepare_chunk();
   bool chunk_ready() const;
-  const std::vector<char>& get_chunk() const;
+  const std::vector<char>& get_chunk();
 
   Request &get_request();
   void reset();
@@ -168,6 +168,7 @@ private:
   ParsingResult tokenize_partial_request(char *buff);
   ParsingResult tokenize_header(char *buff);
   size_t parse_chunk_size();
+  void handle_closed_connection();
 };
 
 #endif // !HTTP_REQUEST_PARSER_HPP

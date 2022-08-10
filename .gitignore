@@ -12,3 +12,4 @@ testers
 server_root/uploads
 server_root/sito/uploads
 tmp.txt
+test/source/node_modules/
