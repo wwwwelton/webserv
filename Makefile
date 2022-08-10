@@ -74,6 +74,12 @@ re: fclean all
 run: $(NAME)
 	./$(NAME) ./default.conf
 
-.PHONY: all clean fclean re
+test:
+	clear && cd test/source && npm test
+
+test_intra:
+	clear && cd test/bin && yes | ./ubuntu_tester http://localhost:3490
+
+.PHONY: all clean fclean re test
 
 -include $(DEPS)
