@@ -26,6 +26,7 @@
 #include <map>
 #include <vector>
 
+#include "RequestParser.hpp"
 #include "Server.hpp"
 #include "Request.hpp"
 #include "ResponseBase.hpp"
@@ -58,6 +59,8 @@ private:
   static mimetypes_map   init_mimetypes();
 
   int           response_code;
+  int           pid;
+  int           io[2];
   std::ifstream file;
 
   std::string httpversion;
@@ -68,7 +71,6 @@ private:
   std::string method;
   size_t      body_max_size;
 
-  Request const* req;
   std::string req_body;
   std::string originalroot;
   std::string path;
@@ -82,7 +84,7 @@ private:
   bool        folder_request;
   bool        valid;
   bool        remove_tmp;
-  bool        path_ends_in_slash;
+
 
   std::string _itoa(size_t nbr);
   int validate_limit_except(void);
@@ -110,10 +112,13 @@ private:
   void create_directory_listing(void);
 
 public:
-  bool          finished;
-  bool          inprogress;
-  bool          incorrect_path;
-  std::string   response_path;
+  Request*       req;
+  RequestParser* parser;
+  bool           finished;
+  bool           inprogress;
+  bool           incorrect_path;
+  bool           path_ends_in_slash;
+  std::string    response_path;
 
   ~Response(void);
   Response(Request *req, Server *_server);
@@ -121,7 +126,7 @@ public:
   void assemble_followup(void);
   void assemble(std::string const& body_path);
   void assemble(void);
-  void set_request(Request const* req);
+  void set_request(Request* req);
   void reset(void);
   void process(void);
   void _send(int fd);

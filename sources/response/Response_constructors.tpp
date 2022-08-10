@@ -24,6 +24,7 @@ void Response::find_location(std::string path, Server *server) {
 }
 
 void Response::reset(void) {
+  req = NULL;
   finished = false;
   inprogress = false;
   incorrect_path = false;
@@ -35,6 +36,7 @@ void Response::reset(void) {
   trailing_path.clear();
   response_path.clear();
   file.close();
+  pid = 0;
   statuscode = " 200";
   statusmsg = "OK\n";
 }
@@ -60,7 +62,7 @@ std::string Response::get_path(std::string req_path) {
   return path;
 }
 
-void Response::set_request(Request const*_req) {
+void Response::set_request(Request *_req) {
   req = _req;
   if (_req->body.size()) {
     WebServ::log.debug() << "Request body:\n" << _req->body << "\n";
@@ -70,15 +72,6 @@ void Response::set_request(Request const*_req) {
   if (location->root == originalroot)
     if (root.at(root.size() - 1) != '/')
       root.push_back('/');
-
-  // gambis
-  // if (path.find("/") != std::string::npos && path.at(path.size() - 1) == '/'
-  //  && root.find("/") != std::string::npos && root.at(path.size() - 1) != '/') {
-  //   server->location[location->root + "/"] = *location;
-  //   location = &server->location[location->root + "/"];
-  //   location->root.push_back('/');
-  // }
-  // gambis
 
   if (req->path[req->path.size() - 1] == '/')
     path_ends_in_slash = true;
@@ -92,13 +85,6 @@ void Response::set_request(Request const*_req) {
     if (location->root == originalroot)
       if (root.at(root.size() - 1) != '/')
         root.push_back('/');
-    // size_t index;
-    // if (location->root.find(req->path) == std::string::npos)
-    //   index = req->path.size();
-    // else
-    //   index = location->root.find(req->path) + req->path.size();
-    // std::string cutpath =
-    //   req->path.substr(index);
     if (!trailing_path.empty() && trailing_path != "/" && root[root.size() - 1] == '/')
       path = root + trailing_path.substr(1);
     else if (trailing_path != "/")
@@ -111,23 +97,34 @@ void Response::set_request(Request const*_req) {
     if (path.size() > 2 && path[path.size() - 1] == '/' &&
                            path[path.size() - 2] == '/')
       path.resize(path.size() - 1);
-    if (path.size() > 2 && path[path.size() - 1] == '/' &&
-                           path[path.size() - 2] == '/')
-      path.resize(path.size() - 1);
   }
+  method = _req->method;
+  response_code = location->redirect.first;
+  if (_req->error)
+    response_code = _req->error;
+
+
   std::cout << location->index[0] << "\n";
   std::cout << "location: " << location->root << "\n";
   std::cout << "req path: " << _req->path << "\n";
   std::cout << "root: " << root << "\n";
   std::cout << "path: " << path << "\n";
   std::cout << "trailing path: " << trailing_path << "\n";
-  method = _req->method;
-  response_code = location->redirect.first;
-  if (_req->error)
-    response_code = _req->error;
 }
 
-Response::Response(void): req(NULL) { }
+Response::Response(void): req(NULL) {
+  finished = false;
+  inprogress = false;
+  incorrect_path = false;
+  folder_request = false;
+  remove_tmp = false;
+  valid = true;
+  path_ends_in_slash = false;
+  response_code = CONTINUE;
+  pid = 0;
+  statuscode = " 200";
+  statusmsg = "OK\n";
+}
 Response::Response(Request *_req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n"), req(_req)
 {

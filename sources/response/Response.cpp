@@ -253,10 +253,12 @@ void Response::process(void) {
   if (response_code == 0) {
     response_code = (this->*method_map[method])();
   }
-  set_statuscode(response_code);
-  dispatch(response_path);
-  if (remove_tmp)
-    unlink(DFL_TMPFILE);
+  if (response_code != 0) {
+    set_statuscode(response_code);
+    dispatch(response_path);
+    if (remove_tmp)
+      unlink(DFL_TMPFILE);
+  }
 }
 
 #include "Response_static.tpp"

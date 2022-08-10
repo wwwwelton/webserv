@@ -73,33 +73,40 @@ void Response::set_environment(void) {
 
 int Response::_post(void) {
   int outfile;
-  int pid;
-  int io[2];
   std::string bin;
   std::string extension;
 
-  if (path.find('.') == std::string::npos) {
-    return INTERNAL_SERVER_ERROR;
-  }
-  extension = path.substr(path.find_last_of('.'));
-  if (extension.at(extension.size() - 1) == '/')
-    extension.resize(extension.size() - 1);
-  if (check_ext(extension))
-    return INTERNAL_SERVER_ERROR;
-  bin = server->cgi[extension];
-  pipe(io);
-  outfile = open(DFL_TMPFILE, O_CREAT | O_RDWR | O_TRUNC, 0777);
   std::cout << *this;
-  pid = fork();
   if (pid == 0) {
-    dup2(io[0], STDIN_FILENO);
-    dup2(outfile, STDOUT_FILENO);
-    set_environment();
-    execlp(bin.c_str(), bin.c_str(), (char *)NULL);
+    if (path.find('.') == std::string::npos) {
+      return INTERNAL_SERVER_ERROR;
+    }
+    extension = path.substr(path.find_last_of('.'));
+    if (extension.at(extension.size() - 1) == '/')
+      extension.resize(extension.size() - 1);
+    if (check_ext(extension))
+      return INTERNAL_SERVER_ERROR;
+    bin = server->cgi[extension];
+    outfile = open(DFL_TMPFILE, O_CREAT | O_RDWR | O_TRUNC, 0777);
+    pipe(io);
+    pid = fork();
+    if (pid == 0) {
+      dup2(io[0], STDIN_FILENO);
+      dup2(outfile, STDOUT_FILENO);
+      set_environment();
+      execlp(bin.c_str(), bin.c_str(), (char *)NULL);
+    }
   }
-  write(io[1], req->body.c_str(), req->body.size());
+  std::vector<char> res;
+  parser->prepare_chunk();
+  if (parser->chunk_ready()) {
+    res = parser->get_chunk();
+    write(io[1], &(*res.begin()), res.size());
+  }
+  if (!parser->finished)
+    return CONTINUE;
   close(io[1]);
-  waitpid(pid, NULL, 0);
+  // waitpid(pid, NULL, 0);
   close(io[0]);
   close(outfile);
   response_path = DFL_TMPFILE;
