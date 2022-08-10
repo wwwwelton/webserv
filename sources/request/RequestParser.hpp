@@ -1,4 +1,5 @@
 #pragma once
+#include "Logger.hpp"
 #ifndef HTTP_REQUEST_PARSER_HPP
 #define HTTP_REQUEST_PARSER_HPP
 
@@ -9,7 +10,7 @@
 #include <string>
 #include <vector>
 
-enum RequestStates {
+enum RequestHeaderStates {
   S_INIT = 1,
 
   S_METHOD_START,
@@ -33,11 +34,16 @@ enum RequestStates {
   S_HEADER_LINE_CRLF,
   S_HEADER_LINE_CR,
   S_HEADER_LINE_LF,
+  S_HEADER_FINISHED
+};
 
-  S_BODY_START,
-  S_BODY,
-  S_BODY_LF,
+enum RequestChunkStates {
+  S_BODY_INIT = 200,
+  // S_BODY_START,
+  // S_BODY,
+  // S_BODY_LF,
 
+  S_CHUNK_INIT,
   S_CHUNK_START,
   S_CHUNK_SIZE,
   S_CHUNK_EXTENSIONS,
@@ -48,15 +54,15 @@ enum RequestStates {
   S_LAST_CHUNK,
   S_LAST_CHUNK_LF,
   S_CHUNK_END,
-  S_CHUNK_END_LF,
-
-  S_DEAD = 0
+  S_CHUNK_END_LF
 };
 
 enum ParsingResult {
   P_PARSING_COMPLETE,
   P_PARSING_INCOMPLETE,
-  P_PARSING_INVALID
+  P_PARSING_INVALID,
+  P_HEADER_COMPLETE,
+  P_REQUEST_COMPLETE
 };
 
 enum RequestErrors {
@@ -67,7 +73,6 @@ enum RequestErrors {
   RequestEntityTooLarge = REQUEST_ENTITY_TOO_LARGE,
   RequestUriTooLong = REQUEST_URI_TOO_LONG,
   HttpVersionUnsupported = HTTP_VERSION_UNSUPPORTED
-
 };
 
 class RequestParser
@@ -77,13 +82,19 @@ class RequestParser
 public:
   bool finished;
 
-  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 200000);
+  RequestParser(int fd = -1, size_t max_body_size = 0, size_t buff_max = 65536);
   ~RequestParser();
 
-  void parse();
   bool is_connected() const;
+
+  void parse();
+  void parse_header();
+
+  void prepare_chunk();
+  bool chunk_ready() const;
+  bool get_chunk() const;
+
   Request &get_request();
-  bool is_parsing_body() const;
   void reset();
 
   class InvalidRequestException: public std::exception {
@@ -92,6 +103,11 @@ public:
     InvalidRequestException(RequestErrors error);
     const char* what() const throw();
     RequestErrors get_error() const;
+  };
+
+  class HeaderFinishedException: public std::exception {
+  public:
+    const char* what() const throw();
   };
 
   class RequestFinishedException: public std::exception {
@@ -116,6 +132,8 @@ private:
   bool valid;
   bool connected;
 
+  bool header_finished;
+
   size_t content_length;
   size_t max_content_length;
   size_t bytes_consumed;
@@ -127,23 +145,28 @@ private:
 
   Request *_request;
 
+  Logger& log;
+
 public:
   int fd;
 
 private:
   char *buffer;
   size_t bytes_read;
-  size_t buff_max;
+  size_t buffer_size;
 
   std::string _header_key;
   std::string _header_value;
 
-  RequestStates current_state;
+  RequestHeaderStates header_state;
+  RequestChunkStates chunk_state;
 
   static std::string supported_version;
   size_t supported_version_index;
 
   ParsingResult tokenize_partial_request(char *buff);
+  ParsingResult tokenize_header(char *buff);
+  size_t parse_chunk_size();
 };
 
 #endif // !HTTP_REQUEST_PARSER_HPP
