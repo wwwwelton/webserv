@@ -15,6 +15,24 @@ describe("GET", () => {
 		expect(response.status).toBe(200);
 	});
 
+	test(server1 + "/index.html should return 200", async () => {
+		const response = await request(server1)
+			.get("/index.html");
+		expect(response.status).toBe(200);
+	});
+
+	test(server1 + "/index.html/ should return 404", async () => {
+		const response = await request(server1)
+			.get("/index.html/");
+		expect(response.status).toBe(404);
+	});
+
+	test(server1 + "/not_exists.html should return 404", async () => {
+		const response = await request(server1)
+			.get("/not_exists.html");
+		expect(response.status).toBe(404);
+	});
+
 	test(server1 + "/not_exists should return 404", async () => {
 		const response = await request(server1)
 			.get("/not_exists");
