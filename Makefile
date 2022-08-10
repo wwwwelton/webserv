@@ -74,7 +74,7 @@ re: fclean all
 run: $(NAME)
 	./$(NAME) ./default.conf
 
-test:
+test_unit:
 	clear && cd test/source && npm test
 
 test_intra:
