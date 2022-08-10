@@ -92,7 +92,7 @@ public:
 
   void prepare_chunk();
   bool chunk_ready() const;
-  bool get_chunk() const;
+  const std::vector<char>& get_chunk() const;
 
   Request &get_request();
   void reset();
