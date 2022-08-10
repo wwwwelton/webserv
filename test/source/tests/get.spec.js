@@ -37,6 +37,12 @@ describe("GET", () => {
 		expect(response.status).toBe(200);
 	});
 
+	test(server1 + "/dinocat.jpg should return 200", async () => {
+		const response = await request(server1)
+			.get("/dinocat.jpg")
+		expect(response.status).toBe(200);
+	});
+
 	test(server1 + "/index.html/ should return 404", async () => {
 		const response = await request(server1)
 			.get("/index.html/");
