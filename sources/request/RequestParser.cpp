@@ -120,6 +120,7 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
   finished(false),
   valid(false),
   connected(true),
+  header_finished(false),
   content_length(),
   max_content_length(max_body_size),
   bytes_consumed(),
