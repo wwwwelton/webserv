@@ -127,6 +127,7 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   parsing_body(false),
   chunked(false),
   chunk_size(),
+  chunk_ready(false),
   log(WebServ::log),
   fd(fd),
   buffer(new char[buffer_size]),
@@ -346,7 +347,7 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
   return P_PARSING_COMPLETE;
 }
 
-ParsingResult RequestParser::tokenize_partial_request(char *buff) {
+ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
   size_t i = 0;
 
   // buff[bytes_read] = '\0';
@@ -530,22 +531,54 @@ void RequestParser::prepare_chunk() {
     throw ConnectionClosedException();
 
   if (!chunked) {
+    chunk_ready = true;
     return;
   }
-  return;
+
   bytes_read = recv(fd, buffer, buffer_size, 0);
   
-  if (bytes_read == 0) {
+  if (bytes_read == (size_t)-1) {
+    throw ReadException(strerror(errno));
+  } else if (bytes_read == 0) {
     return handle_closed_connection();
+  }
+
+  log.debug() << "Bytes read: " << bytes_read
+    << "\nParsing chunk-size"
+    << std::endl;
+
+  try {
+    ParsingResult result = tokenize_chunk_size(buffer);
+    if (result == P_PARSING_COMPLETE) {
+      chunk_ready = true;
+
+      log.debug()
+        << "Finished reading chunk size: " << chunk_size
+        << " in bytes (0x" << std::hex << chunk_size << ")"
+        << std::endl;
+    }
+    _request->error = 0;
+
+  } catch(InvalidRequestException& ex) {
+    log.warning() << "Invalid http request: " << ex.what() << std::endl;
+    _request->error = ex.get_error();
+    finished = true;
+  } catch(std::exception& e) {
+    log.error()
+      << "Unexpected exception on RequestParser: "
+      << e.what() << std::endl;
+    _request->error = 500;
+    finished = true;
   }
 }
 
 bool RequestParser::is_chunk_ready() const {
-  return true;
+  return chunk_ready;
 }
 
 const std::vector<char>& RequestParser::get_chunk() {
   chunk_data.reserve(65535);
+  chunk_ready = false;
   return chunk_data;
 }
 
@@ -578,6 +611,7 @@ void RequestParser::reset() {
   parsing_body = false;
   chunked = false;
   chunk_size = 0;
+  chunk_ready = false;
   bytes_read = 0;
 }
 
