@@ -116,7 +116,7 @@ static inline bool str_iequals(const std::string& str1, const std::string& str2)
 
 std::string RequestParser::supported_version = "HTTP/1.1";
 
-RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
+RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   finished(false),
   valid(false),
   connected(true),
@@ -129,9 +129,9 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buff_max):
   chunk_size(),
   log(WebServ::log),
   fd(fd),
-  buffer(new char[buff_max]),
+  buffer(new char[buffer_size]),
   bytes_read(),
-  buffer_size(buff_max),
+  buffer_size(buffer_size),
   header_state(S_INIT),
   chunk_state(S_CHUNK_INIT),
   supported_version_index(0) {
