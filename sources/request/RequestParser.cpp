@@ -423,10 +423,8 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
             throw InvalidRequestException(BadRequest);
           }
           chunk_state = S_CHUNK_DATA_LF;
-        } else {
-          chunk_size--;
-          chunk_data.push_back(c);
         }
+        return P_PARSING_COMPLETE;
         break;
 
       case S_CHUNK_DATA_LF:
