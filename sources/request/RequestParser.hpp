@@ -92,7 +92,7 @@ public:
   void parse_header();
 
   void prepare_chunk();
-  bool chunk_ready() const;
+  bool is_chunk_ready() const;
   const std::vector<char>& get_chunk();
 
   Request &get_request();

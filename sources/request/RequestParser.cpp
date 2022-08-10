@@ -540,7 +540,7 @@ void RequestParser::prepare_chunk() {
   }
 }
 
-bool RequestParser::chunk_ready() const {
+bool RequestParser::is_chunk_ready() const {
   return true;
 }
 

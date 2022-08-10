@@ -99,7 +99,7 @@ int Response::_post(void) {
   }
   std::vector<char> res;
   parser->prepare_chunk();
-  if (parser->chunk_ready()) {
+  if (parser->is_chunk_ready()) {
     res = parser->get_chunk();
     write(io[1], &(*res.begin()), res.size());
   }
