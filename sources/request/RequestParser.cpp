@@ -529,6 +529,7 @@ Request &RequestParser::get_request() {
 }
 
 void RequestParser::reset() {
+  log.debug() << "RequestParser: reseting..." << std::endl;
   delete this->_request;
   this->_request = new Request();
 
