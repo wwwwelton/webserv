@@ -528,6 +528,10 @@ Request &RequestParser::get_request() {
   return *_request;
 }
 
+bool RequestParser::is_header_finished() const {
+  return header_finished;
+}
+
 void RequestParser::reset() {
   log.debug() << "RequestParser: reseting..." << std::endl;
   delete this->_request;

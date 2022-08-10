@@ -86,6 +86,7 @@ public:
   ~RequestParser();
 
   bool is_connected() const;
+  bool is_header_finished() const;
 
   void parse();
   void parse_header();
