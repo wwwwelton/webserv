@@ -1,33 +1,23 @@
 const request = require('supertest');
 
-let server;
-let route;
+let server1 = "http://127.0.0.1:3490";
 
 describe("GET", () => {
-	server = "http://127.0.0.1:3490";
-	route = "/";
-	test(server + route + " should return 200", async () => {
-		const response = await request(server)
-			.get(route);
+	test(server1 + " should return 200", async () => {
+		const response = await request(server1)
+			.get("");
 		expect(response.status).toBe(200);
-		//expect(response.headers["content-type"]).toContain("text/html");
 	});
 
-	server = "http://127.0.0.1:3490";
-	route = "";
-	test(server + route + " should return 200", async () => {
-		const response = await request(server)
-			.get(route)
+	test(server1 + "/ should return 200", async () => {
+		const response = await request(server1)
+			.get("/");
 		expect(response.status).toBe(200);
-		//expect(response.headers["content-type"]).toContain("text/html");
-		// console.log(response.text);
 	});
 
-	server = "http://127.0.0.1:3490";
-	route = "/";
-	test(server + route + " should return 200", async () => {
-		const response = await request(server)
-			.head(route)
-		expect(response.status).toBe(405);
+	test(server1 + "/not_exists should return 404", async () => {
+		const response = await request(server1)
+			.get("/not_exists");
+		expect(response.status).toBe(404);
 	});
 });
