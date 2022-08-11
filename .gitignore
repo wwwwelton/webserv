@@ -12,5 +12,5 @@ testers
 server_root/uploads
 server_root/sito/uploads
 tmp.txt
-!test/intra/YoupiBanane
+!test/www/YoupiBanane
 test/source/node_modules
