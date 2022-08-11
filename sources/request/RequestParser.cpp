@@ -171,7 +171,7 @@ void print_chunk(const char *str, size_t start, size_t size) {
  * */
 
 ParsingResult RequestParser::tokenize_header(char *buff) {
-  size_t i = 0;
+  i = 0;
 
   while (i < bytes_read) {
     char c = buff[i++];
@@ -348,7 +348,6 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
 }
 
 ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
-  size_t i = 0;
 
   // buff[bytes_read] = '\0';
   // log.debug() << "Incoming request data: [";
@@ -502,8 +501,7 @@ void RequestParser::parse_header() {
         _request->body.assign(chunk_data.begin(), chunk_data.end());
       }
       _request->error = 0;
-      finished = true;
-      log.debug() << "Finished request: " << *_request << std::endl;
+      log.debug() << "Finished header: " << *_request << std::endl;
     }
   } catch(InvalidRequestException& ex) {
     log.warning() << "Invalid http request: " << ex.what() << std::endl;
@@ -533,7 +531,10 @@ void RequestParser::prepare_chunk() {
     return;
   }
 
-  bytes_read = recv(fd, buffer, buffer_size, 0);
+  if (i != bytes_read) {
+    bytes_read = recv(fd, buffer, buffer_size, 0);
+    i = 0;
+  }
   
   if (bytes_read == (size_t)-1) {
     throw ReadException(strerror(errno));
@@ -542,8 +543,7 @@ void RequestParser::prepare_chunk() {
   }
 
   log.debug() << "Bytes read: " << bytes_read
-    << "\nParsing chunk-size"
-    << std::endl;
+    << "\nParsing chunk-size" << std::endl;
 
   try {
     ParsingResult result = tokenize_chunk_size(buffer);
@@ -576,6 +576,19 @@ bool RequestParser::is_chunk_ready() const {
 
 const std::vector<char>& RequestParser::get_chunk() {
   chunk_data.reserve(65535);
+  if (i < bytes_read) {
+    chunk_data.assign(buffer + i, buffer + bytes_read);
+  } else {
+    i = 0;
+    bytes_read = recv(fd, buffer, buffer_size, 0);
+
+    if (bytes_read == (size_t)-1) {
+      throw ReadException(strerror(errno));
+    } else if (bytes_read == 0) {
+      handle_closed_connection();
+    }
+    chunk_data.assign(buffer, buffer + bytes_read);
+  }
   chunk_ready = false;
   return chunk_data;
 }

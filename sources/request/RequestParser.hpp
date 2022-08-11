@@ -153,6 +153,8 @@ public:
   int fd;
 
 private:
+  // buffer iterator;
+  size_t i;
   char *buffer;
   size_t bytes_read;
   size_t buffer_size;
