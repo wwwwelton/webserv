@@ -80,7 +80,7 @@ test_unit:
 test_intra:
 	clear && cd test/bin && yes | ./ubuntu_tester http://localhost:8888
 
-test_up:
+up:
 	make && clear && valgrind --leak-check=full --show-leak-kinds=all \
 	--trace-children=yes --track-fds=yes ./webserv test/conf/tester.conf
 
