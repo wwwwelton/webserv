@@ -139,7 +139,7 @@ void WebServ::_receive(int i) {
   }
   try {
     parser.parse();
-    if (parser.finished)
+    if (parser.finished || parser.is_header_finished())
       pollfds[i].events = POLLIN | POLLOUT;
     if (!parser.is_connected())
       end_connection(i);

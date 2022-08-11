@@ -137,6 +137,7 @@ Response::Response(Request *_req, Server *_server)
   inprogress = false;
   incorrect_path = false;
   server = _server;
+  pid = 0;
 }
 
 Response::~Response(void) {
