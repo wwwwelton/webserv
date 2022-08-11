@@ -69,7 +69,7 @@ describe("POST", () => {
 	test(server1 + "/sito/upload.php should receive a 1K file", async () => {
 		const res = await request(server1)
 			.post("/sito/upload.php")
-			.attach("fileToUpload", "../www/file_to_upload/1K.txt");
+			.attach("fileToUpload", "../www/files_to_upload/1K.txt");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");
 		// expect(res.headers["content-length"]).not.toBe("");
