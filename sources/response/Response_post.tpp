@@ -10,7 +10,6 @@
 static size_t request_header_end_index(std::vector<char> const& vec) {
   size_t index = 0;
   size_t size = vec.size();
-  const char *ptr = &vec[0];
 
   while (index < size) {
     if (vec[index] == '\r' && vec[index + 1] == '\n')
@@ -118,7 +117,7 @@ int Response::_post(void) {
     res = parser->get_chunk();
     if (header_present) {
       size_t index = request_header_end_index(res);
-      if (index == -1)
+      if (index == std::string::npos)
         throw std::exception();
       write(io[1], &res[index], res.size() - index);
       header_present = false;
