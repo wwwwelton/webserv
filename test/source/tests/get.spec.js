@@ -57,6 +57,15 @@ describe("GET", () => {
 		expect(body_math(res.text, server_root + "index.html")).toBeTruthy();
 	});
 
+	test(server1 + "/index.php should return 200", async () => {
+		const res = await request(server1)
+			.get("/index.php");
+		expect(res.status).toBe(200);
+		expect(res.headers["content-type"]).toContain("text/html");
+		expect(res.headers["content-length"]).not.toBe("");
+		expect(res.text).toContain("<p>Hello World</p>");
+	});
+
 	test(server1 + "/paulo.html should return 200", async () => {
 		const res = await request(server1)
 			.get("/paulo.html")
