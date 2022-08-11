@@ -102,6 +102,15 @@ describe("GET", () => {
 		expect(body_math(res.text, server_root + "custom_404.html")).toBeTruthy();
 	});
 
+	test(server1 + "/index.php/ should return 404", async () => {
+		const res = await request(server1)
+			.get("/index.php/");
+		expect(res.status).toBe(404);
+		expect(res.headers["content-type"]).toContain("text/html");
+		expect(res.headers["content-length"]).not.toBe("");
+		expect(body_math(res.text, server_root + "custom_404.html")).toBeTruthy();
+	});
+
 	test(server1 + "/not_exists.html should return 404", async () => {
 		const res = await request(server1)
 			.get("/not_exists.html");
