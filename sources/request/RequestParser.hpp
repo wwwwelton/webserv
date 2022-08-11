@@ -137,7 +137,7 @@ private:
 
   size_t content_length;
   size_t max_content_length;
-  size_t bytes_consumed;
+  size_t body_bytes_so_far;
   bool parsing_body;
 
   bool chunked;
@@ -171,7 +171,9 @@ private:
   ParsingResult tokenize_partial_request(char *buff);
   ParsingResult tokenize_header(char *buff);
   ParsingResult tokenize_chunk_size(char *buff);
+
   void handle_closed_connection();
+  // void tokenize_chunk_size(char *buff);
 };
 
 #endif // !HTTP_REQUEST_PARSER_HPP

@@ -123,7 +123,7 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   header_finished(false),
   content_length(),
   max_content_length(max_body_size),
-  bytes_consumed(),
+  body_bytes_so_far(),
   parsing_body(false),
   chunked(false),
   chunk_size(),
@@ -580,6 +580,8 @@ const std::vector<char>& RequestParser::get_chunk() {
   chunk_data.reserve(65535);
   if (i < bytes_read) {
     chunk_data.assign(buffer + i, buffer + bytes_read);
+    body_bytes_so_far = bytes_read - i;
+    i = bytes_read;
   } else {
     i = 0;
     bytes_read = recv(fd, buffer, buffer_size, 0);
@@ -589,9 +591,15 @@ const std::vector<char>& RequestParser::get_chunk() {
     } else if (bytes_read == 0) {
       handle_closed_connection();
     }
+    if (body_bytes_so_far + bytes_read > content_length)
+      throw InvalidRequestException(RequestEntityTooLarge);
+
+    body_bytes_so_far += bytes_read;
     chunk_data.assign(buffer, buffer + bytes_read);
   }
   chunk_ready = false;
+  if (body_bytes_so_far == content_length)
+    finished = true;
   return chunk_data;
 }
 
@@ -620,7 +628,7 @@ void RequestParser::reset() {
   valid = false;
   supported_version_index = 0;
   content_length = 0;
-  bytes_consumed = 0;
+  body_bytes_so_far = 0;
   parsing_body = false;
   chunked = false;
   chunk_size = 0;
