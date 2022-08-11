@@ -66,7 +66,9 @@ void Response::set_environment(void) {
   setenv("SCRIPT_NAME", fetch_path(bin).c_str(), 1);
   setenv("SCRIPT_FILENAME", (server->root + req->path).c_str(), 1);
   // setenv("SCRIPT_FILENAME", "./server_root/sito/upload.php", 1);
-  setenv("CONTENT_LENGTH", _itoa(req->body.size()).c_str(), 1);
+  // setenv("CONTENT_LENGTH", _itoa(req->body.size()).c_str(), 1);
+  if (req->headers.count("Content-Length"))
+    setenv("CONTENT_LENGTH", req->headers.at("Content-Length").c_str(), 1);
   setenv("CONTENT_TYPE", req->headers.at("Content-Type").c_str(), 1);
   setenv("REDIRECT_STATUS", "true", 1);
 }
