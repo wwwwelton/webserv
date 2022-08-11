@@ -7,7 +7,7 @@
 
 #include "Response.hpp"
 
-static size_t request_header_end_index(const std::vector<char> vec) {
+static size_t request_header_end_index(std::vector<char> const& vec) {
   size_t index = 0;
   size_t size = vec.size();
   const char *ptr = &vec[0];
@@ -116,7 +116,16 @@ int Response::_post(void) {
   parser->prepare_chunk();
   if (parser->is_chunk_ready()) {
     res = parser->get_chunk();
-    write(io[1], &(*res.begin()), res.size());
+    if (header_present) {
+      size_t index = request_header_end_index(res);
+      if (index == -1)
+        throw std::exception();
+      write(io[1], &res[index], res.size() - index);
+      header_present = false;
+    }
+    else {
+      write(io[1], &res[0], res.size());
+    }
   }
   if (!parser->finished)
     return CONTINUE;

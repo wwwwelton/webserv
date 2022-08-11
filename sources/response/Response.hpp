@@ -84,6 +84,7 @@ private:
   bool        folder_request;
   bool        valid;
   bool        remove_tmp;
+  bool        header_present;
 
 
   std::string _itoa(size_t nbr);

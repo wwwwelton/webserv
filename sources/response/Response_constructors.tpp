@@ -32,6 +32,7 @@ void Response::reset(void) {
   remove_tmp = false;
   valid = true;
   path_ends_in_slash = false;
+  header_present = true;
   response_code = CONTINUE;
   trailing_path.clear();
   response_path.clear();
@@ -113,6 +114,7 @@ void Response::set_request(Request *_req) {
 }
 
 Response::Response(void): req(NULL) {
+  header_present = true;
   finished = false;
   inprogress = false;
   incorrect_path = false;
@@ -128,6 +130,7 @@ Response::Response(void): req(NULL) {
 Response::Response(Request *_req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n"), req(_req)
 {
+  header_present = true;
   folder_request = false;
   remove_tmp = false;
   finished = false;
