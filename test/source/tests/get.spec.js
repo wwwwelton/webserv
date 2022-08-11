@@ -110,4 +110,46 @@ describe("GET", () => {
 		expect(res.headers["content-length"]).not.toBe("");
 		expect(body_math(res.text, server_root + "custom_404.html")).toBeTruthy();
 	});
+
+	test(server1 + "/post should return 405", async () => {
+		const res = await request(server1)
+			.get("/post");
+		expect(res.status).toBe(405);
+		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
+	});
+
+	test(server1 + "/post/ should return 405", async () => {
+		const res = await request(server1)
+			.get("/post/");
+		expect(res.status).toBe(405);
+		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
+	});
+
+	test(server1 + "/put should return 405", async () => {
+		const res = await request(server1)
+			.get("/put");
+		expect(res.status).toBe(405);
+		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
+	});
+
+	test(server1 + "/put/ should return 405", async () => {
+		const res = await request(server1)
+			.get("/put/");
+		expect(res.status).toBe(405);
+		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
+	});
+
+	test(server1 + "/delete should return 405", async () => {
+		const res = await request(server1)
+			.get("/delete");
+		expect(res.status).toBe(405);
+		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
+	});
+
+	test(server1 + "/delete/ should return 405", async () => {
+		const res = await request(server1)
+			.get("/delete/");
+		expect(res.status).toBe(405);
+		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
+	});
 });
