@@ -284,8 +284,8 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
 
       case S_HEADER_LINE_VALUE:
         if (c == '\r' || c == '\n') {
-          _request->headers[_header_key] = _header_value;
           if (str_iequals(_header_key, "content-length")) {
+            _header_key = "Content-Length";
             std::stringstream ss(_header_value);
             ss >> content_length;
             if (content_length > max_content_length) {
@@ -298,9 +298,11 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
             }
             _request->body.reserve(content_length);
           } else if (str_iequals(_header_key, "transfer-encoding")) {
+            _header_key = "Transfer-Encoding";
             if (_header_value != "identity")
               chunked = true;
           }
+          _request->headers[_header_key] = _header_value;
         }
         if (c == '\r') { // header value finished
           header_state = S_HEADER_LINE_LF;
