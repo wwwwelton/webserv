@@ -11,7 +11,8 @@ describe("CGI", () => {
 
 		test(server1 + "/cgi/hello.php should return Hello, World!", async () => {
 			const res = await request(server1)
-				.get("/cgi/hello.php");
+				.get("/cgi/hello.php")
+				.set("X-Webserv-Test", "/cgi/hello.php should return Hello, World!");
 			expect(res.status).toBe(200);
 			expect(res.headers["content-type"]).toContain("text/html");
 			expect(res.headers["content-length"]).not.toBe("");
@@ -20,7 +21,8 @@ describe("CGI", () => {
 
 		test(server1 + "/cgi/hello.py should return Hello, World!", async () => {
 			const res = await request(server1)
-				.get("/cgi/hello.py");
+				.get("/cgi/hello.py")
+				.set("X-Webserv-Test", "/cgi/hello.py should return Hello, World!");
 			expect(res.status).toBe(200);
 			expect(res.headers["content-type"]).toContain("text/html");
 			expect(res.headers["content-length"]).not.toBe("");

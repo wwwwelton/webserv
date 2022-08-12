@@ -11,6 +11,7 @@ describe("POST", () => {
 	test(server1 + "/post should return 200", async () => {
 		const res = await request(server1)
 			.post("/post")
+			.set("X-Webserv-Test", "/post should return 200");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");
 		// expect(res.headers["content-length"]).not.toBe("");
@@ -20,6 +21,7 @@ describe("POST", () => {
 	test(server1 + "/post/ should return 200", async () => {
 		const res = await request(server1)
 			.post("/post/")
+			.set("X-Webserv-Test", "/post/ should return 200");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");
 		// expect(res.headers["content-length"]).not.toBe("");
@@ -29,6 +31,7 @@ describe("POST", () => {
 	test(server1 + "/sito should return 200", async () => {
 		const res = await request(server1)
 			.post("/sito")
+			.set("X-Webserv-Test", "/sito should return 200");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");
 		// expect(res.headers["content-length"]).not.toBe("");
@@ -38,6 +41,7 @@ describe("POST", () => {
 	test(server1 + "/sito/ should return 200", async () => {
 		const res = await request(server1)
 			.post("/sito/")
+			.set("X-Webserv-Test", "/sito/ should return 200");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");
 		// expect(res.headers["content-length"]).not.toBe("");
@@ -47,6 +51,7 @@ describe("POST", () => {
 	test(server1 + "/post/upload.php should receive a 1K file", async () => {
 		const res = await request(server1)
 			.post("/post/upload.php")
+			.set("X-Webserv-Test", "/post/upload.php should receive a 1K file")
 			.attach("fileToUpload", "../www/files_to_upload/1K.txt");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");
@@ -57,6 +62,7 @@ describe("POST", () => {
 	test(server1 + "/post/upload.php should receive a 1M file", async () => {
 		const res = await request(server1)
 			.post("/post/upload.php")
+			.set("X-Webserv-Test", "/post/upload.php should receive a 1M file")
 			.attach("fileToUpload", "../www/files_to_upload/1M.txt");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");

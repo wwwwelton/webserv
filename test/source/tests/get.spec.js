@@ -10,7 +10,8 @@ describe("GET", () => {
 
 	test(server1 + " should return 200", async () => {
 		const res = await request(server1)
-			.get("");
+			.get("")
+			.set("X-Webserv-Test", " should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -19,7 +20,8 @@ describe("GET", () => {
 
 	test(server1 + "/ should return 200", async () => {
 		const res = await request(server1)
-			.get("/");
+			.get("/")
+			.set("X-Webserv-Test", "/ should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -28,7 +30,8 @@ describe("GET", () => {
 
 	test(server1 + "/index.html should return 200", async () => {
 		const res = await request(server1)
-			.get("/index.html");
+			.get("/index.html")
+			.set("X-Webserv-Test", "/index.html should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -37,7 +40,8 @@ describe("GET", () => {
 
 	test(server1 + "/index.php should return 200", async () => {
 		const res = await request(server1)
-			.get("/index.php");
+			.get("/index.php")
+			.set("X-Webserv-Test", "/index.php should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -47,6 +51,7 @@ describe("GET", () => {
 	test(server1 + "/paulo.html should return 200", async () => {
 		const res = await request(server1)
 			.get("/paulo.html")
+			.set("X-Webserv-Test", "/paulo.html should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -56,6 +61,7 @@ describe("GET", () => {
 	test(server1 + "/joao.html should return 200", async () => {
 		const res = await request(server1)
 			.get("/joao.html")
+			.set("X-Webserv-Test", "/joao.html should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -65,6 +71,7 @@ describe("GET", () => {
 	test(server1 + "/dinocat.jpg should return 200", async () => {
 		const res = await request(server1)
 			.get("/dinocat.jpg")
+			.set("X-Webserv-Test", "/dinocat.jpg should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("image/jpg");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -73,7 +80,8 @@ describe("GET", () => {
 
 	test(server1 + "/index.html/ should return 404", async () => {
 		const res = await request(server1)
-			.get("/index.html/");
+			.get("/index.html/")
+			.set("X-Webserv-Test", "/index.html/ should return 404");
 		expect(res.status).toBe(404);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -82,7 +90,8 @@ describe("GET", () => {
 
 	test(server1 + "/index.php/ should return 404", async () => {
 		const res = await request(server1)
-			.get("/index.php/");
+			.get("/index.php/")
+			.set("X-Webserv-Test", "/index.php/ should return 404");
 		expect(res.status).toBe(404);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -91,7 +100,8 @@ describe("GET", () => {
 
 	test(server1 + "/not_exists.html should return 404", async () => {
 		const res = await request(server1)
-			.get("/not_exists.html");
+			.get("/not_exists.html")
+			.set("X-Webserv-Test", "/not_exists.html should return 404");
 		expect(res.status).toBe(404);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -100,7 +110,8 @@ describe("GET", () => {
 
 	test(server1 + "/not_exists should return 404", async () => {
 		const res = await request(server1)
-			.get("/not_exists");
+			.get("/not_exists")
+			.set("X-Webserv-Test", "/not_exists should return 404");
 		expect(res.status).toBe(404);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
@@ -109,42 +120,48 @@ describe("GET", () => {
 
 	test(server1 + "/post should return 405", async () => {
 		const res = await request(server1)
-			.get("/post");
+			.get("/post")
+			.set("X-Webserv-Test", "/post should return 405");
 		expect(res.status).toBe(405);
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
 
 	test(server1 + "/post/ should return 405", async () => {
 		const res = await request(server1)
-			.get("/post/");
+			.get("/post/")
+			.set("X-Webserv-Test", "/post/ should return 405");
 		expect(res.status).toBe(405);
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
 
 	test(server1 + "/put should return 405", async () => {
 		const res = await request(server1)
-			.get("/put");
+			.get("/put")
+			.set("X-Webserv-Test", "/put should return 405");
 		expect(res.status).toBe(405);
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
 
 	test(server1 + "/put/ should return 405", async () => {
 		const res = await request(server1)
-			.get("/put/");
+			.get("/put/")
+			.set("X-Webserv-Test", "/put/ should return 405");
 		expect(res.status).toBe(405);
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
 
 	test(server1 + "/delete should return 405", async () => {
 		const res = await request(server1)
-			.get("/delete");
+			.get("/delete")
+			.set("X-Webserv-Test", "/delete should return 405");
 		expect(res.status).toBe(405);
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
 
 	test(server1 + "/delete/ should return 405", async () => {
 		const res = await request(server1)
-			.get("/delete/");
+			.get("/delete/")
+			.set("X-Webserv-Test", "/delete/ should return 405");
 		expect(res.status).toBe(405);
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
