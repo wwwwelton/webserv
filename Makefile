@@ -82,7 +82,7 @@ test_intra:
 
 up:
 	make && clear && valgrind --leak-check=full --show-leak-kinds=all \
-	--trace-children=yes --track-fds=yes ./webserv test/conf/tester.conf
+	--track-fds=yes ./webserv test/conf/tester.conf
 
 .PHONY: all clean fclean re test
 
