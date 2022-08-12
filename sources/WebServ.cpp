@@ -132,17 +132,27 @@ void WebServ::_accept(int i) {
 void WebServ::_receive(int i) {
   int fd = pollfds[i].fd;
   RequestParser &parser = *clientlist[fd].request_parser;
+  Response &response = *clientlist[fd].response;
 
-  if (parser.is_header_finished()) {
-    _respond(i);
-    return;
-  }
+  // if (parser.is_header_finished()) {
+  //   _respond(i);
+  //   return;
+  // }
   try {
-    parser.parse();
-    if (parser.finished || parser.is_header_finished())
-      pollfds[i].events = POLLIN | POLLOUT;
+    if (parser.is_header_finished() == false)
+      parser.parse_header();
+    if (response.req == NULL && parser.is_header_finished())
+      response.set_request(&parser.get_request());
+    if (!parser.finished && parser.is_header_finished()) {
+      parser.prepare_chunk();
+      if (parser.is_chunk_ready())
+        response.process();
+      pollfds[i].events = POLLIN;
+    }
     if (!parser.is_connected())
       end_connection(i);
+    if (parser.finished)
+      pollfds[i].events = POLLOUT;
   } catch (std::exception &e) {
     WebServ::log.error()
         << "exception caught while tokenizing request: "

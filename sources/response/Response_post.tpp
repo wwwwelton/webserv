@@ -112,20 +112,13 @@ int Response::_post(void) {
     }
   }
   std::vector<char> res;
-  parser->prepare_chunk();
-  if (parser->is_chunk_ready()) {
-    res = parser->get_chunk();
-    if (header_present) {
-      size_t index = request_header_end_index(res);
-      if (index == std::string::npos)
-        throw std::exception();
-      write(io[1], &res[index], res.size() - index);
-      header_present = false;
-    }
-    else {
-      write(io[1], &res[0], res.size());
-    }
-  }
+  res = parser->get_chunk();
+  // size_t index = request_header_end_index(res);
+  // if (index == std::string::npos)
+    // throw std::exception();
+  // write(io[1], &res[index], res.size() - index);
+  // header_present = false;
+  write(io[1], &res[0], res.size());
   if (!parser->finished)
     return CONTINUE;
   close(io[1]);
