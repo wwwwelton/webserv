@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <fstream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -49,6 +50,7 @@ class Config {
 
  public:
   int backlog;
+  std::set<std::string> cgi_list;
 
  private:
   std::vector<Server> _servers;
