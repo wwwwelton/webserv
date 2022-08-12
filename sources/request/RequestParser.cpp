@@ -341,12 +341,14 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
           chunk_state = S_BODY_INIT;
           parsing_body = true;
         }
+        return P_PARSING_COMPLETE;
         break;
       default:
+        throw std::exception();
         break;
     }
   }
-  return P_PARSING_COMPLETE;
+  return P_PARSING_INCOMPLETE;
 }
 
 ParsingResult RequestParser::tokenize_chunk_size(char *buff) {

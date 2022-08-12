@@ -52,7 +52,7 @@ WebServ::~WebServ(void) {
 void WebServ::init(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
 
-  init_signals(this);
+  // init_signals(this);
   log.info() << "WebServ Signals initialized\n";
 
   validate_input(argc, argv);

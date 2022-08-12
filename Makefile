@@ -74,6 +74,9 @@ re: fclean all
 run: $(NAME)
 	./$(NAME) ./default.conf
 
+client: client.cpp
+	g++ client.cpp -g -o client
+
 .PHONY: all clean fclean re
 
 -include $(DEPS)
