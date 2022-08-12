@@ -81,6 +81,7 @@ test_intra:
 	clear && cd test/bin && yes | ./ubuntu_tester http://localhost:8888
 
 up:
+	cd test/source && npm i
 	make && clear && valgrind --leak-check=full --show-leak-kinds=all \
 	--track-fds=yes ./webserv test/conf/tester.conf
 
