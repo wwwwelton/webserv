@@ -20,7 +20,7 @@ describe("DELETE", () => {
 		fs.unlink("../www/delete/file2.txt", () => { });
 		fs.chmod("../www/delete/cannot_delete", 0o777, () => { });
 		fs.unlink("../www/delete/cannot_delete", () => { });
-		fs.rmdir("../www/delete", { recursive: true }, () => { });
+		// fs.rmdir("../www/delete", { recursive: true }, () => { });
 	});
 
 	beforeEach(async () => {
