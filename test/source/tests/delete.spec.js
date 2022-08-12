@@ -1,27 +1,4 @@
-const request = require('supertest');
-const { v4: uuidv4 } = require('uuid');
-const fs = require('fs')
-const LoremIpsum = require("lorem-ipsum").LoremIpsum;
-
-function file_toString(path) {
-	var file = fs.readFileSync(path)
-		.toString('utf-8');
-	return file;
-}
-
-function create_file(content) {
-	var file = uuidv4();
-	fs.writeFileSync("/tmp/" + file, content);
-	return "/tmp/" + file;
-}
-
-function body_math(res_body, file) {
-
-	var body = create_file(res_body);
-	var ret = fs.readFileSync(body).equals(fs.readFileSync(file));
-	fs.unlinkSync(body);
-	return ret;
-}
+const { request, fs, LoremIpsum, body_math } = require('./utils.js');
 
 let server1 = "http://127.0.0.1:3490";
 let server_root = "../../server_root/";
