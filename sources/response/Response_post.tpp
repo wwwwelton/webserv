@@ -7,17 +7,17 @@
 
 #include "Response.hpp"
 
-static size_t request_header_end_index(std::vector<char> const& vec) {
-  size_t index = 0;
-  size_t size = vec.size();
+// static size_t request_header_end_index(std::vector<char> const& vec) {
+//   size_t index = 0;
+//   size_t size = vec.size();
 
-  while (index < size) {
-    if (vec[index] == '\r' && vec[index + 1] == '\n')
-      return index + 2;
-    ++index;
-  }
-  return -1;
-}
+//   while (index < size) {
+//     if (vec[index] == '\r' && vec[index + 1] == '\n')
+//       return index + 2;
+//     ++index;
+//   }
+//   return -1;
+// }
 
 static std::string fetch_path(std::string const& bin) {
   int pid;
