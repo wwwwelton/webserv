@@ -24,6 +24,5 @@ function body_math(res_body, file) {
 }
 
 module.exports = {
-	request, uuidv4, fs, LoremIpsum,
-	file_toString, create_file, body_math
+	request, uuidv4, fs, LoremIpsum, file_toString, create_file, body_math
 };

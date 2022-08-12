@@ -5,6 +5,9 @@ let server_root = "../../server_root/";
 
 describe("DELETE", () => {
 	beforeAll(async () => {
+		if (!fs.existsSync("../www/delete")) {
+			fs.mkdirSync("../www/delete");
+		}
 		const lorem = new LoremIpsum();
 		fs.writeFileSync("../www/delete/file1.txt", lorem.generateWords(400));
 		fs.writeFileSync("../www/delete/file2.txt", lorem.generateParagraphs(400));
@@ -17,6 +20,7 @@ describe("DELETE", () => {
 		fs.unlink("../www/delete/file2.txt", () => { });
 		fs.chmod("../www/delete/cannot_delete", 0o777, () => { });
 		fs.unlink("../www/delete/cannot_delete", () => { });
+		fs.rmdir("../www/delete", { recursive: true }, () => { });
 	});
 
 	beforeEach(async () => {
