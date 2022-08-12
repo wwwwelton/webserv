@@ -66,13 +66,33 @@ describe("POST", () => {
 		// expect(body_math(res.text, server_root + "index.html")).toBeTruthy();
 	});
 
-	test(server1 + "/sito/upload.php should receive a 1K file", async () => {
+	test(server1 + "/post/upload.php should receive a 1K file", async () => {
 		const res = await request(server1)
-			.post("/sito/upload.php")
+			.post("/post/upload.php")
 			.attach("fileToUpload", "../www/files_to_upload/1K.txt");
 		expect(res.status).toBe(200);
 		// expect(res.headers["content-type"]).toContain("text/html");
 		// expect(res.headers["content-length"]).not.toBe("");
 		// expect(body_math(res.text, server_root + "index.html")).toBeTruthy();
 	});
+
+	test(server1 + "/post/upload.php should receive a 1M file", async () => {
+		const res = await request(server1)
+			.post("/post/upload.php")
+			.attach("fileToUpload", "../www/files_to_upload/1M.txt");
+		expect(res.status).toBe(200);
+		// expect(res.headers["content-type"]).toContain("text/html");
+		// expect(res.headers["content-length"]).not.toBe("");
+		// expect(body_math(res.text, server_root + "index.html")).toBeTruthy();
+	});
+
+	// test(server1 + "/post/upload.php should receive a 10M file", async () => {
+	// 	const res = await request(server1)
+	// 		.post("/post/upload.php")
+	// 		.attach("fileToUpload", "../www/files_to_upload/10M.txt");
+	// 	expect(res.status).toBe(200);
+	// 	// expect(res.headers["content-type"]).toContain("text/html");
+	// 	// expect(res.headers["content-length"]).not.toBe("");
+	// 	// expect(body_math(res.text, server_root + "index.html")).toBeTruthy();
+	// });
 });
