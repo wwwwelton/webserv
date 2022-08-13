@@ -133,6 +133,7 @@ void WebServ::_receive(int i) {
   int fd = pollfds[i].fd;
   RequestParser &parser = *clientlist[fd].request_parser;
   Response &response = *clientlist[fd].response;
+  response.parser = &parser;
 
   // if (parser.is_header_finished()) {
   //   _respond(i);
