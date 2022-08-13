@@ -45,7 +45,17 @@ describe("GET", () => {
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
-		expect(res.text).toContain("<p>Hello World</p>");
+		expect(res.text).toContain("Hello, World PHP!");
+	});
+
+	test(server1 + "/index.py should return 200", async () => {
+		const res = await request(server1)
+			.get("/index.py")
+			.set("X-Webserv-Test", "/index.py should return 200");
+		expect(res.status).toBe(200);
+		expect(res.headers["content-type"]).toContain("text/html");
+		expect(res.headers["content-length"]).not.toBe("");
+		expect(res.text).toContain("Hello, World PYTHON!");
 	});
 
 	test(server1 + "/paulo.html should return 200", async () => {
