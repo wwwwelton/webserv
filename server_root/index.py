@@ -1,3 +1,7 @@
+#!/usr/local/bin/python
+import cgi
+
+print ('''
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -13,8 +17,8 @@
 </head>
 
 <body class="bg-light">
-	<h1 class="text-center p-4"><?php echo "<p>Hello, World PHP!</p>"; ?></h1>
-	<h1 class="text-center p-4">1 + 1 = <?php echo 1 + 1; ?></h1>
+	<h1 class="text-center p-4">Hello, World PYTHON!</h1>
+	<h1 class="text-center p-4">1 + 1 = 2</h1>
 
 	<div style="height: 200px;"></div>
 
@@ -32,3 +36,4 @@
 </body>
 
 </html>
+''')
