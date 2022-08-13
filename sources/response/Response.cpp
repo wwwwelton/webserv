@@ -217,6 +217,8 @@ void Response::assemble(std::string const& body_path) {
   size_t            body_size = 0;
 
   WebServ::log.debug() << "File requested: " << path << "\n";
+  WebServ::log.debug() << "Body path: " << body_path << "\n";
+  file.close();
   file.open(body_path.c_str(), file.ate);
   body_max_size = file.tellg();
   if (file.bad() || file.fail())
@@ -248,6 +250,14 @@ void Response::assemble(std::string const& body_path) {
 }
 
 void Response::process(void) {
+  if (response_ready) {
+    WebServ::log.warning() << "response ready\n";
+    set_statuscode(response_code);
+    dispatch(response_path);
+    if (remove_tmp)
+      unlink(DFL_TMPFILE);
+    return;
+  }
   for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)
     response_code = (this->*validation_functions[i])();
   if (response_code == 0) {

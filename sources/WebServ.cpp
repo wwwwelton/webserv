@@ -146,8 +146,10 @@ void WebServ::_receive(int i) {
       response.set_request(&parser.get_request());
     if (!parser.finished && parser.is_header_finished()) {
       parser.prepare_chunk();
-      if (parser.is_chunk_ready())
+      if (parser.is_chunk_ready()) {
+        WebServ::log.warning() << "Receive\n";
         response.process();
+      }
       pollfds[i].events = POLLIN;
     }
     if (!parser.is_connected())
@@ -177,12 +179,15 @@ void WebServ::_respond(int i) {
     response._send(fd);
   }
   else if (parser.finished) {
+    WebServ::log.warning() << "Response\n";
     response.process();
     response._send(fd);
   }
   else if (parser.is_header_finished()) {
     try {
       response.process();
+      if (parser.finished)
+        response._send(fd);
     } catch (std::exception &e) {
       WebServ::log.error()
           << "exception caught while tokenizing request: "

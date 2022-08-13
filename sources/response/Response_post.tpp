@@ -122,10 +122,14 @@ int Response::_post(void) {
   if (!parser->finished)
     return CONTINUE;
   close(io[1]);
-  // waitpid(pid, NULL, 0);
+  waitpid(pid, NULL, 0);
   close(io[0]);
   close(outfile);
   response_path = DFL_TMPFILE;
-  remove_tmp = true;
+  WebServ::log.warning() << "Response finished\n";
+  WebServ::log.warning() << response_path << "\n";
+  response_ready = true;
+  parser->finished = true;
+  // remove_tmp = true;
   return OK;
 }
