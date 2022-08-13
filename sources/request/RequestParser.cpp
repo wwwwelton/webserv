@@ -427,6 +427,7 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
           }
           chunk_state = S_CHUNK_DATA_LF;
         }
+        // there would be a push_back(c) here;
         return P_PARSING_COMPLETE;
         break;
 
@@ -474,6 +475,7 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
 }
 
 void RequestParser::handle_closed_connection() {
+    this->header_finished = true;
     this->finished = true;
     this->connected = false;
     log.warning()
@@ -520,88 +522,49 @@ void RequestParser::parse_header() {
   }
 }
 
-void RequestParser::parse() {
-  parse_header();
-}
-
 void RequestParser::prepare_chunk() {
   if (finished)
     throw RequestFinishedException();
   if (!connected)
     throw ConnectionClosedException();
 
-  if (!chunked) {
-    chunk_ready = true;
-    return;
-  }
-
-  if (i != bytes_read) {
+  log.debug() << "preparing chunk" << std::endl;
+  if (i < bytes_read) {
+    chunk_data.assign(buffer + i, buffer + bytes_read);
+    body_bytes_so_far = bytes_read - i;
+    i = -1;
+  } else {
     bytes_read = recv(fd, buffer, buffer_size, 0);
-    i = 0;
-  }
-  
-  if (bytes_read == (size_t)-1) {
-    throw ReadException(strerror(errno));
-  } else if (bytes_read == 0) {
-    return handle_closed_connection();
-  }
-
-  log.debug() << "Bytes read: " << bytes_read
-    << "\nParsing chunk-size" << std::endl;
-
-  try {
-    ParsingResult result = tokenize_chunk_size(buffer);
-    if (result == P_PARSING_COMPLETE) {
-      chunk_ready = true;
-
-      log.debug()
-        << "Finished reading chunk size: " << chunk_size
-        << " in bytes (0x" << std::hex << chunk_size << ")"
-        << std::endl;
+    if (bytes_read == (size_t)-1) {
+      throw ReadException(strerror(errno));
+    } else if (bytes_read == 0) {
+      return handle_closed_connection();
     }
-    _request->error = 0;
-
-  } catch(InvalidRequestException& ex) {
-    log.warning() << "Invalid http request: " << ex.what() << std::endl;
-    _request->error = ex.get_error();
-    finished = true;
-  } catch(std::exception& e) {
-    log.error()
-      << "Unexpected exception on RequestParser: "
-      << e.what() << std::endl;
-    _request->error = 500;
-    finished = true;
+    body_bytes_so_far += bytes_read;
+    chunk_data.assign(buffer, buffer + bytes_read);
   }
+  chunk_ready = true;
+  if (content_length > 0) {
+    if (body_bytes_so_far > content_length) {
+      finished = true;
+      throw InvalidRequestException(RequestEntityTooLarge);
+    } else if (body_bytes_so_far == content_length) {
+      log.info() << "all content-length was read" << std::endl;
+      finished = true;
+    }
+  }
+
 }
 
 bool RequestParser::is_chunk_ready() const {
+  log.debug() << "chunk is ready? " << chunk_ready << std::endl;
   return chunk_ready;
 }
 
 const std::vector<char>& RequestParser::get_chunk() {
-  chunk_data.reserve(65535);
-  if (i < bytes_read) {
-    chunk_data.assign(buffer + i, buffer + bytes_read);
-    body_bytes_so_far = bytes_read - i;
-    i = bytes_read;
-  } else {
-    i = 0;
-    bytes_read = recv(fd, buffer, buffer_size, 0);
-
-    if (bytes_read == (size_t)-1) {
-      throw ReadException(strerror(errno));
-    } else if (bytes_read == 0) {
-      handle_closed_connection();
-    }
-    if (body_bytes_so_far + bytes_read > content_length)
-      throw InvalidRequestException(RequestEntityTooLarge);
-
-    body_bytes_so_far += bytes_read;
-    chunk_data.assign(buffer, buffer + bytes_read);
-  }
+  log.info() << "returning chunk: " << std::string(chunk_data.begin(),
+      chunk_data.end()) << std::endl;
   chunk_ready = false;
-  if (body_bytes_so_far == content_length)
-    finished = true;
   return chunk_data;
 }
 

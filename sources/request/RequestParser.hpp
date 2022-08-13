@@ -1,9 +1,9 @@
 #pragma once
-#include "Logger.hpp"
 #ifndef HTTP_REQUEST_PARSER_HPP
 #define HTTP_REQUEST_PARSER_HPP
 
 #include "Request.hpp"
+#include "Logger.hpp"
 #include "defines.hpp"
 
 #include <exception>
@@ -88,7 +88,6 @@ public:
   bool is_connected() const;
   bool is_header_finished() const;
 
-  void parse();
   void parse_header();
 
   void prepare_chunk();

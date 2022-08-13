@@ -1,4 +1,4 @@
-POST /paulo HTTP/1.1
+POST /sito/upload.php HTTP/1.1
 Host: 127.0.0.1:3492
 Content-Type: text/plain
 Content-Length: 13
