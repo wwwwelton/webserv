@@ -551,7 +551,7 @@ bool RequestParser::is_chunk_ready() const {
 
 const std::vector<char>& RequestParser::get_chunk() {
   info() << "returning chunk" << std::endl;
-  // print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
+  print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
   info() << "current body size: " << body_bytes_so_far << std::endl;
   chunk_ready = false;
   return chunk_data;
@@ -575,6 +575,7 @@ void RequestParser::reset() {
   delete this->_request;
   this->_request = new Request();
 
+  i = 0;
   finished = false;
   header_finished = false;
   header_state = S_INIT;
