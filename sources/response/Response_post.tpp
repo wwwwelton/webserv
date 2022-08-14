@@ -130,6 +130,6 @@ int Response::_post(void) {
   WebServ::log.warning() << response_path << "\n";
   response_ready = true;
   parser->finished = true;
-  remove_tmp = true;
+  // remove_tmp = true;
   return OK;
 }
