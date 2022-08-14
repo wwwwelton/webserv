@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <string>
+#include <sys/poll.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -58,20 +59,64 @@ void send_string_chunks(int sock_fd, const std::string &str, int write_size) {
   }
 }
 
-int send_data(
-    const std::string &port,
+void send_data(
+    int conn_fd,
     int write_size,
     std::ifstream &content) {
-  std::stringstream ss;
-  uint16_t p;
 
+  std::string data;
+
+  while (1) {
+    std::string line;
+    std::getline(content, line);
+    if (content.eof())
+      break;
+    data.append(line + "\n");
+  }
+
+  send_string_chunks(conn_fd, data, write_size);
+
+}
+
+#define BUFFER_SIZE 3000
+
+void read_response(int conn_fd) {
+  int bytes_read = 0;
+
+  char buffer[BUFFER_SIZE + 1];
+  buffer[BUFFER_SIZE] = '\0';
+
+  struct pollfd pfd = {};
+  pfd.fd = conn_fd;
+  pfd.events = POLLIN;
+  std::cout << "dumping response: " << std::endl;
+  while (poll(&pfd, 1, 1000)) {
+    int event_pollin = pfd.revents & POLLIN;
+    if (!event_pollin) {
+      perror("poll");
+      exit(2);
+    }
+    bytes_read = recv(conn_fd, buffer, BUFFER_SIZE, 0);
+    if (bytes_read == 0) {
+      break; // exit
+    }
+
+    std::cout << buffer;
+  }
+
+  std::cout << "\nend of response" << std::endl;
+}
+
+int open_connection(const std::string& port) {
   struct sockaddr_in server;
-  int sock_fd;
+  std::stringstream ss;
+  short p;
+  int conn_fd;
 
   memset(&server, 0, sizeof server);
 
-  sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sock_fd == -1) {
+  conn_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (conn_fd == -1) {
     perror("socket");
     exit(1);
   }
@@ -83,27 +128,12 @@ int send_data(
   server.sin_port = htons(p);
   inet_pton(AF_INET, "127.0.0.1", &server.sin_addr);
 
-  int conn_fd = connect(sock_fd, (struct sockaddr*)&server, sizeof server);
-  if (conn_fd == -1) {
+  if (connect(conn_fd, (struct sockaddr*)&server, sizeof server)) {
     std::cout << "port: " << port << std::endl;
     perror("connect");
     exit(1);
   }
-  std::string data;
-
-  while (1) {
-    std::string line;
-    std::getline(content, line);
-    if (content.eof())
-      break;
-    data.append(line + "\n");
-  }
-
-  send_string_chunks(sock_fd, data, write_size);
-
-  close(conn_fd);
-  close(sock_fd);
-  return (0);
+  return conn_fd;
 }
 
 int main (int argc, char **argv)
@@ -140,5 +170,8 @@ int main (int argc, char **argv)
   if (!content.good()) {
     perror(argv[2]);
   }
-  return send_data(port, write_size, content);
+  int conn_fd = open_connection(port);
+  send_data(conn_fd, write_size, content);
+  read_response(conn_fd);
+  close(conn_fd);
 }
