@@ -16,7 +16,7 @@ function file_upload_handler() {
       chmod($target_file, 0755);
       unlink($target_file);
       echo("<p>" . $target_file .
-           "previous file with the same name deleted.</p>");
+           "previous file with the same name deleted.</p>\n");
   }
 
   $uploadOk = 1;
@@ -29,9 +29,9 @@ function file_upload_handler() {
   } else {
     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
       echo "<p>" . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])).
-           " has been uploaded. </p>";
+           " has been uploaded. </p>\n";
     } else {
-      echo "<p>Sorry, there was an error uploading your file.</p>";
+      echo "<p>Sorry, max file size exceeded.</p>";
     }
     echo "<p>Redirecting to homepage in 10 seconds</p>";
   }
