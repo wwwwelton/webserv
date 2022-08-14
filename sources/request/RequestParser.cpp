@@ -148,8 +148,7 @@ RequestParser::~RequestParser() {
   delete _request;
 }
 
-void print_chunk(const char *str, size_t start, size_t size) {
-  std::ostream& out = std::cout;
+void print_chunk(std::ostream& out, const char *str, size_t start, size_t size) {
   for (size_t i = start; size > 0; size--) {
     char c = str[i++];
     if (std::isprint(c)) {
@@ -532,7 +531,6 @@ void RequestParser::prepare_chunk() {
   if (i < bytes_read) {
     chunk_data.assign(buffer + i, buffer + bytes_read);
     body_bytes_so_far = bytes_read - i;
-    i = -1;
   } else {
     bytes_read = recv(fd, buffer, buffer_size, 0);
     if (bytes_read == (size_t)-1) {
@@ -543,6 +541,7 @@ void RequestParser::prepare_chunk() {
     body_bytes_so_far += bytes_read;
     chunk_data.assign(buffer, buffer + bytes_read);
   }
+  i = -1;
   chunk_ready = true;
   if (content_length > 0) {
     if (body_bytes_so_far > content_length) {
@@ -557,13 +556,14 @@ void RequestParser::prepare_chunk() {
 }
 
 bool RequestParser::is_chunk_ready() const {
-  log.debug() << "chunk is ready? " << chunk_ready << std::endl;
+  log.debug() << "chunk is ready? " << std::boolalpha << chunk_ready << std::endl;
   return chunk_ready;
 }
 
 const std::vector<char>& RequestParser::get_chunk() {
-  log.info() << "returning chunk: " << std::string(chunk_data.begin(),
-      chunk_data.end()) << std::endl;
+  log.info() << "returning chunk" << std::endl;
+  // print_chunk(log.debug(), &*chunk_data.begin(), 0, chunk_data.size());
+  log.info() << "\ncurrent body size: " << body_bytes_so_far << std::endl;
   chunk_ready = false;
   return chunk_data;
 }
