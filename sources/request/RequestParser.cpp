@@ -288,7 +288,7 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
             std::stringstream ss(_header_value);
             ss >> content_length;
             if (content_length > max_content_length) {
-              log.warning() << "Request content-length is "
+              warning() << "request content-length is "
                 << content_length
                 << " but the serve max content-length acceptable is "
                 << max_content_length
@@ -352,21 +352,10 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
 
 ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
 
-  // buff[bytes_read] = '\0';
-  // log.debug() << "Incoming request data: [";
-  // print_chunk(buff, 0, bytes_read);
-  // std::cout << "]" << std::endl;
   while (i < bytes_read) {
     char c = buff[i++];
-    // log.info() << "current request: " << *_request << std::endl;
 
     switch (chunk_state) {
-      // case S_BODY_START:
-      //   log.debug() << "Request before body parsing: " << *_request << std::endl;
-      //   content_length--;
-      //   _request->body.push_back(c);
-      //   chunk_state = S_BODY;
-      //   break;
 
       case S_CHUNK_START:
         chunk_size = get_hex(c);
@@ -477,8 +466,8 @@ void RequestParser::handle_closed_connection() {
     this->header_finished = true;
     this->finished = true;
     this->connected = false;
-    log.warning()
-      << "RequestParser: read 0 bytes, setting connection as closed"
+    warning()
+      << "read 0 bytes, setting connection as closed"
       << std::endl;
     throw ConnectionClosedException();
 }
@@ -497,7 +486,7 @@ void RequestParser::parse_header() {
   } else if (bytes_read == 0) {
     return handle_closed_connection();
   }
-  log.debug() << "Bytes read: " << bytes_read << std::endl;
+  debug() << "bytes read: " << bytes_read << std::endl;
 
   try {
     ParsingResult result = tokenize_header(buffer);
@@ -506,15 +495,15 @@ void RequestParser::parse_header() {
         _request->body.assign(chunk_data.begin(), chunk_data.end());
       }
       _request->error = 0;
-      log.debug() << "Finished header: " << *_request << std::endl;
+      debug() << "finished header: " << *_request << std::endl;
     }
   } catch(InvalidRequestException& ex) {
-    log.warning() << "Invalid http request: " << ex.what() << std::endl;
+    warning() << "invalid http request: " << ex.what() << std::endl;
     _request->error = ex.get_error();
     finished = true;
   } catch(std::exception& e) {
-    log.error()
-      << "Unexpected exception on RequestParser: "
+    error()
+      << "unexpected exception on RequestParser: "
       << e.what() << std::endl;
     _request->error = 500;
     finished = true;
@@ -527,7 +516,7 @@ void RequestParser::prepare_chunk() {
   if (!connected)
     throw ConnectionClosedException();
 
-  log.debug() << "preparing chunk" << std::endl;
+  debug() << "preparing chunk" << std::endl;
   if (i < bytes_read) {
     chunk_data.assign(buffer + i, buffer + bytes_read);
     body_bytes_so_far = bytes_read - i;
@@ -548,7 +537,7 @@ void RequestParser::prepare_chunk() {
       finished = true;
       throw InvalidRequestException(RequestEntityTooLarge);
     } else if (body_bytes_so_far == content_length) {
-      log.info() << "all content-length was read" << std::endl;
+      info() << "all content-length was read" << std::endl;
       finished = true;
     }
   }
@@ -561,9 +550,9 @@ bool RequestParser::is_chunk_ready() const {
 }
 
 const std::vector<char>& RequestParser::get_chunk() {
-  log.info() << "returning chunk" << std::endl;
-  // print_chunk(log.debug(), &*chunk_data.begin(), 0, chunk_data.size());
-  log.info() << "\ncurrent body size: " << body_bytes_so_far << std::endl;
+  info() << "returning chunk" << std::endl;
+  // print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
+  info() << "current body size: " << body_bytes_so_far << std::endl;
   chunk_ready = false;
   return chunk_data;
 }
@@ -582,7 +571,7 @@ bool RequestParser::is_header_finished() const {
 }
 
 void RequestParser::reset() {
-  log.debug() << "RequestParser: reseting..." << std::endl;
+  debug() << "reseting..." << std::endl;
   delete this->_request;
   this->_request = new Request();
 
@@ -599,6 +588,22 @@ void RequestParser::reset() {
   chunk_size = 0;
   chunk_ready = false;
   bytes_read = 0;
+}
+
+std::ostream& RequestParser::debug() {
+  return log.debug() << "[Request parser]: ";
+}
+
+std::ostream& RequestParser::info() {
+  return log.info() << "[Request parser]: ";
+}
+
+std::ostream& RequestParser::warning() {
+  return log.warning() << "[Request parser]: ";
+}
+
+std::ostream& RequestParser::error() {
+  return log.error() << "[Request parser]: ";
 }
 
 RequestParser::InvalidRequestException::InvalidRequestException(RequestErrors error) {

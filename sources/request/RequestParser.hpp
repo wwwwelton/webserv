@@ -172,7 +172,13 @@ private:
   ParsingResult tokenize_chunk_size(char *buff);
 
   void handle_closed_connection();
-  // void tokenize_chunk_size(char *buff);
+
+  // utils
+  std::ostream& debug();
+  std::ostream& info();
+  std::ostream& warning();
+  std::ostream& error();
+
 };
 
 #endif // !HTTP_REQUEST_PARSER_HPP
