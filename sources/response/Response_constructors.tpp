@@ -126,6 +126,7 @@ Response::Response(void): req(NULL) {
   path_ends_in_slash = false;
   response_code = CONTINUE;
   pid = 0;
+  httpversion = "HTTP/1.1 ";
   statuscode = " 200";
   statusmsg = "OK\n";
 }
@@ -134,13 +135,16 @@ Response::Response(Request *_req, Server *_server)
 {
   response_ready = false;
   header_present = true;
-  folder_request = false;
-  remove_tmp = false;
   finished = false;
   inprogress = false;
   incorrect_path = false;
-  server = _server;
+  folder_request = false;
+  remove_tmp = false;
+  valid = true;
+  path_ends_in_slash = false;
+  response_code = CONTINUE;
   pid = 0;
+  server = _server;
 }
 
 Response::~Response(void) {
