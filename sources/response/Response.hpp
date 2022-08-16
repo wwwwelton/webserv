@@ -71,7 +71,6 @@ private:
   std::string method;
   size_t      body_max_size;
 
-  std::string req_body;
   std::string originalroot;
   std::string path;
   std::string trailing_path;

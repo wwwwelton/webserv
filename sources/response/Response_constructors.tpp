@@ -66,10 +66,6 @@ std::string Response::get_path(std::string req_path) {
 
 void Response::set_request(Request *_req) {
   req = _req;
-  if (_req->body.size()) {
-    WebServ::log.debug() << "Request body:\n" << _req->body << "\n";
-    req_body = req->body;
-  }
   find_location(_req->path, server);
   if (location->root == originalroot)
     if (root.at(root.size() - 1) != '/')

@@ -296,7 +296,6 @@ ParsingResult RequestParser::tokenize_header(char *buff) {
                 << std::endl;
               throw InvalidRequestException(RequestEntityTooLarge);
             }
-            _request->body.reserve(content_length);
           } else if (str_iequals(_header_key, "transfer-encoding")) {
             _header_key = "Transfer-Encoding";
             if (_header_value != "identity")
@@ -481,9 +480,6 @@ void RequestParser::parse_header() {
   try {
     ParsingResult result = tokenize_header(buffer);
     if (result == P_PARSING_COMPLETE) {
-      if (chunked) {
-        _request->body.assign(chunk_data.begin(), chunk_data.end());
-      }
       if (!chunked && content_length == 0)
         finished = true;
       _request->error = 0;

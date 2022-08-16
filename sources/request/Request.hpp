@@ -18,9 +18,7 @@ struct Request {
   std::string path;
   std::string http_version;
   std::string host;
-  std::string body;
   unsigned int error;
-  int body_size;
   int finished;
 
   Request();
