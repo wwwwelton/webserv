@@ -16,37 +16,25 @@
 	<h1 class="text-center p-4">Cookies 🍪</h1>
 
 	<?php
-
-	foreach (getallheaders() as $name => $value) {
-		echo "$name: $value\n";
-	}
-
-	?>
-
-	<?php
-	$cookie_name = "color";
+	$cookie_name = "cookie";
 	$cookie_value = $_POST["cookie_value"];
 
 
 	if ($cookie_value) {
 		setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
-		setcookie("salada", "de tomate", time() + (86400 * 30), "/");
 		header("Refresh:0");
 	}
 
-	//print_r($_COOKIE);
-
 	if (!isset($_COOKIE[$cookie_name])) {
-		echo '<h1 class="text-center p-4">Cookie is not setted.</h1>';
+		echo '<h1 class="text-center p-4">Cookie was not set.</h1>';
 	} else {
-		echo '<h1 class="text-center p-4">Cookie: color</h1>';
-		echo '<h1 class="text-center p-4">Value: ' . $_COOKIE[$cookie_name] . '</h1>';
+		echo '<h1 class="text-center p-4">Cookie: ' . $_COOKIE[$cookie_name] . '</h1>';
 	}
 	?>
 
 	<div class="container py-4 px-4">
 		<div class="row">
-			<form class="form-inline mx-auto" action="index.php" method="post" enctype="multipart/form-data">
+			<form class="form-inline mx-auto" action="index.php" method="post">
 				<div class="form-group mx-2">
 					<label for="cookie_name" class="sr-only">Cookie Name</label>
 					<input type="text" readonly class="form-control-plaintext" id="cookie_name" value="Cookie Name">
@@ -56,7 +44,7 @@
 					<input type="text" name="cookie_value" class="form-control" id="cookie_value" placeholder="Cookie Value">
 				</div>
 				<button type="submit" class="btn btn-success mx-2">Set Cookie</button>
-				<button type="submit" class="btn btn-danger mx-2">Delete Cookie</button>
+				<a class="btn btn-danger mx-2" href="delete.php" role="button">Delete Cookie</a>
 			</form>
 		</div>
 	</div>
