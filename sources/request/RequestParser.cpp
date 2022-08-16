@@ -117,6 +117,7 @@ static inline bool str_iequals(const std::string& str1, const std::string& str2)
 std::string RequestParser::supported_version = "HTTP/1.1";
 
 RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
+  fd(fd),
   finished(false),
   valid(false),
   connected(true),
@@ -130,7 +131,6 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   chunk_ready(false),
   chunk_bytes_so_far(),
   log(WebServ::log),
-  fd(fd),
   buffer(new char[buffer_size]),
   bytes_read(),
   buffer_size(buffer_size),
@@ -646,21 +646,32 @@ void RequestParser::reset() {
   delete this->_request;
   this->_request = new Request();
 
-  i = 0;
-  finished = false;
-  header_finished = false;
-  header_state = S_INIT;
-  chunk_state = S_CHUNK_INIT;
   valid = false;
-  supported_version_index = 0;
+  finished = false;
+
+  header_finished = false;
+
   content_length = 0;
   body_bytes_so_far = 0;
-  chunk_bytes_so_far = 0;
-  parsing_body = false;
-  chunked = false;
+  parsing_body = 0;
+
+  chunked = 0;
   chunk_size = 0;
-  chunk_ready = false;
+  chunk_ready = 0;
+  chunk_bytes_so_far = 0;
+  chunk_data.clear();
+
+  // buffer iterator;
+  i = 0;
   bytes_read = 0;
+
+  _header_key = "";
+  _header_value = "";
+
+  header_state = S_INIT;
+  chunk_state = S_CHUNK_INIT;
+
+  supported_version_index = 0;
 }
 
 std::ostream& RequestParser::debug() {

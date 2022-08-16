@@ -80,6 +80,7 @@ class RequestParser
   RequestParser(const RequestParser &);
   RequestParser &operator=(const RequestParser &);
 public:
+  int fd;
   bool finished;
 
   RequestParser(int fd = -1, size_t max_body_size = 0, size_t buffer_max = 65536);
@@ -149,10 +150,6 @@ private:
 
   Logger& log;
 
-public:
-  int fd;
-
-private:
   // buffer iterator;
   size_t i;
   char *buffer;
