@@ -128,6 +128,7 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   chunked(false),
   chunk_size(),
   chunk_ready(false),
+  chunk_bytes_so_far(),
   log(WebServ::log),
   fd(fd),
   buffer(new char[buffer_size]),
@@ -406,6 +407,8 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
           throw InvalidRequestException(BadRequest);
         }
         chunk_state = S_CHUNK_DATA;
+        info() << "finished reading chunk size: " << chunk_size << '\n';
+        chunk_bytes_so_far += chunk_size;
         break;
 
       case S_CHUNK_DATA:
@@ -416,7 +419,8 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
           chunk_state = S_CHUNK_DATA_LF;
         }
         // there would be a push_back(c) here;
-        return P_PARSING_COMPLETE;
+        chunk_size--;
+        chunk_data.push_back(c);
         break;
 
       case S_CHUNK_DATA_LF:
@@ -444,6 +448,7 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
       case S_CHUNK_END_LF:
         if (c != '\n')
           throw InvalidRequestException(BadRequest);
+        finished = true;
         return P_PARSING_COMPLETE;
         break;
 
@@ -462,16 +467,6 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
   return P_PARSING_INCOMPLETE;
 }
 
-void RequestParser::handle_closed_connection() {
-    this->header_finished = true;
-    this->finished = true;
-    this->connected = false;
-    warning()
-      << "read 0 bytes, setting connection as closed"
-      << std::endl;
-    throw ConnectionClosedException();
-}
-
 void RequestParser::parse_header() {
   if (header_finished)
     throw HeaderFinishedException();
@@ -480,12 +475,7 @@ void RequestParser::parse_header() {
 
   bytes_read = recv(fd, buffer, buffer_size, 0);
 
-  if (bytes_read == (size_t)-1) {
-    throw ReadException(strerror(errno));
-
-  } else if (bytes_read == 0) {
-    return handle_closed_connection();
-  }
+  check_read_value(bytes_read);
   debug() << "bytes read: " << bytes_read << std::endl;
 
   try {
@@ -494,6 +484,8 @@ void RequestParser::parse_header() {
       if (chunked) {
         _request->body.assign(chunk_data.begin(), chunk_data.end());
       }
+      if (!chunked && content_length == 0)
+        finished = true;
       _request->error = 0;
       debug() << "finished header: " << *_request << std::endl;
     }
@@ -510,28 +502,76 @@ void RequestParser::parse_header() {
   }
 }
 
-void RequestParser::prepare_chunk() {
-  if (finished)
-    throw RequestFinishedException();
-  if (!connected)
+void RequestParser::check_read_value(size_t bytes_read) {
+  if (bytes_read == (size_t)-1) {
+    throw ReadException(strerror(errno));
+  } else if (bytes_read == 0) {
+    this->header_finished = true;
+    this->finished = true;
+    this->connected = false;
+    warning()
+      << "read 0 bytes, setting connection as closed"
+      << std::endl;
     throw ConnectionClosedException();
+  }
+}
 
-  debug() << "preparing chunk" << std::endl;
+bool RequestParser::prepare_chunked_body() {
+  info() << "preparing a chunked body\n";
+
+  if (i == bytes_read) {
+    info() << "reading a new chunk\n";
+    bytes_read = recv(fd, buffer, buffer_size, 0);
+    check_read_value(bytes_read);
+    i = 0;
+  } else
+    info() << "using remaining chunk in the buffer\n";
+
+  chunk_data.clear();
+
+  ParsingResult result = tokenize_chunk_size(buffer);
+
+  if (result == P_PARSING_COMPLETE) {
+    finished = true;
+    warning() << "finished the chunked request" << std::endl;
+  }
+  if (chunk_data.size() != 0) {
+    return true;
+  }
+
+  // info() << "chunk size is not 0, assigning to chunk_data" << std::endl;
+  // char *chunk_start = buffer + i;
+  // size_t assign_size = std::min(chunk_size, bytes_read - i);
+  // i += assign_size;
+  // chunk_data.insert(chunk_data.end(), chunk_start, chunk_start + assign_size);
+  // chunk_state = S_CHUNK_DATA;
+  //
+  // // if (chunk_size == 0) {
+  // //   // chunk_data.clear();
+  // //   info() << "chunk size is 0, finishing request" << std::endl;
+  // //   finished = true;
+  // //   return true;
+  // // }
+  //
+  // if (chunk_state <= S_CHUNK_DATA_START)
+  //   return false;
+  return false;
+}
+
+bool RequestParser::prepare_regular_body() {
+  info() << "preparing a regular body\n";
+
   if (i < bytes_read) {
     chunk_data.assign(buffer + i, buffer + bytes_read);
     body_bytes_so_far = bytes_read - i;
   } else {
     bytes_read = recv(fd, buffer, buffer_size, 0);
-    if (bytes_read == (size_t)-1) {
-      throw ReadException(strerror(errno));
-    } else if (bytes_read == 0) {
-      return handle_closed_connection();
-    }
     body_bytes_so_far += bytes_read;
     chunk_data.assign(buffer, buffer + bytes_read);
   }
+
   i = -1;
-  chunk_ready = true;
+
   if (content_length > 0) {
     if (body_bytes_so_far > content_length) {
       finished = true;
@@ -541,7 +581,37 @@ void RequestParser::prepare_chunk() {
       finished = true;
     }
   }
+  return true;
+}
 
+// FIXME: check if we just finished the header;
+void RequestParser::prepare_chunk() {
+  try {
+    if (finished)
+      throw RequestFinishedException();
+    if (!connected)
+      throw ConnectionClosedException();
+
+    debug() << "preparing chunk" << std::endl;
+    bool ready;
+    if (chunked)
+      ready = prepare_chunked_body();
+    else
+      ready = prepare_regular_body();
+    chunk_ready = ready;
+
+  } catch(InvalidRequestException& ex) {
+    info() << "invalid http request: " << ex.what() << std::endl;
+    _request->error = ex.get_error();
+    finished = true;
+
+  } catch(std::exception& e) {
+    error()
+      << "unexpected exception on RequestParser: "
+      << e.what() << std::endl;
+    _request->error = 500;
+    finished = true;
+  }
 }
 
 bool RequestParser::is_chunk_ready() const {
@@ -553,6 +623,7 @@ const std::vector<char>& RequestParser::get_chunk() {
   info() << "returning chunk" << std::endl;
   print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
   info() << "current body size: " << body_bytes_so_far << std::endl;
+
   chunk_ready = false;
   return chunk_data;
 }
@@ -584,6 +655,7 @@ void RequestParser::reset() {
   supported_version_index = 0;
   content_length = 0;
   body_bytes_so_far = 0;
+  chunk_bytes_so_far = 0;
   parsing_body = false;
   chunked = false;
   chunk_size = 0;

@@ -142,6 +142,7 @@ private:
   bool chunked;
   size_t chunk_size;
   bool chunk_ready;
+  size_t chunk_bytes_so_far;
   std::vector<char> chunk_data;
 
   Request *_request;
@@ -171,7 +172,10 @@ private:
   ParsingResult tokenize_header(char *buff);
   ParsingResult tokenize_chunk_size(char *buff);
 
-  void handle_closed_connection();
+  bool prepare_chunked_body();
+  bool prepare_regular_body();
+
+  void check_read_value(size_t bytes_read);
 
   // utils
   std::ostream& debug();
