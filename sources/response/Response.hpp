@@ -126,6 +126,7 @@ public:
   Response(Request *req, Server *_server);
   Response(void);
   void assemble_followup(void);
+  void assemble_cgi(std::string const& body_path);
   void assemble(std::string const& body_path);
   void assemble(void);
   void set_request(Request* req);

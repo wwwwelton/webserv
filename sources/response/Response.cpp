@@ -104,11 +104,11 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       exit(1);
     }
     // std::cout << body_path.c_str();
-    execlp(bin.c_str(), "-f", "-q", body_path.substr(2).c_str(), NULL);
+    execlp(bin.c_str(), "-f", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
   close(fd);
-  assemble("./tmp");
+  assemble_cgi("./tmp");
   unlink("./tmp");
 }
 
@@ -209,6 +209,56 @@ void Response::assemble(void) {
   ResponseBase::size = str.size();
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
   WebServ::log.debug() << ResponseBase::buffer_resp;
+  WebServ::log.debug() << *this;
+}
+
+void Response::assemble_cgi(std::string const& body_path) {
+  std::string       body;
+  size_t            body_size = 0;
+
+  WebServ::log.debug() << "File requested: " << path << "\n";
+  WebServ::log.debug() << "Body path: " << body_path << "\n";
+  file.close();
+  file.open(body_path.c_str());
+  if (file.bad() || file.fail())
+    WebServ::log.error() << "file opening in Response::assemble\n";
+
+  std::string str(httpversion + statuscode + statusmsg);
+  if (incorrect_path) {
+    // req->path[req->path.size() - 1] != '/';
+    str.append("Location: " + req->path + "/\n");
+  }
+  std::string header;
+  std::getline(file, header);
+  while (header.size() && header[0] != '\r' && header[1] != '\n') {
+    str.append(header);
+    str.push_back('\n');
+    std::getline(file, header);
+  }
+
+  std::streampos current = file.tellg();
+  file.seekg(current, std::ios::end);
+  body_max_size = file.tellg() - current;
+  WebServ::log.warning() << body_max_size << "\n";
+  file.seekg(current);
+
+  char buf[BUFFER_SIZE];
+  file.read(buf, BUFFER_SIZE);
+  body_size = file.gcount();
+  if (body_max_size < BUFFER_SIZE) {
+    finished = true;
+  }
+  else {
+    // contenttype = "Content-Type: application/octet-stream\n";
+    inprogress = true;
+  }
+  str.append(DFL_CONTENTLEN);
+  str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
+  std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
+  std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
+  ResponseBase::size = str.size() + body_size;
+  ResponseBase::buffer_resp[ResponseBase::size] = '\0';
+  // WebServ::log.debug() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
