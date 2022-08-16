@@ -68,7 +68,8 @@ void Response::set_environment(void) {
   setenv("SERVER_SOFTWARE", "TDD/4.0", 1);
   setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
   setenv("REQUEST_METHOD", "POST", 1);
-
+  if (req->headers.count("Cookie"))
+    setenv("HTTP_COOKIE", req->headers.at("Cookie").c_str(), 1);
   setenv("REDIRECT_STATUS", "200", 1);
   // setenv("REQUEST_URI", "/post/upload_handler.php", 1);
   setenv("REQUEST_URI", req->path.c_str(), 1);

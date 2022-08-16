@@ -30,6 +30,7 @@
 
 	if ($cookie_value) {
 		setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
+		setcookie("salada", "de tomate", time() + (86400 * 30), "/");
 		header("Refresh:0");
 	}
 

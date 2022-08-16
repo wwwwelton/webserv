@@ -88,7 +88,7 @@ int Response::validate_http_version(void) {
 }
 
 void Response::cgi(std::string const &body_path, std::string const &bin) {
-  int fd = open("./tmp", O_CREAT | O_RDWR | O_TRUNC, 0644);
+  int fd = open(DFL_TMPFILE, O_CREAT | O_RDWR | O_TRUNC, 0644);
   if (fd == -1)
     throw(std::exception());
   int status;
@@ -96,6 +96,8 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
   if (pid == 0) {
     setenv("SERVER_PORT", _itoa(server->port).c_str(), 1);
     setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
+    if (req->headers.count("Cookie"))
+      setenv("HTTP_COOKIE", req->headers.at("Cookie").c_str(), 1);
     setenv("REDIRECT_STATUS", "200", 1);
     setenv("REQUEST_URI", req->path.c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
@@ -108,8 +110,8 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
   }
   waitpid(pid, &status, 0);
   close(fd);
-  assemble_cgi("./tmp");
-  unlink("./tmp");
+  assemble_cgi(DFL_TMPFILE);
+  // unlink(DFL_TMPFILE);
 }
 
 void Response::dispatch(std::string const& body_path) {
@@ -132,8 +134,12 @@ void Response::dispatch(std::string const& body_path) {
     cgi(body_path, location->cgi[extension]);
   }
   else if (mimetypes.count(extension)) {
-    contenttype = mimetypes[extension];
-    assemble(body_path);
+    if (response_path == DFL_TMPFILE)
+      assemble_cgi(body_path);
+    else {
+      contenttype = mimetypes[extension];
+      assemble(body_path);
+    }
   }
   else {
     WebServ::log.warning() << extension << " support not yet implemented\n";
@@ -219,7 +225,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   WebServ::log.debug() << "File requested: " << path << "\n";
   WebServ::log.debug() << "Body path: " << body_path << "\n";
   file.close();
-  file.open(body_path.c_str());
+  file.open(body_path.c_str(), std::ios::binary);
   if (file.bad() || file.fail())
     WebServ::log.error() << "file opening in Response::assemble\n";
 
@@ -230,15 +236,20 @@ void Response::assemble_cgi(std::string const& body_path) {
   }
   std::string header;
   std::getline(file, header);
+  // WebServ::log.warning() << "Header: " << header << "\n";
   while (header.size() && header[0] != '\r' && header[1] != '\n') {
     str.append(header);
     str.push_back('\n');
     std::getline(file, header);
+    // WebServ::log.warning() << "Header: " << header << "\n";
   }
 
   std::streampos current = file.tellg();
-  file.seekg(current, std::ios::end);
+  // std::cout << "Current: " << current << "\n";
+  file.seekg(0, std::ios::end);
+  // std::cout << "end: " << file.tellg() << "\n";
   body_max_size = file.tellg() - current;
+  // std::cout << "Body: " << body_max_size << "\n";
   WebServ::log.warning() << body_max_size << "\n";
   file.seekg(current);
 
@@ -258,7 +269,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  // WebServ::log.debug() << ResponseBase::buffer_resp;
+  // WebServ::log.error() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
@@ -295,7 +306,7 @@ void Response::assemble(std::string const& body_path) {
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  // WebServ::log.debug() << ResponseBase::buffer_resp;
+  // WebServ::log.error() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
