@@ -62,7 +62,6 @@ void Response::create_error_page(void) {
   content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
   content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
   outfile << content;
-  response_path = DFL_DYNFILE;
   remove_tmp = true;
   infile.close();
   outfile.close();
