@@ -78,6 +78,8 @@ void Response::set_request(Request *_req) {
   if (req->method == "POST") {
     if (req->headers.count("Origin"))
       path = "./" + req->headers.at("Origin") + _req->path;
+	else
+	  path = "./" + req->path;
   }
   else {
     if (location->root == originalroot)

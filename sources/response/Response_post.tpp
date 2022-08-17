@@ -93,6 +93,7 @@ int Response::_post(void) {
 
   std::cout << *this;
   if (pid == 0) {
+	// path = "/sito/upload.php/";
     if (path.find('.') == std::string::npos) {
       return INTERNAL_SERVER_ERROR;
     }
