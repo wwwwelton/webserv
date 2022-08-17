@@ -169,6 +169,7 @@ void print_chunk(std::ostream& out, const char *str, size_t start, size_t size) 
         out << '.';
     }
   }
+  out << std::endl;
 }
 
 /*
