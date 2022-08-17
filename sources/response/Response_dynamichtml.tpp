@@ -64,6 +64,7 @@ void Response::create_error_page(void) {
   remove_tmp = true;
   infile.close();
   outfile.close();
+  response_path = DFL_DYNFILE;
 }
 
 void Response::create_redir_page(void) {
