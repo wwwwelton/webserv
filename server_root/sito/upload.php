@@ -31,13 +31,18 @@ function file_upload_handler() {
       echo "<p>" . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])).
            " has been uploaded. </p>\n";
     } else {
-      echo "<p>Sorry, max file size exceeded.</p>";
+      echo "<p>The file has been uploaded, but we couldn't seve it</p>";
     }
     echo "<p>Redirecting to homepage in 10 seconds</p>";
   }
 }
 ?>
 
+<?php 
+ echo "DUMPING ALL HEADERS !!! \n";
+ echo "DUMPING ALL HEADERS !!! \n";
+ foreach (getallheaders() as $name => $value) {     echo "$name: $value\n"; } 
+ ?>
 <!DOCTYPE html>
 <html>
 <head>
