@@ -172,7 +172,7 @@ void Response::set_statuscode(int code) {
 
   if (folder_request) {
     create_directory_listing();
-    response_path = DFL_TMPFILE;
+    response_path = DFL_DYNFILE;
   }
   else if (response_code >= BAD_REQUEST) {
     if (server->error_page.count(response_code)) {

@@ -46,7 +46,6 @@ void Response::create_directory_listing(void) {
   closedir(directory);
   file.close();
   out.close();
-  response_path = DFL_DYNFILE;
   remove_tmp = true;
 }
 
