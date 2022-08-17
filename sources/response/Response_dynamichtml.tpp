@@ -13,7 +13,7 @@ void Response::create_directory_listing(void) {
   std::string       tmp;
 
   file.open("./sources/templates/index.html");
-  out.open(DFL_TMPFILE, out.out | out.trunc | std::ios::binary);
+  out.open(DFL_DYNFILE, out.out | out.trunc | std::ios::binary);
 
   file.get(*(out.rdbuf()), '$');
   file.ignore();
@@ -46,6 +46,7 @@ void Response::create_directory_listing(void) {
   closedir(directory);
   file.close();
   out.close();
+  response_path = DFL_DYNFILE;
   remove_tmp = true;
 }
 
@@ -55,13 +56,13 @@ void Response::create_error_page(void) {
   std::ofstream     outfile;
 
   infile.open("./sources/templates/error.html");
-  outfile.open(DFL_TMPFILE, outfile.trunc);
+  outfile.open(DFL_DYNFILE, outfile.trunc);
   content.assign(std::istreambuf_iterator<char>(infile),
                  std::istreambuf_iterator<char>());
   content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
   content.replace(content.find("PLACEHOLDER"), 11, statuscode + statusmsg);
   outfile << content;
-  response_path = DFL_TMPFILE;
+  response_path = DFL_DYNFILE;
   remove_tmp = true;
   infile.close();
   outfile.close();
@@ -73,7 +74,7 @@ void Response::create_redir_page(void) {
   std::ofstream     outfile;
 
   infile.open("./sources/templates/redirect.html");
-  outfile.open(DFL_TMPFILE, outfile.trunc);
+  outfile.open(DFL_DYNFILE, outfile.trunc);
   content.assign(std::istreambuf_iterator<char>(infile),
                  std::istreambuf_iterator<char>());
   // WebServ::log.error() << content;
@@ -81,7 +82,7 @@ void Response::create_redir_page(void) {
   content.replace(content.find("$URL"), 4, location->redirect.second);
   // WebServ::log.error() << content;
   outfile << content;
-  response_path = DFL_TMPFILE;
+  response_path = DFL_DYNFILE;
   remove_tmp = true;
   infile.close();
   outfile.close();

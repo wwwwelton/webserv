@@ -317,8 +317,10 @@ void Response::process(void) {
     WebServ::log.warning() << "response ready\n";
     set_statuscode(response_code);
     dispatch(response_path);
-    if (remove_tmp)
+    if (remove_tmp) {
       unlink(DFL_TMPFILE);
+      unlink(DFL_DYNFILE);
+    }
     return;
   }
   for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)
@@ -329,8 +331,10 @@ void Response::process(void) {
   if (response_code != 0) {
     set_statuscode(response_code);
     dispatch(response_path);
-    if (remove_tmp)
+    if (remove_tmp) {
       unlink(DFL_TMPFILE);
+      unlink(DFL_DYNFILE);
+    }
   }
 }
 

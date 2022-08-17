@@ -9,6 +9,7 @@
 # define HTTPRESPONSE_HPP
 
 #define DFL_TMPFILE "./tmp.html"
+#define DFL_DYNFILE "./temp.html"
 
 #include <unistd.h>
 #include <sys/types.h>
