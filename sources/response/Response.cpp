@@ -223,7 +223,6 @@ void Response::assemble_cgi(std::string const& body_path) {
   std::string       body;
   size_t            body_size = 0;
 
-  WebServ::log.error() << "CAIED NO CGI 226!\n\n";
   WebServ::log.debug() << "File requested: " << path << "\n";
   WebServ::log.debug() << "Body path: " << body_path << "\n";
   file.close();

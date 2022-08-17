@@ -91,7 +91,7 @@ int Response::_post(void) {
   std::string bin;
   std::string extension;
 
-  std::cout << *this;
+  WebServ::log.debug() << *this;
   if (pid == 0) {
 	// path = "/sito/upload.php/";
     if (path.find('.') == std::string::npos) {
