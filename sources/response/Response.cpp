@@ -208,7 +208,6 @@ void Response::assemble_followup(void) {
 }
 
 void Response::assemble(void) {
-  WebServ::log.error() << "CAIED NO assemble 211!\n\n";
   std::string str(httpversion + statuscode + statusmsg + contenttype);
   str.append(DFL_CONTENTLEN);
   str.replace(str.find("LENGTH"), 6, _itoa(0));
