@@ -3,6 +3,7 @@
 #include "WebServ.hpp"
 #include <cctype>
 #include <cstddef>
+#include <fstream>
 #include <sstream>
 #include <sys/socket.h>
 #include <exception>
@@ -138,6 +139,11 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   chunk_state(S_CHUNK_INIT),
   supported_version_index(0) {
     _request = new Request();
+    const char *filename = "/tmp/webserv-request-body";
+    file_body.open(filename, std::ios_base::trunc);
+    if (!file_body.good()) {
+      error() << "Couldn't open file " << filename << std::endl;
+    }
   }
 
 RequestParser::RequestParser(const RequestParser &): log(WebServ::log) { }
@@ -416,10 +422,11 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
             throw InvalidRequestException(BadRequest);
           }
           chunk_state = S_CHUNK_DATA_LF;
+        } else {
+          // there would be a push_back(c) here;
+          chunk_size--;
+          chunk_data.push_back(c);
         }
-        // there would be a push_back(c) here;
-        chunk_size--;
-        chunk_data.push_back(c);
         break;
 
       case S_CHUNK_DATA_LF:
@@ -429,6 +436,8 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
         break;
 
       case S_LAST_CHUNK:
+        if (c != '\r')
+          throw InvalidRequestException(BadRequest);
         chunk_state = S_LAST_CHUNK_LF;
         break;
 
@@ -558,11 +567,14 @@ bool RequestParser::prepare_regular_body() {
   info() << "preparing a regular body\n";
 
   if (i < bytes_read) {
+    info() << "using remaining" << (bytes_read - i) << "bytes from buffer\n";
     chunk_data.assign(buffer + i, buffer + bytes_read);
     body_bytes_so_far = bytes_read - i;
   } else {
+    info() << "reading more bytes\n";
     bytes_read = recv(fd, buffer, buffer_size, 0);
     body_bytes_so_far += bytes_read;
+    info() << bytes_read << " bytes where read" << std::endl;
     chunk_data.assign(buffer, buffer + bytes_read);
   }
 
@@ -620,6 +632,7 @@ const std::vector<char>& RequestParser::get_chunk() {
   print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
   info() << "current body size: " << body_bytes_so_far << std::endl;
 
+  file_body << std::string(chunk_data.begin(), chunk_data.end());
   chunk_ready = false;
   return chunk_data;
 }
