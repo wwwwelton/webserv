@@ -16,7 +16,7 @@ function file_upload_handler() {
       chmod($target_file, 0755);
       unlink($target_file);
       echo("<p>" . $target_file .
-           "previous file with the same name deleted.</p>\n");
+           "previous file with the same name deleted.</p>");
   }
 
   $uploadOk = 1;
@@ -29,7 +29,7 @@ function file_upload_handler() {
   } else {
     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
       echo "<p>" . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])).
-           " has been uploaded. </p>\n";
+           " has been uploaded. </p>";
     } else {
       echo "<p>The file has been uploaded, but we couldn't seve it</p>";
     }
@@ -38,10 +38,10 @@ function file_upload_handler() {
 }
 ?>
 
-<?php 
+<?php
  echo "DUMPING ALL HEADERS !!! \n";
  echo "DUMPING ALL HEADERS !!! \n";
- foreach (getallheaders() as $name => $value) {     echo "$name: $value\n"; } 
+ foreach (getallheaders() as $name => $value) {     echo "$name: $value\n"; }
  ?>
 <!DOCTYPE html>
 <html>

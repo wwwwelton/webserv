@@ -72,8 +72,8 @@ describe("DELETE", () => {
 
 	test(server1 + "/delete/cannot_delete should return 401", async () => {
 		const res = await request(server1)
-			.delete("/delete/cannot_delete")
-			.set("X-Webserv-Test", "/delete/cannot_delete should return 401");
+			.delete("/delete/cannot_delete");
+			// .set("X-Webserv-Test", "/delete/cannot_delete should return 401");
 		expect(res.status).toBe(401);
 		expect(fs.existsSync("../www/delete/cannot_delete")).toBeTruthy();
 		expect(res.text).toContain("401 Unauthorized");
