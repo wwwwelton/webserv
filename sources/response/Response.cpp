@@ -233,7 +233,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   std::string str(httpversion + statuscode + statusmsg);
   if (incorrect_path) {
     // req->path[req->path.size() - 1] != '/';
-    str.append("Location: " + (std::string)"127.0.0.1:3490/" + req->path + "/\n");
+    str.append("Location: " + req->path + "/\n");
   }
   std::string header;
   std::getline(file, header);
