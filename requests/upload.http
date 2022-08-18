@@ -1,0 +1,14 @@
+POST /sito/upload.php HTTP/1.1
+Host: 127.0.0.1:8080
+User-Agent: curl/7.84.0
+Accept: */*
+Content-Length: 207
+Content-Type: multipart/form-data; boundary=------------------------842a4fce795db68b
+
+--------------------------842a4fce795db68b
+Content-Disposition: form-data; name="fileToUpload"; filename="hello.txt"
+Content-Type: text/plain
+
+hello world
+
+--------------------------842a4fce795db68b--

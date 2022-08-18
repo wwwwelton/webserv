@@ -1,0 +1,24 @@
+POST /upload.php HTTP/1.1
+Host: 127.0.0.1:8080
+Accept: */*
+Transfer-Encoding: chunked
+Content-Type: multipart/form-data; boundary=------------------------842a4fce795db68b
+User-Agent: curl/7.84.0
+
+2C
+--------------------------842a4fce795db68b
+
+4B
+Content-Disposition: form-data; name="fileToUpload"; filename="hello.txt"
+
+1C
+Content-Type: text/plain
+
+
+3C
+hello world
+
+--------------------------842a4fce795db68b--
+
+0
+
