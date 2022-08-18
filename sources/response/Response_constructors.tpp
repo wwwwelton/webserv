@@ -39,7 +39,7 @@ void Response::reset(void) {
   response_path.clear();
   file.close();
   pid = 0;
-  statuscode = " 200";
+  statuscode = "200 ";
   statusmsg = "OK\n";
 }
 
