@@ -99,6 +99,7 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
     if (req->headers.count("Cookie"))
       setenv("HTTP_COOKIE", req->headers.at("Cookie").c_str(), 1);
     setenv("REDIRECT_STATUS", "200", 1);
+    setenv("HTTP_HOST", req->headers.at("Host").c_str(), 1);
     setenv("REQUEST_URI", req->path.c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
     if (dup2(fd, STDOUT_FILENO) == -1) {
@@ -232,16 +233,20 @@ void Response::assemble_cgi(std::string const& body_path) {
   std::string str(httpversion + statuscode + statusmsg);
   if (incorrect_path) {
     // req->path[req->path.size() - 1] != '/';
-    str.append("Location: " + req->path + "/\n");
+    str.append("Location: " + (std::string)"127.0.0.1:3490/" + req->path + "/\n");
   }
   std::string header;
   std::getline(file, header);
-  // WebServ::log.warning() << "Header: " << header << "\n";
+  WebServ::log.warning() << "Header: " << header << "\n";
   while (header.size() && header[0] != '\r' && header[1] != '\n') {
     str.append(header);
+    if (header.find("Status") != std::string::npos) {
+      str.replace(str.find("200 "), 4, "302 ");
+
+    }
     str.push_back('\n');
     std::getline(file, header);
-    // WebServ::log.warning() << "Header: " << header << "\n";
+    WebServ::log.warning() << "Header: " << header << "\n";
   }
 
   std::streampos current = file.tellg();
@@ -269,7 +274,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  // WebServ::log.error() << ResponseBase::buffer_resp;
+  WebServ::log.error() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
