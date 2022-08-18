@@ -11,6 +11,7 @@ todo
 testers
 test/source/node_modules/
 server_root/uploads
+server_root/wordpress
 server_root/sito/uploads
 tmp.txt
 tmp.html
