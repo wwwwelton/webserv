@@ -88,6 +88,4 @@ up:
 client: client.cpp
 	g++ client.cpp -g -o client
 
-.PHONY: all clean fclean re
-
 -include $(DEPS)
