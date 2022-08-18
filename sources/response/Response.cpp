@@ -59,7 +59,7 @@ int Response::_trace(void) {
 
 void Response::_send(int fd) {
   ssize_t bytes;
-  bytes = send(fd, ResponseBase::buffer_resp, ResponseBase::size, 0);
+  bytes = send(fd, ResponseBase::buffer_resp, ResponseBase::size, MSG_NOSIGNAL);
   if (bytes == 0 || bytes == -1) {
     WebServ::log.error() << "unable to send response: "
                          << strerror(errno) << "\n";
