@@ -7,8 +7,21 @@
 
 #include "Response.hpp"
 
+void Response::extract_query_parameters(void) {
+  size_t      question_mark;
+
+  question_mark = req->path.find('?');
+  if (question_mark != std::string::npos) {
+    url_parameters = req->path.substr(question_mark);
+    req->path.erase(question_mark, std::string::npos);
+    WebServ::log.warning() << "Query params: " << url_parameters << "\n";
+    WebServ::log.warning() << "Path after params: " << req->path << "\n";
+  }
+}
+
 void Response::find_location(std::string path, Server *server) {
   std::string remainder;
+
   while (path.find('/') != std::string::npos) {
     if (server->location.count(path)) {
       location = &server->location[path];
@@ -16,6 +29,7 @@ void Response::find_location(std::string path, Server *server) {
       //   path = path.erase(path.find_last_of('/'));
       return;
     }
+
     remainder = path.substr(path.find_last_of('/'));
     trailing_path = remainder + trailing_path;
     path = path.erase(path.find_last_of('/'));
@@ -66,6 +80,7 @@ std::string Response::get_path(std::string req_path) {
 
 void Response::set_request(Request *_req) {
   req = _req;
+  extract_query_parameters();
   find_location(_req->path, server);
   if (location->root == originalroot)
     if (root.at(root.size() - 1) != '/')
@@ -80,6 +95,8 @@ void Response::set_request(Request *_req) {
       path = "./" + req->headers.at("Origin") + _req->path;
     else
       path = "./" + req->path;
+    if (path.compare(0, 6, "./http", 6))
+      path = path.substr(2);
   } else {
     if (location->root == originalroot)
       if (root.at(root.size() - 1) != '/')
@@ -96,6 +113,10 @@ void Response::set_request(Request *_req) {
     if (path.size() > 2 && path[path.size() - 1] == '/' &&
                            path[path.size() - 2] == '/')
       path.resize(path.size() - 1);
+  }
+  if (!path.compare(0, 6, "./http", 6)) {
+    path = path.substr(2);
+    WebServ::log.error() << "New path: " << path << "\n";
   }
   method = _req->method;
   response_code = location->redirect.first;

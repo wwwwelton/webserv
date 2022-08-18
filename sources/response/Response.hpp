@@ -75,7 +75,7 @@ private:
   std::string originalroot;
   std::string path;
   std::string trailing_path;
-  std::string query_parameters;
+  std::string url_parameters;
   std::string root;
   std::string bin;
 
@@ -110,6 +110,7 @@ private:
   int _patch(void);
   int _trace(void);
   void find_location(std::string path, Server *_server);
+  void extract_query_parameters(void);
   void create_error_page(void);
   void create_redir_page(void);
   void create_directory_listing(void);

@@ -92,6 +92,7 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
   if (fd == -1)
     throw(std::exception());
   int status;
+  WebServ::log.error() << body_path.c_str();
   int pid = fork();
   if (pid == 0) {
     setenv("SERVER_PORT", _itoa(server->port).c_str(), 1);
@@ -100,13 +101,16 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       setenv("HTTP_COOKIE", req->headers.at("Cookie").c_str(), 1);
     setenv("REDIRECT_STATUS", "200", 1);
     setenv("HTTP_HOST", req->headers.at("Host").c_str(), 1);
+    // setenv("REQUEST_METHOD", "GET", 1);
     setenv("REQUEST_URI", req->path.c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
+    if (!url_parameters.empty())
+      setenv("QUERY_STRING", url_parameters.substr(1).c_str(), 1);
+    WebServ::log.error() << "Env var: " << getenv("QUERY_STRING") << "\n";
     if (dup2(fd, STDOUT_FILENO) == -1) {
       perror("dup2");
       exit(1);
     }
-    // std::cout << body_path.c_str();
     execlp(bin.c_str(), "-f", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
