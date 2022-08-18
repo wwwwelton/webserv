@@ -75,6 +75,7 @@ private:
   std::string originalroot;
   std::string path;
   std::string trailing_path;
+  std::string query_parameters;
   std::string root;
   std::string bin;
 
