@@ -74,6 +74,10 @@ re: fclean all
 run: $(NAME)
 	./$(NAME) ./default.conf
 
+word:
+	cd server_root && wget https://br.wordpress.org/latest-pt_BR.zip \
+	&& unzip latest-pt_BR.zip && rm -rf latest-pt_BR.zip
+
 test_unit:
 	clear && cd test/source && npm test
 
