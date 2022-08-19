@@ -1,6 +1,7 @@
 #include "RequestParser.hpp"
 #include "Request.hpp"
 #include "WebServ.hpp"
+#include <algorithm>
 #include <cctype>
 #include <cstddef>
 #include <fstream>
@@ -425,8 +426,16 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
           chunk_state = S_CHUNK_DATA_LF;
         } else {
           // there would be a push_back(c) here;
-          chunk_size--;
-          chunk_data.push_back(c);
+          int read_size = std::min(chunk_size, bytes_read - i + 1);
+          // chunk_size--;
+          int start = i - 1;
+          chunk_data.insert(
+              chunk_data.end(),
+              buffer + start,
+              buffer + start + read_size);
+          chunk_size -= read_size;
+          i += read_size - 1;
+          // chunk_data.push_back(c);
         }
         break;
 
