@@ -120,8 +120,12 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
     setenv("REDIRECT_STATUS", "200", 1);
     setenv("HTTP_HOST", req->headers.at("Host").c_str(), 1);
     setenv("REQUEST_METHOD", "GET", 1);
+<<<<<<< Updated upstream
     setenv("SCRIPT_NAME", fetch_path2(bin).c_str(), 1);
     setenv("SCRIPT_FILENAME", (server->root + req->path).c_str(), 1);
+=======
+    setenv("SCRIPT_FILENAME", body_path.substr(2).c_str(), 1);
+>>>>>>> Stashed changes
     setenv("REQUEST_URI", req->path.c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
     if (!url_parameters.empty())
@@ -131,6 +135,7 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       perror("dup2");
       exit(1);
     }
+    WebServ::log.error() << body_path << "\n";
     execlp(bin.c_str(), "-f", body_path.substr(2).c_str(), NULL);
   }
   waitpid(pid, &status, 0);
