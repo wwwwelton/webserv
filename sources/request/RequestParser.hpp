@@ -143,7 +143,6 @@ private:
   bool chunked;
   size_t chunk_size;
   bool chunk_ready;
-  size_t chunk_bytes_so_far;
   std::vector<char> chunk_data;
 
   Request *_request;
