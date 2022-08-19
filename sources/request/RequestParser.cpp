@@ -646,7 +646,7 @@ bool RequestParser::is_chunk_ready() const {
 
 const std::vector<char>& RequestParser::get_chunk() {
   info() << "returning chunk" << std::endl;
-  print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
+//   print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
   info() << "current body size: " << body_bytes_so_far << std::endl;
 
   file_body << std::string(chunk_data.begin(), chunk_data.end());

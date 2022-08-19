@@ -1,0 +1,4 @@
+memory_limit = 256M
+display_errors = off
+upload_max_filesize = 11M
+post_max_size = 11M

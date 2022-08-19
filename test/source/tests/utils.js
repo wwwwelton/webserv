@@ -2,6 +2,7 @@ const request = require('supertest');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs')
 const LoremIpsum = require("lorem-ipsum").LoremIpsum;
+const { exec } = require("child_process");
 
 function file_toString(path) {
 	var file = fs.readFileSync(path)
@@ -24,5 +25,5 @@ function body_math(res_body, file) {
 }
 
 module.exports = {
-	request, uuidv4, fs, LoremIpsum, file_toString, create_file, body_math
+	request, uuidv4, fs, LoremIpsum, file_toString, create_file, body_math, exec
 };
