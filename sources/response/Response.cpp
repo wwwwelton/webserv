@@ -87,6 +87,24 @@ int Response::validate_http_version(void) {
   return CONTINUE;
 }
 
+static std::string fetch_path2(std::string const& bin) {
+  int pid;
+  int io[2];
+  char buf[1024];
+
+  pipe(io);
+  pid = fork();
+  if (pid == 0) {
+    dup2(io[1], STDOUT_FILENO);
+    execlp("which", "which", bin.c_str(), NULL);
+  }
+  close(io[1]);
+  pid = read(io[0], buf, 1024);
+  close(io[0]);
+  buf[pid] = '\0';
+  return std::string(buf);
+}
+
 void Response::cgi(std::string const &body_path, std::string const &bin) {
   int fd = open(DFL_TMPFILE, O_CREAT | O_RDWR | O_TRUNC, 0644);
   if (fd == -1)
@@ -101,7 +119,9 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       setenv("HTTP_COOKIE", req->headers.at("Cookie").c_str(), 1);
     setenv("REDIRECT_STATUS", "200", 1);
     setenv("HTTP_HOST", req->headers.at("Host").c_str(), 1);
-    // setenv("REQUEST_METHOD", "GET", 1);
+    setenv("REQUEST_METHOD", "GET", 1);
+    setenv("SCRIPT_NAME", fetch_path2(bin).c_str(), 1);
+    setenv("SCRIPT_FILENAME", (server->root + req->path).c_str(), 1);
     setenv("REQUEST_URI", req->path.c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
     if (!url_parameters.empty())
