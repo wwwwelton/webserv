@@ -79,7 +79,7 @@ void Response::set_environment(void) {
 
   // setenv("SCRIPT_NAME", "/usr/bin/php-cgi", 1);
   setenv("SCRIPT_NAME", fetch_path(bin).c_str(), 1);
-  setenv("SCRIPT_FILENAME", (server->root + req->path).c_str(), 1);
+  setenv("SCRIPT_FILENAME", (location->root + trailing_path).c_str(), 1);
   // setenv("SCRIPT_FILENAME", "./server_root/sito/upload.php", 1);
   // setenv("CONTENT_LENGTH", _itoa(req->body.size()).c_str(), 1);
   if (req->headers.count("Content-Length"))
