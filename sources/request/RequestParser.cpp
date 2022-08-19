@@ -131,7 +131,6 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   chunked(false),
   chunk_size(),
   chunk_ready(false),
-  chunk_bytes_so_far(),
   log(WebServ::log),
   buffer(new char[buffer_size]),
   bytes_read(),
@@ -415,7 +414,15 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
         }
         chunk_state = S_CHUNK_DATA;
         info() << "finished reading chunk size: " << chunk_size << '\n';
-        chunk_bytes_so_far += chunk_size;
+        body_bytes_so_far += chunk_size;
+        if (body_bytes_so_far > max_content_length) {
+          error() << "client is sending a chunked request, but the request"
+            << " reached the server max tolerance\n"
+            << "current request size is " << body_bytes_so_far
+            << " but the configured client_max_body_size is "
+            << max_content_length << "\n";
+          throw InvalidRequestException(RequestEntityTooLarge);
+        }
         break;
 
       case S_CHUNK_DATA:
@@ -677,7 +684,6 @@ void RequestParser::reset() {
   chunked = 0;
   chunk_size = 0;
   chunk_ready = 0;
-  chunk_bytes_so_far = 0;
   chunk_data.clear();
 
   // buffer iterator;
