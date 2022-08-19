@@ -16,11 +16,9 @@
 	<h1 class="text-center p-4">Form (Query String) 📄</h1>
 
 	<?php
-	$queries = array();
-	parse_str($_SERVER['QUERY_STRING'], $queries);
-	foreach ($queries as $key => $value) {
-		echo '<h1 class="text-center">' . $key . ": " . $value . '</h1>';
-	}
+    foreach ($_GET as $key => $value) {
+        echo '<h1 class="text-center">' . $key . ": " . $value . '</h1>';
+    }
 	?>
 
 	<div class="container py-4 px-4">
