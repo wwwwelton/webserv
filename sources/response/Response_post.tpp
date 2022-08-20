@@ -89,7 +89,7 @@ void Response::set_environment(void) {
 }
 
 int Response::_post(void) {
-  int outfile;
+  int outfile = 0;
   std::string bin;
   std::string extension;
 
@@ -128,7 +128,8 @@ int Response::_post(void) {
   close(io[1]);
   waitpid(pid, NULL, 0);
   close(io[0]);
-  close(outfile);
+  if (outfile)
+    close(outfile);
   response_path = DFL_TMPFILE;
   WebServ::log.warning() << "Response finished\n";
   WebServ::log.warning() << response_path << "\n";
