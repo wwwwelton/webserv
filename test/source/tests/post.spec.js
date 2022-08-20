@@ -51,7 +51,18 @@ describe("POST", () => {
 		await new Promise(r => setTimeout(() => r(), 10));
 	});
 
-	jest.setTimeout(600000);
+	jest.setTimeout(60000);
+
+	test(server1 + "/post2/ should return 200", async () => {
+		const res = await request(server1)
+			.post("/post2")
+			.set("X-Webserv-Test", "/post2 should return 200");
+		expect(res.status).toBe(200);
+		expect(res.headers["content-type"]).toContain("text/html");
+		expect(res.headers["content-length"]).not.toBe("");
+		expect(res.headers["location"]).toContain("/post2/");
+		expect(res.text).not.toBe("");
+	});
 
 	test(server1 + "/post should return 301", async () => {
 		const res = await request(server1)
@@ -61,6 +72,16 @@ describe("POST", () => {
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
 		expect(res.headers["location"]).toContain("/post/");
+	});
+
+	test(server1 + "/post2 should return 301", async () => {
+		const res = await request(server1)
+			.post("/post2")
+			.set("X-Webserv-Test", "/post2 should return 301");
+		expect(res.status).toBe(301);
+		expect(res.headers["content-type"]).toContain("text/html");
+		expect(res.headers["content-length"]).not.toBe("");
+		expect(res.headers["location"]).toContain("/post2/");
 	});
 
 	test(server1 + "/sito should return 301", async () => {
