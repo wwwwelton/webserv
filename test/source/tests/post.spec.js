@@ -55,7 +55,7 @@ describe("POST", () => {
 
 	test(server1 + "/post2/ should return 200", async () => {
 		const res = await request(server1)
-			.post("/post2")
+			.post("/post2/")
 			.set("X-Webserv-Test", "/post2 should return 200");
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
@@ -103,10 +103,10 @@ describe("POST", () => {
 		expect(res.headers["content-length"]).not.toBe("");
 	});
 
-	test(server1 + "/sito/ should return 403", async () => {
+	test(server1 + "/sito2/ should return 403", async () => {
 		const res = await request(server1)
-			.post("/sito/")
-			.set("X-Webserv-Test", "/sito/ should return 403");
+			.post("/sito2/")
+			.set("X-Webserv-Test", "/sito2/ should return 403");
 		expect(res.status).toBe(403);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
