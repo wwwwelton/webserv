@@ -52,8 +52,23 @@ std::string Config::_open(char* file) {
   return (ss.str());
 }
 
+void Config::_purge_comments(std::string* str) {
+  size_t pos1, pos2;
+
+  pos1 = str->find("#");
+  pos2 = str->find("\n", pos1);
+  pos2 = (pos2 == std::string::npos) ? 1 : pos2;
+  while (pos1 != std::string::npos) {
+    str->erase(pos1, pos2 - pos1);
+    pos1 = str->find("#");
+    pos2 = str->find("\n", pos1);
+  }
+}
+
 std::string Config::_sanitize(const std::string& file_content) {
   std::string tmp(file_content);
+
+  _purge_comments(&tmp);
 
   String::replace_all(&tmp, "\n", " ");
   String::replace_all(&tmp, "\t", " ");
@@ -151,7 +166,6 @@ Server Config::_parse_server(std::istringstream* is) {
     directive = tokens[0];
 
     helper.set_tokens(tokens);
-
     if (helper.directive_already_exists())
       throw ConfigHelper::DirectiveDuplicate(tokens[0]);
     if (directive == "listen") {
