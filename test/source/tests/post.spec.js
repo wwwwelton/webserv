@@ -60,7 +60,6 @@ describe("POST", () => {
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
-		expect(res.headers["location"]).toContain("/post2/");
 		expect(res.text).not.toBe("");
 	});
 
@@ -71,7 +70,7 @@ describe("POST", () => {
 		expect(res.status).toBe(301);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
-		expect(res.headers["location"]).toContain("/post/");
+		expect(res.headers["location"]).toBe(server1 + "/post/");
 	});
 
 	test(server1 + "/post2 should return 301", async () => {
@@ -81,32 +80,13 @@ describe("POST", () => {
 		expect(res.status).toBe(301);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
-		expect(res.headers["location"]).toContain("/post2/");
-	});
-
-	test(server1 + "/sito should return 301", async () => {
-		const res = await request(server1)
-			.post("/sito")
-			.set("X-Webserv-Test", "/sito should return 301");
-		expect(res.status).toBe(301);
-		expect(res.headers["content-type"]).toContain("text/html");
-		expect(res.headers["content-length"]).not.toBe("");
-		expect(res.headers["location"]).toContain("/sito/");
+		expect(res.headers["location"]).toBe(server1 + "/post2/");
 	});
 
 	test(server1 + "/post/ should return 403", async () => {
 		const res = await request(server1)
 			.post("/post/")
 			.set("X-Webserv-Test", "/post/ should return 403");
-		expect(res.status).toBe(403);
-		expect(res.headers["content-type"]).toContain("text/html");
-		expect(res.headers["content-length"]).not.toBe("");
-	});
-
-	test(server1 + "/sito2/ should return 403", async () => {
-		const res = await request(server1)
-			.post("/sito2/")
-			.set("X-Webserv-Test", "/sito2/ should return 403");
 		expect(res.status).toBe(403);
 		expect(res.headers["content-type"]).toContain("text/html");
 		expect(res.headers["content-length"]).not.toBe("");
