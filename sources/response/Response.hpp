@@ -47,6 +47,7 @@ typedef std::map<int, std::string>                        status_map;
 typedef std::map<std::string, std::string>                mimetypes_map;
 
 private:
+  static size_t          id;
   static status_map      statuslist;
   static mimetypes_map   mimetypes;
   static meth_map        method_map;
@@ -62,6 +63,7 @@ private:
   int           response_code;
   int           pid;
   int           io[2];
+  size_t        thisid;
   std::ifstream file;
 
   std::string httpversion;

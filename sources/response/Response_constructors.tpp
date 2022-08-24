@@ -147,6 +147,8 @@ Response::Response(void): req(NULL) {
   httpversion = "HTTP/1.1 ";
   statuscode = " 200";
   statusmsg = "OK\n";
+  thisid = id;
+  ++id;
 }
 Response::Response(Request *_req, Server *_server)
 : httpversion("HTTP/1.1 "), statuscode("200 "), statusmsg("OK\n"), req(_req)
@@ -163,6 +165,8 @@ Response::Response(Request *_req, Server *_server)
   response_code = CONTINUE;
   pid = 0;
   server = _server;
+  thisid = id;
+  ++id;
 }
 
 Response::~Response(void) {

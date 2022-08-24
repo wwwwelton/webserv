@@ -7,6 +7,8 @@
 
 #include "Response.hpp"
 
+size_t Response::id = 0;
+
 Response::status_map Response::statuslist = Response::init_status_map();
 Response::status_map Response::init_status_map(void) {
   status_map _map;
