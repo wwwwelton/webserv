@@ -63,7 +63,7 @@ void Response::set_environment(void) {
   if (req->headers.count("Accept-Language"))
     setenv("HTTP_ACCEPT_LANGUAGE", req->headers.at("Accept-Language").c_str(), 1);
   if (req->headers.count("Accept-Encoding"))
-    setenv("HTTP_ACEPT_ENCODING", req->headers.at("Accept-Encoding").c_str(), 1);
+    setenv("HTTP_ACCEPT_ENCODING", req->headers.at("Accept-Encoding").c_str(), 1);
   setenv("SERVER_PORT", _itoa(server->port).c_str(), 1);
   setenv("SERVER_SOFTWARE", "TDD/4.0", 1);
   setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);

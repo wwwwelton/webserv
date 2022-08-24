@@ -110,7 +110,7 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
   if (fd == -1)
     throw(std::exception());
   int status;
-  WebServ::log.error() << body_path.c_str();
+  // WebServ::log.error() << body_path.c_str() << "\n";
   int pid = fork();
   if (pid == 0) {
     setenv("SERVER_PORT", _itoa(server->port).c_str(), 1);
@@ -119,7 +119,13 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       setenv("HTTP_COOKIE", req->headers.at("Cookie").c_str(), 1);
     setenv("REDIRECT_STATUS", "200", 1);
     setenv("HTTP_HOST", req->headers.at("Host").c_str(), 1);
-    setenv("REQUEST_METHOD", "GET", 1);
+    // setenv("REQUEST_METHOD", "GET", 1);
+    // WebServ::log.error() << "PATH_INFO: " << path << "\n";
+    // WebServ::log.error() << "TRANSLATED: "
+                         // << (std::getenv("PWD") + path.substr(2)).c_str()
+                         // << "\n";
+    // setenv("PATH_INFO", path.substr(2).c_str(), 1);
+    // setenv("PATH_TRANSLATED", (std::getenv("PWD") + path.substr(2)).c_str(), 1);
     setenv("SCRIPT_NAME", fetch_path2(bin).c_str(), 1);
     setenv("SCRIPT_FILENAME", body_path.substr(2).c_str(), 1);
     setenv("REQUEST_URI", req->path.c_str(), 1);
@@ -266,7 +272,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   while (header.size() && header[0] != '\r' && header[1] != '\n') {
     str.append(header);
     if (header.find("Status") != std::string::npos) {
-      str.replace(str.find("200 "), 4, "302 ");
+      str.replace(str.find("200 "), 4, header.substr(8, 4));
 
     }
     str.push_back('\n');
@@ -299,7 +305,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  WebServ::log.error() << ResponseBase::buffer_resp;
+  // WebServ::log.error() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
@@ -336,7 +342,7 @@ void Response::assemble(std::string const& body_path) {
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  // WebServ::log.error() << ResponseBase::buffer_resp;
+  WebServ::log.error() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
