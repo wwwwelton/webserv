@@ -129,12 +129,12 @@ void Response::set_request(Request *_req) {
     response_code = _req->error;
 
 
-  std::cout << location->index[0] << "\n";
-  std::cout << "location: " << location->root << "\n";
-  std::cout << "req path: " << _req->path << "\n";
-  std::cout << "root: " << root << "\n";
-  std::cout << "path: " << path << "\n";
-  std::cout << "trailing path: " << trailing_path << "\n";
+  WebServ::log.debug() << location->index[0] << "\n";
+  WebServ::log.debug() << "location: " << location->root << "\n";
+  WebServ::log.debug() << "req path: " << _req->path << "\n";
+  WebServ::log.debug() << "root: " << root << "\n";
+  WebServ::log.debug() << "path: " << path << "\n";
+  WebServ::log.debug() << "trailing path: " << trailing_path << "\n";
 }
 
 Response::Response(void): req(NULL) {
