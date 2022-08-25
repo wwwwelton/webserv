@@ -170,5 +170,10 @@ Response::Response(Request *_req, Server *_server)
 }
 
 Response::~Response(void) {
-  file.close();
+  if (file.is_open())
+    file.close();
+  if (postfilename.size()) {
+    close(postfile);
+    unlink(postfilename.c_str());
+  }
 }

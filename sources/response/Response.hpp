@@ -65,6 +65,8 @@ private:
   int           io[2];
   size_t        thisid;
   std::ifstream file;
+  int           postfile;
+  std::string   postfilename;
 
   std::string httpversion;
   std::string statuscode;
