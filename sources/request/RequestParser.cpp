@@ -139,6 +139,7 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   chunk_state(S_CHUNK_INIT),
   supported_version_index(0) {
     _request = new Request();
+    just_finished_header = false;
   }
 
 RequestParser::RequestParser(const RequestParser &): log(WebServ::log) { }
@@ -472,14 +473,6 @@ ParsingResult RequestParser::tokenize_chunk_size(char *buff) {
         return P_PARSING_COMPLETE;
         break;
 
-      // body won't be a multipart payload
-      // case S_BODY:
-      //   content_length--;
-      //   _request->body.push_back(c);
-      //   if (content_length == 0)
-      //     return P_PARSING_COMPLETE;
-      //   break;
-
       default:
         throw std::exception();
     }
@@ -504,7 +497,8 @@ void RequestParser::parse_header() {
       if (!chunked && content_length == 0)
         finished = true;
       _request->error = 0;
-      debug() << "finished header: " << *_request << std::endl;
+      debug() << "finished request header: " << *_request << std::endl;
+      just_finished_header = true;
     }
   } catch(InvalidRequestException& ex) {
     warning() << "invalid http request: " << ex.what() << std::endl;
@@ -537,6 +531,11 @@ bool RequestParser::prepare_chunked_body() {
   info() << "preparing a chunked body\n";
 
   if (i == bytes_read) {
+    if (just_finished_header) {
+      debug() << "must poll again\n";
+      just_finished_header = false;
+      return false;
+    }
     info() << "reading a new chunk\n";
     bytes_read = recv(fd, buffer, buffer_size, 0);
     check_read_value(bytes_read);
@@ -556,22 +555,6 @@ bool RequestParser::prepare_chunked_body() {
     return true;
   }
 
-  // info() << "chunk size is not 0, assigning to chunk_data" << std::endl;
-  // char *chunk_start = buffer + i;
-  // size_t assign_size = std::min(chunk_size, bytes_read - i);
-  // i += assign_size;
-  // chunk_data.insert(chunk_data.end(), chunk_start, chunk_start + assign_size);
-  // chunk_state = S_CHUNK_DATA;
-  //
-  // // if (chunk_size == 0) {
-  // //   // chunk_data.clear();
-  // //   info() << "chunk size is 0, finishing request" << std::endl;
-  // //   finished = true;
-  // //   return true;
-  // // }
-  //
-  // if (chunk_state <= S_CHUNK_DATA_START)
-  //   return false;
   return false;
 }
 
@@ -583,6 +566,11 @@ bool RequestParser::prepare_regular_body() {
     chunk_data.assign(buffer + i, buffer + bytes_read);
     body_bytes_so_far = bytes_read - i;
   } else {
+    if (just_finished_header) {
+      debug() << "must poll again\n";
+      just_finished_header = false;
+      return false;
+    }
     info() << "reading more bytes\n";
     bytes_read = recv(fd, buffer, buffer_size, 0);
     body_bytes_so_far += bytes_read;
@@ -604,7 +592,6 @@ bool RequestParser::prepare_regular_body() {
   return true;
 }
 
-// FIXME: check if we just finished the header;
 void RequestParser::prepare_chunk() {
   try {
     if (finished)
@@ -670,6 +657,7 @@ void RequestParser::reset() {
   finished = false;
 
   header_finished = false;
+  just_finished_header = false;
 
   content_length = 0;
   body_bytes_so_far = 0;

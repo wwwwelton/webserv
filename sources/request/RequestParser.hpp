@@ -134,6 +134,7 @@ private:
   bool connected;
 
   bool header_finished;
+  bool just_finished_header;
 
   size_t content_length;
   size_t max_content_length;
