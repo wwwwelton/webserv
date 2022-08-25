@@ -175,4 +175,12 @@ describe("GET", () => {
 		expect(res.status).toBe(405);
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
+
+	test(server1 + "/query_string/index.php should return valid query string", async () => {
+		const res = await request(server1)
+			.get("/query_string/index.php?value1=1&value2=2&value3=3&value4=4")
+			.set("X-Webserv-Test", "/query_string/index.php should return valid query string");
+		expect(res.status).toBe(200);
+		expect(res.text).toBe("value1=1-value2=2-value3=3-value4=4-");
+	});
 });
