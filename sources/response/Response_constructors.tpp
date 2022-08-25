@@ -38,6 +38,10 @@ void Response::find_location(std::string path, Server *server) {
 }
 
 void Response::reset(void) {
+  if (remove_tmp) {
+    unlink(DFL_TMPFILE);
+    unlink(DFL_DYNFILE);
+  }
   req = NULL;
   finished = false;
   inprogress = false;
@@ -170,6 +174,10 @@ Response::Response(Request *_req, Server *_server)
 }
 
 Response::~Response(void) {
+  if (remove_tmp) {
+    unlink(DFL_TMPFILE);
+    unlink(DFL_DYNFILE);
+  }
   if (file.is_open())
     file.close();
   if (postfilename.size()) {

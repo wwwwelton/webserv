@@ -306,6 +306,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
   // WebServ::log.error() << ResponseBase::buffer_resp;
+  remove_tmp = true;
   WebServ::log.debug() << *this;
 }
 
@@ -351,10 +352,6 @@ void Response::process(void) {
     WebServ::log.warning() << "response ready\n";
     set_statuscode(response_code);
     dispatch(response_path);
-    if (remove_tmp) {
-      unlink(DFL_TMPFILE);
-      unlink(DFL_DYNFILE);
-    }
     return;
   }
   for (size_t i = 0; i < validation_functions.size() && response_code == 0; i++)
@@ -365,10 +362,6 @@ void Response::process(void) {
   if (response_code != 0) {
     set_statuscode(response_code);
     dispatch(response_path);
-    if (remove_tmp) {
-      unlink(DFL_TMPFILE);
-      unlink(DFL_DYNFILE);
-    }
   }
 }
 
