@@ -55,6 +55,7 @@ void Response::reset(void) {
   response_code = CONTINUE;
   trailing_path.clear();
   response_path.clear();
+  url_parameters.clear();
   file.close();
   pid = 0;
   statuscode = "200 ";
