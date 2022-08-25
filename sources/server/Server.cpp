@@ -224,7 +224,7 @@ void Server::print(void) {
 
 void Server::print_addr(std::pair<const int, Server*>& p) {
   std::ios cout_default(NULL);
-  cout_default.copyfmt(std::cout);
+  cout_default.copyfmt(std::cerr);
   Logger log(LOG_LEVEL);
   in_addr t;
 
@@ -236,7 +236,7 @@ void Server::print_addr(std::pair<const int, Server*>& p) {
       << "http://" << inet_ntoa(t) << ":"
       << ntohs(p.second->port)
       << std::endl;
-  std::cout.copyfmt(cout_default);
+  std::cerr.copyfmt(cout_default);
 }
 
 Server::ConnectException::ConnectException(const std::string& str)
