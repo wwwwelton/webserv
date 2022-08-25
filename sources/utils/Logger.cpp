@@ -35,7 +35,7 @@ Logger::Logger(const char *filename, log_levels level, bool colored_output)
   _colored_output = colored_output;
 }
 
-Logger::Logger(log_levels level, bool colored_output) : _out(std::cout) {
+Logger::Logger(log_levels level, bool colored_output) : _out(std::cerr) {
   this->_colored_output = colored_output;
   _log_level = level;
   if (colored_output)
