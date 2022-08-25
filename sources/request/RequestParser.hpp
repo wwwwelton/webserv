@@ -179,7 +179,6 @@ private:
   std::ostream& warning();
   std::ostream& error();
 
-  std::ofstream file_body;
 };
 
 #endif // !HTTP_REQUEST_PARSER_HPP

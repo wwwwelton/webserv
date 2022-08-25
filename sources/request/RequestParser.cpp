@@ -139,11 +139,6 @@ RequestParser::RequestParser(int fd, size_t max_body_size, size_t buffer_size):
   chunk_state(S_CHUNK_INIT),
   supported_version_index(0) {
     _request = new Request();
-    const char *filename = "/tmp/webserv-request-body";
-    file_body.open(filename, std::ios_base::trunc);
-    if (!file_body.good()) {
-      error() << "Couldn't open file " << filename << std::endl;
-    }
   }
 
 RequestParser::RequestParser(const RequestParser &): log(WebServ::log) { }
@@ -649,7 +644,6 @@ const std::vector<char>& RequestParser::get_chunk() {
 //   print_chunk(debug(), &*chunk_data.begin(), 0, chunk_data.size());
   info() << "current body size: " << body_bytes_so_far << std::endl;
 
-  file_body << std::string(chunk_data.begin(), chunk_data.end());
   chunk_ready = false;
   return chunk_data;
 }
