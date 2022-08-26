@@ -107,24 +107,29 @@ static std::string fetch_path2(std::string const& bin) {
 
 void Response::cgi(std::string const &body_path, std::string const &bin) {
   int fd = open(DFL_TMPFILE, O_CREAT | O_RDWR | O_TRUNC, 0644);
+  int piper[2];
+  pipe(piper);
   if (fd == -1)
     throw(std::exception());
   int status;
   // WebServ::log.error() << body_path.c_str() << "\n";
   int pid = fork();
   if (pid == 0) {
+    dup2(piper[0], STDIN_FILENO);
+    close(piper[1]);
     setenv("SERVER_PORT", _itoa(server->port).c_str(), 1);
     setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
     if (req->headers.count("Cookie"))
       setenv("HTTP_COOKIE", req->headers.at("Cookie").c_str(), 1);
     setenv("REDIRECT_STATUS", "200", 1);
     setenv("HTTP_HOST", req->headers.at("Host").c_str(), 1);
-    // setenv("REQUEST_METHOD", "GET", 1);
+    setenv("REQUEST_METHOD", "GET", 1);
+    setenv("PATH_INFO", req->path.c_str(), 1);
     // WebServ::log.error() << "PATH_INFO: " << path << "\n";
     // WebServ::log.error() << "TRANSLATED: "
                          // << (std::getenv("PWD") + path.substr(2)).c_str()
                          // << "\n";
-    // setenv("PATH_INFO", path.substr(2).c_str(), 1);
+    // setenv("PATH_INFO", path.substr(1).c_str(), 1);
     // setenv("PATH_TRANSLATED", (std::getenv("PWD") + path.substr(2)).c_str(), 1);
     setenv("SCRIPT_NAME", fetch_path2(bin).c_str(), 1);
     setenv("SCRIPT_FILENAME", body_path.substr(2).c_str(), 1);
@@ -138,8 +143,10 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       exit(1);
     }
     WebServ::log.error() << body_path << "\n";
-    execlp(bin.c_str(), "-f", body_path.substr(2).c_str(), NULL);
+    execlp(bin.c_str(), bin.c_str(), body_path.substr(2).c_str(), NULL);
   }
+  close(piper[0]);
+  close(piper[1]);
   waitpid(pid, &status, 0);
   close(fd);
   assemble_cgi(DFL_TMPFILE);
