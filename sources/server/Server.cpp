@@ -110,7 +110,7 @@ void Server::_bind(void) {
   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes))
     throw ConnectException("setsockopt");
   if (bind(sockfd, (const sockaddr*)&sockaddress, sizeof(sockaddr_in)))
-    throw ConnectException("bind");
+    throw BindException("bind", port, ip);
 }
 
 void Server::_listen(int backlog) {
@@ -245,5 +245,23 @@ Server::ConnectException::ConnectException(const std::string& str)
 }
 
 const char* Server::ConnectException::what(void) const throw() {
+  return (_m.c_str());
+}
+
+Server::BindException::BindException(const std::string& str,
+                                     int _port,
+                                     in_addr_t _ip)
+    : LoadException(str) {
+  in_addr t;
+  t.s_addr = _ip;
+  std::stringstream ss;
+  ss << " ";
+  ss << inet_ntoa(t);
+  ss << ":";
+  ss << ntohs(_port);
+  _m = "WebServ Failed to start (" + str + "): " + strerror(errno) + ss.str();
+}
+
+const char* Server::BindException::what(void) const throw() {
   return (_m.c_str());
 }

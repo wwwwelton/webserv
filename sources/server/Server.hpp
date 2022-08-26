@@ -76,6 +76,12 @@ class Server {
     explicit ConnectException(const std::string& str);
     const char* what(void) const throw();
   };
+
+  class BindException : public LoadException {
+   public:
+    BindException(const std::string& str, int _port, in_addr_t _ip);
+    const char* what(void) const throw();
+  };
 };
 
 #endif  // SERVER_HPP
