@@ -69,7 +69,8 @@ void Response::set_environment(void) {
   setenv("SCRIPT_FILENAME", (location->root + trailing_path).c_str(), 1);
   if (req->headers.count("Content-Length"))
     setenv("CONTENT_LENGTH", req->headers.at("Content-Length").c_str(), 1);
-  setenv("CONTENT_TYPE", req->headers.at("Content-Type").c_str(), 1);
+  if (req->headers.count("Content-Type"))
+    setenv("CONTENT_TYPE", req->headers.at("Content-Type").c_str(), 1);
   setenv("REDIRECT_STATUS", "true", 1);
 }
 
