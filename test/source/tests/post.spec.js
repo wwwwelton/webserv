@@ -152,14 +152,6 @@ describe("POST", () => {
 		expect(res.text).toContain("10M.txt OK");
 	});
 
-	test(server1 + "/query_string/index.php should return valid query string", async () => {
-		const res = await request(server1)
-			.post("/query_string/index.php?value1=1&value2=2&value3=3&value4=4")
-			.set("X-Webserv-Test", "/query_string/index.php should return valid query string");
-		expect(res.status).toBe(200);
-		expect(res.text).toBe("value1=1-value2=2-value3=3-value4=4-");
-	});
-
 	// test(server1 + "/post/upload.php should receive a 100M file", async () => {
 	// 	const res = await request(server1)
 	// 		.post("/post/upload.php")
@@ -218,5 +210,13 @@ describe("POST", () => {
 		expect(res.headers["content-length"]).not.toBe("");
 		expect(fs.existsSync("../www/post/uploads/20M.txt")).toBeFalsy();
 		expect(res.text).toContain("ERROR");
+	});
+
+	test(server1 + "/query_string/index.php should return a valid query string", async () => {
+		const res = await request(server1)
+			.post("/query_string/index.php?value1=1&value2=2&value3=3&value4=4")
+			.set("X-Webserv-Test", "/query_string/index.php should return valid query string");
+		expect(res.status).toBe(200);
+		expect(res.text).toBe("value1=1-value2=2-value3=3-value4=4-");
 	});
 });

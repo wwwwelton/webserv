@@ -176,7 +176,7 @@ describe("GET", () => {
 		expect(body_math(res.text, server_root + "custom_405.html")).toBeTruthy();
 	});
 
-	test(server1 + "/query_string/index.php should return valid query string", async () => {
+	test(server1 + "/query_string/index.php should return a valid query string", async () => {
 		const res = await request(server1)
 			.get("/query_string/index.php?value1=1&value2=2&value3=3&value4=4")
 			.set("X-Webserv-Test", "/query_string/index.php should return valid query string");
