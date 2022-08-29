@@ -42,6 +42,7 @@ Response::mimetypes_map Response::init_mimetypes(void) {
   _map[".html"] = "Content-Type: text/html; charset=utf-8\n";
   _map[".css"] = "Content-Type: text/css; charset=utf-8\n";
   _map[".jpg"] = "Content-type: image/jpg\n";
+  _map[".ico"] = "Content-type: image/vnd.microsoft.icon\n";
   _map[".php"] = "Content-Type: text/plain; charset=utf-8\n";
   _map[".js"] = "Content-Type: application/javascript\n";
   return _map;
