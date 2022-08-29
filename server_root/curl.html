@@ -20,13 +20,12 @@
 		<h5 class="text-left">GET</h5>
 		<pre><code>curl -v -X GET 127.0.0.1:3490</code></pre>
 		<h5 class="text-left">POST</h5>
-		<pre><code>curl -v -X GET 127.0.0.1:3490</code></pre>
-		<h5 class="text-left">PUT</h5>
-		<pre><code>curl -v -X GET 127.0.0.1:3490</code></pre>
+		<pre><code>curl -v -X POST -F fileToUpload=@1K.txt 127.0.0.1:3490/file_upload/index.php</code></pre>
+		<pre><code>curl -v -X POST 127.0.0.1:3490/form/index.php\?value1\=1\&value2\=2</code></pre>
 		<h5 class="text-left">DELETE</h5>
-		<pre><code>curl -v -X GET 127.0.0.1:3490</code></pre>
-		<h5 class="text-left">UNKNOWN</h5>
-		<pre><code>curl -v -X GET 127.0.0.1:3490</code></pre>
+		<pre><code>curl -v -X DELETE 127.0.0.1:3490/delete/file7.txt</code></pre>
+		<h5 class="text-left">HEAD</h5>
+		<pre><code>curl -v -X HEAD 127.0.0.1:3490</code></pre>
 	</div>
 
 	<div style="height: 200px;"></div>
