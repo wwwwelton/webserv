@@ -60,9 +60,9 @@ void Server::fill(void) {
     root = DFL_SERVER_ROOT;
   if (index.size() == 0)
     index = String::split(DFL_SERVER_INDEX, " ");
-  if (error_page.count(404) > 0)
+  if (error_page.count(404) == 0)
     error_page[404] = DFL_404_PAGE;
-  if (error_page.count(405) > 0)
+  if (error_page.count(405) == 0)
     error_page[405] = DFL_405_PAGE;
   if (timeout == 0)
     timeout = DFL_TIMEOUT;
