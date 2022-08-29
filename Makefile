@@ -47,14 +47,13 @@ DEPS    = $(SRC:%.cpp=$(OBJDIR)/%.d)
 
 vpath %.cpp sources sources/response sources/server sources/request \
 sources/utils
-vpath %.cpp sources sources/response sources/server sources/request \
-sources/utils
 vpath %.hpp sources sources/response sources/server sources/request \
 sources/utils
 
 all: $(NAME)
 
 $(NAME): $(OBJDIR) $(OBJ)
+	which php-cgi || sudo apt-get install php-cgi
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 $(OBJDIR)/%.o: %.cpp
