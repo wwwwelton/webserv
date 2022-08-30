@@ -57,7 +57,6 @@ void WebServ::init(int argc, char **argv) {
 
   validate_input(argc, argv);
   conf.load(argv[1]);
-  kill_ghost_in_the_shell(conf);
   log.info() << "WebServ Loaded " << argv[1] << "\n";
 
   clientlist.reserve(conf.backlog);

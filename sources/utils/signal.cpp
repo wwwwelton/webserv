@@ -24,14 +24,3 @@ void init_signals(WebServ *ptr) {
   std::signal(SIGQUIT, reinterpret_cast<__sighandler_t>(func));
   sighandler(0, ptr);
 }
-
-void kill_ghost_in_the_shell(const Config &conf) {
-  for (std::set<std::string>::iterator
-           it = conf.cgi_list.begin();
-       it != conf.cgi_list.end(); it++) {
-    std::vector<std::string> vec = String::split(*it, "/");
-    std::string cgi = *(vec.end() - 1);
-    cgi = "pkill -9 -f " + cgi;
-    std::system(cgi.c_str());
-  }
-}

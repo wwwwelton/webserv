@@ -22,6 +22,5 @@ class Config;
 
 void sighandler(const int signal, void* ptr);
 void init_signals(WebServ* ptr);
-void kill_ghost_in_the_shell(const Config& conf);
 
 #endif  // SIGNAL_HPP
