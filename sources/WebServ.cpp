@@ -38,7 +38,7 @@ WebServ::~WebServ(void) {
     std::vector<_pollfd>::iterator it = pollfds.begin();
     std::vector<_pollfd>::iterator ite = pollfds.end();
     for (; it != ite; it++) {
-      if (serverlist.count(it->fd))
+      if (serverlist.count(it->fd) || it->fd == -1)
         continue;
       delete clientlist[it->fd].request_parser;
       delete clientlist[it->fd].response;
@@ -52,7 +52,7 @@ WebServ::~WebServ(void) {
 void WebServ::init(int argc, char **argv) {
   log.info() << "WebServ Initializing\n";
 
-  // init_signals(this);
+  init_signals(this);
   log.info() << "WebServ Signals initialized\n";
 
   validate_input(argc, argv);
