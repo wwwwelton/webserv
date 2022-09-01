@@ -8,7 +8,7 @@
 #ifndef HTTPBASE_HPP
 #define HTTPBASE_HPP
 
-#define BUFFER_SIZE 5000
+#define BUFFER_SIZE 100000
 #define HEADER_SIZE 5000
 
 class ResponseBase {
