@@ -14,8 +14,8 @@ void Response::extract_query_parameters(void) {
   if (question_mark != std::string::npos) {
     url_parameters = req->path.substr(question_mark);
     req->path.erase(question_mark, std::string::npos);
-    WebServ::log.warning() << "Query params: " << url_parameters << "\n";
-    WebServ::log.warning() << "Path after params: " << req->path << "\n";
+    // WebServ::log.warning() << "Query params: " << url_parameters << "\n";
+    // WebServ::log.warning() << "Path after params: " << req->path << "\n";
   }
 }
 
@@ -129,12 +129,12 @@ void Response::set_request(Request *_req) {
     response_code = _req->error;
 
 
-  WebServ::log.debug() << location->index[0] << "\n";
-  WebServ::log.debug() << "location: " << location->root << "\n";
-  WebServ::log.debug() << "req path: " << _req->path << "\n";
-  WebServ::log.debug() << "root: " << root << "\n";
-  WebServ::log.debug() << "path: " << path << "\n";
-  WebServ::log.debug() << "trailing path: " << trailing_path << "\n";
+  // WebServ::log.debug() << location->index[0] << "\n";
+  // WebServ::log.debug() << "location: " << location->root << "\n";
+  // WebServ::log.debug() << "req path: " << _req->path << "\n";
+  // WebServ::log.debug() << "root: " << root << "\n";
+  // WebServ::log.debug() << "path: " << path << "\n";
+  // WebServ::log.debug() << "trailing path: " << trailing_path << "\n";
 }
 
 Response::Response(void): req(NULL) {

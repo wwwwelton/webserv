@@ -125,19 +125,12 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
     setenv("HTTP_HOST", req->headers.at("Host").c_str(), 1);
     setenv("REQUEST_METHOD", "GET", 1);
     setenv("PATH_INFO", req->path.c_str(), 1);
-    // WebServ::log.error() << "PATH_INFO: " << path << "\n";
-    // WebServ::log.error() << "TRANSLATED: "
-                         // << (std::getenv("PWD") + path.substr(2)).c_str()
-                         // << "\n";
-    // setenv("PATH_INFO", path.substr(1).c_str(), 1);
-    // setenv("PATH_TRANSLATED", (std::getenv("PWD") + path.substr(2)).c_str(), 1);
     setenv("SCRIPT_NAME", fetch_path2(bin).c_str(), 1);
     setenv("SCRIPT_FILENAME", body_path.substr(2).c_str(), 1);
     setenv("REQUEST_URI", req->path.c_str(), 1);
     setenv("REDIRECT_STATUS", "true", 1);
     if (!url_parameters.empty())
       setenv("QUERY_STRING", url_parameters.substr(1).c_str(), 1);
-    WebServ::log.error() << "Env var: " << getenv("QUERY_STRING") << "\n";
     if (dup2(fd, STDOUT_FILENO) == -1) {
       perror("dup2");
       exit(1);
@@ -150,7 +143,6 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
   waitpid(pid, &status, 0);
   close(fd);
   assemble_cgi(DFL_TMPFILE);
-  // unlink(DFL_TMPFILE);
 }
 
 void Response::dispatch(std::string const& body_path) {
@@ -168,7 +160,7 @@ void Response::dispatch(std::string const& body_path) {
   else
     extension = tmp.substr(tmp.find_last_of('.'));
   if (location->cgi.count(extension)) {
-    WebServ::log.error() << "here\n";
+    // WebServ::log.error() << "here\n";
     contenttype = "Content-Type: text/html; charset=utf-8\n";
     cgi(body_path, location->cgi[extension]);
   }
@@ -241,9 +233,6 @@ void Response::assemble_followup(void) {
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  // WebServ::log.warning() << "Multipart response only partially implemented\n"
-  //                        << "message: \n"
-  //                        << ResponseBase::buffer_resp << "\n";
 }
 
 void Response::assemble(void) {
@@ -253,7 +242,7 @@ void Response::assemble(void) {
   std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
   ResponseBase::size = str.size();
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  WebServ::log.debug() << ResponseBase::buffer_resp;
+  // WebServ::log.debug() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
 }
 
@@ -261,8 +250,8 @@ void Response::assemble_cgi(std::string const& body_path) {
   std::string       body;
   size_t            body_size = 0;
 
-  WebServ::log.debug() << "File requested: " << path << "\n";
-  WebServ::log.debug() << "Body path: " << body_path << "\n";
+  // WebServ::log.debug() << "File requested: " << path << "\n";
+  // WebServ::log.debug() << "Body path: " << body_path << "\n";
   file.close();
   file.open(body_path.c_str(), std::ios::binary);
   if (file.bad() || file.fail())
@@ -275,7 +264,7 @@ void Response::assemble_cgi(std::string const& body_path) {
   }
   std::string header;
   std::getline(file, header);
-  WebServ::log.warning() << "Header: " << header << "\n";
+  // WebServ::log.warning() << "Header: " << header << "\n";
   while (header.size() && header[0] != '\r' && header[1] != '\n') {
     str.append(header);
     if (header.find("Status") != std::string::npos) {
@@ -284,28 +273,22 @@ void Response::assemble_cgi(std::string const& body_path) {
     }
     str.push_back('\n');
     std::getline(file, header);
-    WebServ::log.warning() << "Header: " << header << "\n";
+    // WebServ::log.warning() << "Header: " << header << "\n";
   }
 
   std::streampos current = file.tellg();
-  // std::cout << "Current: " << current << "\n";
   file.seekg(0, std::ios::end);
-  // std::cout << "end: " << file.tellg() << "\n";
   body_max_size = file.tellg() - current;
-  // std::cout << "Body: " << body_max_size << "\n";
-  WebServ::log.warning() << body_max_size << "\n";
+  // WebServ::log.warning() << body_max_size << "\n";
   file.seekg(current);
 
   char buf[BUFFER_SIZE];
   file.read(buf, BUFFER_SIZE);
   body_size = file.gcount();
-  if (body_max_size < BUFFER_SIZE) {
+  if (body_max_size < BUFFER_SIZE)
     finished = true;
-  }
-  else {
-    // contenttype = "Content-Type: application/octet-stream\n";
+  else
     inprogress = true;
-  }
   str.append(DFL_CONTENTLEN);
   str.replace(str.find("LENGTH"), 6, _itoa(body_max_size));
   std::memmove(ResponseBase::buffer_resp, str.c_str(), str.size());
@@ -321,8 +304,8 @@ void Response::assemble(std::string const& body_path) {
   std::string       body;
   size_t            body_size = 0;
 
-  WebServ::log.debug() << "File requested: " << path << "\n";
-  WebServ::log.debug() << "Body path: " << body_path << "\n";
+  // WebServ::log.debug() << "File requested: " << path << "\n";
+  // WebServ::log.debug() << "Body path: " << body_path << "\n";
   file.close();
   file.open(body_path.c_str(), file.ate);
   body_max_size = file.tellg();
@@ -332,13 +315,10 @@ void Response::assemble(std::string const& body_path) {
   char buf[BUFFER_SIZE];
   file.read(buf, BUFFER_SIZE);
   body_size = file.gcount();
-  if (body_max_size < BUFFER_SIZE) {
+  if (body_max_size < BUFFER_SIZE)
     finished = true;
-  }
-  else {
-    // contenttype = "Content-Type: application/octet-stream\n";
+  else
     inprogress = true;
-  }
   std::string str(httpversion + statuscode + statusmsg + contenttype);
   if (incorrect_path) {
     // req->path[req->path.size() - 1] != '/';
@@ -350,13 +330,12 @@ void Response::assemble(std::string const& body_path) {
   std::memmove(&ResponseBase::buffer_resp[str.size()], buf, body_size);
   ResponseBase::size = str.size() + body_size;
   ResponseBase::buffer_resp[ResponseBase::size] = '\0';
-  WebServ::log.error() << ResponseBase::buffer_resp;
   WebServ::log.debug() << *this;
+  // WebServ::log.debug() << ResponseBase::buffer_resp;
 }
 
 void Response::process(void) {
   if (response_ready) {
-    WebServ::log.warning() << "response ready\n";
     set_statuscode(response_code);
     dispatch(response_path);
     return;

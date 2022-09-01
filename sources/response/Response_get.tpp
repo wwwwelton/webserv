@@ -34,7 +34,7 @@ int Response::validate_folder(void) {
   }
   else if (S_ISDIR(path_stat.st_mode)) {
     if (!location->autoindex) {
-      WebServ::log.warning() << "check autoindex config\n";
+      // WebServ::log.warning() << "check autoindex config\n";
       if (path == root)
         return NOT_FOUND;
       else
@@ -60,7 +60,7 @@ int Response::validate_index(void) {
     for (size_t i = 0; i < server->index.size(); i++) {
       std::string indexpath = root + "/" + server->index[i];
       if (!access(indexpath.c_str(), R_OK)) {
-        WebServ::log.warning() << "Redirected to: " << indexpath << "\n";
+        WebServ::log.debug() << "Redirected to: " << indexpath << "\n";
         response_path = indexpath;
         return OK;
       }

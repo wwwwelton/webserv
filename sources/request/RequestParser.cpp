@@ -489,7 +489,7 @@ void RequestParser::parse_header() {
   bytes_read = recv(fd, buffer, buffer_size, 0);
 
   check_read_value(bytes_read);
-  debug() << "bytes read: " << bytes_read << std::endl;
+  info() << "bytes read: " << bytes_read << std::endl;
 
   try {
     ParsingResult result = tokenize_header(buffer);

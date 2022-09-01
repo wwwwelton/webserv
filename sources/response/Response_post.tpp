@@ -93,7 +93,6 @@ int Response::_post(void) {
     postfile = open(postfilename.c_str(), O_CREAT | O_RDWR, 0666);
     if (postfile == -1)
       throw(std::exception());
-    WebServ::log.error() << "postfile opened\n";
   }
   WebServ::log.debug() << *this;
   std::vector<char> res;
@@ -121,8 +120,8 @@ int Response::_post(void) {
   unlink(postfilename.c_str());
   postfilename.clear();
   response_path = DFL_TMPFILE;
-  WebServ::log.warning() << "Response finished\n";
-  WebServ::log.warning() << response_path << "\n";
+  // WebServ::log.warning() << "Response finished\n";
+  // WebServ::log.warning() << response_path << "\n";
   response_ready = true;
   parser->finished = true;
   remove_tmp = true;
