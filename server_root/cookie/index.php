@@ -17,7 +17,13 @@
 
 	<?php
 	$cookie_name = "cookie";
-	$cookie_value = $_POST["cookie_value"];
+	if ($_SERVER["REQUEST_METHOD"] == "POST") {
+		$cookie_value = $_POST["cookie_value"];
+	}
+	else
+	{
+		$cookie_value = "";
+	}
 
 
 	if ($cookie_value) {

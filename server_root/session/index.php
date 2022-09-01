@@ -18,7 +18,13 @@
 	<?php
 	session_start();
 
-	$username = $_POST["username"];
+	if ($_SERVER["REQUEST_METHOD"] == "POST") {
+		$username = $_POST["username"];
+	}
+	else
+	{
+		$username = "";
+	}
 
 	if ($username) {
 		$_SESSION["username"] = $username;

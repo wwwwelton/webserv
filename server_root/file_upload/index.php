@@ -30,16 +30,15 @@
 	<h1 class="text-center p-4">File Upload 🆙</h1>
 
 	<?php
-
-	$target_dir = "uploads/";
-	$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
-
-	if (file_exists($target_file)) {
-		chmod($target_file, 0755);
-		unlink($target_file);
-	}
-
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
+		$target_dir = "uploads/";
+		$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+
+		if (file_exists($target_file)) {
+			chmod($target_file, 0755);
+			unlink($target_file);
+		}
+
 		if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
 			echo '<h1 id="pre_upload" class="text-center p-4"><a href="' . $target_file . '" target="_blank" role="button">' . basename($_FILES["fileToUpload"]["name"]) . '</a></h1>';
 		} else {
