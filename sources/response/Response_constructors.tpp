@@ -121,7 +121,7 @@ void Response::set_request(Request *_req) {
   }
   if (!path.compare(0, 6, "./http", 6)) {
     path = path.substr(2);
-    WebServ::log.error() << "New path: " << path << "\n";
+    // WebServ::log.error() << "New path: " << path << "\n";
   }
   method = _req->method;
   response_code = location->redirect.first;

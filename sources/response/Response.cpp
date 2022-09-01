@@ -135,7 +135,7 @@ void Response::cgi(std::string const &body_path, std::string const &bin) {
       perror("dup2");
       exit(1);
     }
-    WebServ::log.error() << body_path << "\n";
+    // WebServ::log.error() << body_path << "\n";
     execlp(bin.c_str(), bin.c_str(), body_path.substr(2).c_str(), NULL);
   }
   close(piper[0]);
