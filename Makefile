@@ -42,7 +42,6 @@ INC     = defines.hpp \
 		  ConfigHelper.hpp \
 
 OBJDIR  = objects
-INSTALL = /usr/bin/php-cgi
 OBJ     = $(SRC:%.cpp=$(OBJDIR)/%.o)
 DEPS    = $(SRC:%.cpp=$(OBJDIR)/%.d)
 
@@ -53,10 +52,10 @@ sources/utils
 
 all: $(NAME)
 
-$(NAME): $(INSTALL) $(OBJDIR) $(OBJ)
+$(NAME): $(OBJDIR) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
-$(INSTALL):
+dep:
 	which php-cgi || (sudo apt-get update && sudo apt-get install php-cgi)
 
 $(OBJDIR)/%.o: %.cpp
