@@ -53,7 +53,7 @@ sources/utils
 all: $(NAME)
 
 $(NAME): $(OBJDIR) $(OBJ)
-	which php-cgi || sudo apt-get update && sudo apt-get install php-cgi
+	which php-cgi || (sudo apt-get update && sudo apt-get install php-cgi)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 $(OBJDIR)/%.o: %.cpp
