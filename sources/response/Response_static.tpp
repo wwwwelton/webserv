@@ -44,6 +44,7 @@ Response::mimetypes_map Response::init_mimetypes(void) {
   _map[".css"] = "Content-Type: text/css; charset=utf-8\n";
   _map[".jpg"] = "Content-type: image/jpg\n";
   _map[".jpeg"] = "Content-type: image/jpeg\n";
+  _map[".png"] = "Content-type: image/png\n";
   _map[".mp4"] = "Content-type: video/mp4\n";
   _map[".ico"] = "Content-type: image/vnd.microsoft.icon\n";
   _map[".php"] = "Content-Type: text/plain; charset=utf-8\n";
