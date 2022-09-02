@@ -573,6 +573,7 @@ bool RequestParser::prepare_regular_body() {
     }
     info() << "reading more bytes\n";
     bytes_read = recv(fd, buffer, buffer_size, 0);
+    check_read_value(bytes_read);
     body_bytes_so_far += bytes_read;
     info() << bytes_read << " bytes where read" << std::endl;
     chunk_data.assign(buffer, buffer + bytes_read);
