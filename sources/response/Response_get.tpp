@@ -71,7 +71,7 @@ int Response::validate_index(void) {
       folder_request = true;
     }
     else if (errno == ENOENT)
-      return FORBIDDEN;
+      return NOT_FOUND;
     else if (errno == EACCES)
       return UNAUTHORIZED;
   }
