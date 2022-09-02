@@ -6,6 +6,7 @@
 //##############################################################################
 
 #pragma once
+#include <functional>
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
 
@@ -14,13 +15,13 @@
 #include <map>
 #include <string>
 
+bool lower_less(char c1, char c2) {
+  return std::tolower(c1) < std::tolower(c2);
+}
+
 struct Comparator {
   bool operator()(const std::string& s1, const std::string& s2) const {
-    std::string str1(s1.length(), ' ');
-    std::string str2(s2.length(), ' ');
-    std::transform(s1.begin(), s1.end(), str1.begin(), tolower);
-    std::transform(s2.begin(), s2.end(), str2.begin(), tolower);
-    return str1 < str2;
+    return std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), lower_less);
   }
 };
 
