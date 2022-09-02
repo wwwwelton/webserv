@@ -40,7 +40,7 @@
 		}
 
 		if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-			echo '<h1 id="pre_upload" class="text-center p-4"><a href="' . $target_file . '" target="_blank" role="button">' . basename($_FILES["fileToUpload"]["name"]) . '</a></h1>';
+			echo '<h1 id="pre_upload" class="text-center p-4"><a href="' . "/uploads" . '" target="_blank" role="button">' . basename($_FILES["fileToUpload"]["name"]) . '</a></h1>';
 		} else {
 			echo '<h1 id="pre_upload" class="text-center text-danger p-4">An error occurred when moving the file!</h1>';
 		}
