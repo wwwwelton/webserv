@@ -54,11 +54,12 @@ int Response::validate_folder(void) {
 
 int Response::validate_index(void) {
   // server->print();
-  if (path != originalroot && path[path.size() - 1] != '/')
-    return CONTINUE;
+  // if (path != originalroot && path[path.size() - 1] != '/')
+  //   return CONTINUE;
   if (path == root && location->index.size()) {
     for (size_t i = 0; i < location->index.size(); i++) {
       std::string indexpath = root + "/" + location->index[i];
+      WebServ::log.error() << indexpath << "\n";
       if (!access(indexpath.c_str(), R_OK)) {
         WebServ::log.debug() << "Redirected to: " << indexpath << "\n";
         response_path = indexpath;
