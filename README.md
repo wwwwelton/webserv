@@ -60,6 +60,6 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 ---
 
 Made by:
-João Rodriguez 👋 [See my github](https://github.com/VLN37)
-Paulo Santana 👋 [See my linkedin](https://www.linkedin.com/in/paulostn/)
-Welton Leite 👋 [See my linkedin](https://www.linkedin.com/in/welton-leite-b3492985/)
+João Rodriguez 👋 [See my github](https://github.com/VLN37)<br/>
+Paulo Santana 👋 [See my linkedin](https://www.linkedin.com/in/paulostn/)<br/>
+Welton Leite 👋 [See my linkedin](https://www.linkedin.com/in/welton-leite-b3492985/)<br/>
