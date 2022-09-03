@@ -196,7 +196,8 @@ void WebServ::_respond(int i) {
     pollfds[i].events = POLLIN;
     parser.reset();
     response.reset();
-    // end_connection(i);
+    if (response.response_code != 200)
+      end_connection(i);
   }
 }
 

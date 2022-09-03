@@ -60,7 +60,6 @@ private:
   static status_map      init_status_map();
   static mimetypes_map   init_mimetypes();
 
-  int           response_code;
   int           pid;
   int           io[2];
   size_t        thisid;
@@ -127,6 +126,7 @@ public:
   bool           incorrect_path;
   bool           path_ends_in_slash;
   std::string    response_path;
+  int            response_code;
 
   ~Response(void);
   Response(Request *req, Server *_server);
